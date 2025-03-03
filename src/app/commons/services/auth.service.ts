@@ -69,6 +69,15 @@ export class AuthService {
     }
     return this.http.post(`${this.apiUrl}/send-otp`, user);
   }
+
+  verifyOtp(phoneNumber: string, otp: string) {
+    const otpReq = {
+      phoneNumber,
+      otp
+    }
+    return this.http.post(`${this.apiUrl}/verify-otp`, otpReq);
+  }
+
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);
     localStorage.removeItem(STORAGE.ME);

@@ -1,0 +1,82 @@
+.page {
+    background: #c89d1d;
+    height: 100vh;
+    text-align: center;
+    padding: 40px 10px;
+    .logo {
+        width: 160px;
+        margin: 20% auto;
+    }
+
+    .text {
+        h1 {
+            color: #FFF;
+            font-weight: bold;
+            line-height: 1;
+            font-size: 40px;
+        }
+
+        p {
+            margin: 0;
+            color: #ebebeb;
+
+        }
+    }
+  
+    .buttons {
+        text-align: center;
+        ion-button.button-solid  {
+            margin: 40px auto;
+            width: 60%;
+            --background: #fff;
+            color: #580404;
+            font-weight: bold;
+        }
+    }
+
+    ion-button.ios.button.button-clear {
+        background: none;
+        color: white;
+    }
+
+    .errors {
+        color: #af4040;
+    }
+ 
+
+ 
+    
+
+}
+
+
+
+
+.otp {
+    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    h1 {
+        font-size: 21px;
+        font-weight: bold;
+        color: white;
+        padding-bottom: 20px;
+    }
+}
+  
+ 
+  .customBtn{
+    border-radius:0px;
+    padding:10px;
+  }
+  
+  ion-input {
+    display:inline-block;
+    background: white;
+    border-radius: 6px;
+    margin: 0 2px;
+    width:40px;
+    height:40px;
+    text-align:center;
+  }
+

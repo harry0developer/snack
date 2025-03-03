@@ -1,0 +1,52 @@
+
+
+<ion-header [translucent]="true">
+ 
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+  
+  
+    <!-- <div class="text">
+      <h1>Welcome</h1>
+      <p>Match, meet, mingle</p>
+    </div> -->
+  
+    <div class="container">
+      <div class="row justify-content-md-center">
+          <div class="col-md-4 text-center">
+            <div class="row">
+              <div class="col-sm-12 mt-5 otp">
+                <h1>Enter OTP</h1>
+                  <form class="mt-5">
+                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(1)"></ion-input>
+                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(2)"></ion-input>
+                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(3)"></ion-input>
+                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(4)"></ion-input>
+                    <!-- <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(5)"></ion-input>
+                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(6)"></ion-input> -->
+                  </form>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+
+   
+  
+    <div class="buttons">
+      <ion-button expand="block" class="btn" (click)="verifyOtp()">Verify</ion-button>
+
+      <ion-button fill="clear" (click)="goToSignIn()">Go to login</ion-button>
+  
+    </div>
+  </div>
+</ion-content>
+
+

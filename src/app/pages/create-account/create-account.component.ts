@@ -36,10 +36,12 @@ export class CreateAccountComponent  implements OnInit {
   }
 
   sendOtp() {
-    this.authService.sendOtp(this.phoneNumber).subscribe((res) => {
-      console.log("Send ", res);
-      
-    },err => console.log(err))
+          this.authService.storageSave("phone", this.phoneNumber)
+this.router.navigateByUrl('otp')
+    // this.authService.sendOtp(this.phoneNumber).subscribe((res) => {
+    //   console.log("Send ", res);
+    //   this.authService.storageSave("phone", this.phoneNumber)
+    // },err => console.log(err))
   }
 
 

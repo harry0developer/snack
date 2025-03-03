@@ -15,6 +15,10 @@ const routes: Routes = [
     path: 'create-account',
     loadChildren: () => import('./pages/create-account/create-account.module').then(m => m.CreateAccountComponentModule)
   },
+  {
+    path: 'otp',
+    loadChildren: () => import('./pages/otp/otp.module').then(m => m.OtpComponentModule)
+  },
   { path: 'protected', component: ProtectedComponent },
   {
     path: 'chat/:uid',

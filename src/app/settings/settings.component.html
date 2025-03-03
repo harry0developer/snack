@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar> 
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()">Done</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  
+  <div class="container">
+ 
+    <div class="settings">
+      <ion-item-divider class="divider">
+        <ion-label>My Info</ion-label>
+      </ion-item-divider>
+
+      <ion-item detail="false">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-label>
+          <p class="title">My Email Address</p>
+          <p>{{user?.email}}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item detail="false">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-label>
+          <p class="title">My Gender</p>
+          <p>{{user?.gender}}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item detail="false">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-label>
+          <p class="title">Date Of Birth</p>
+          <p>{{dateOfBirth}}</p>
+        </ion-label>
+      </ion-item>
+    </div>
+
+    <div class="settings">
+      <ion-item-divider class="divider">
+        <ion-label>My Preference</ion-label>
+        <ion-icon slot="end" name="create-outline" (click)="openPreferencesModal()"></ion-icon>
+      </ion-item-divider>
+ 
+      <ion-item>
+        <ion-icon slot="start" name="heart-outline"></ion-icon>
+        <ion-label>
+          <p class="title">Looking for</p>
+          <ul class="looking-for">
+            <li *ngFor="let item of user?.want">{{item}}</li>
+          </ul>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-icon slot="start" name="heart-outline"></ion-icon>
+        <ion-label>
+          <p class="title">With</p>
+          <ul class="looking-for">
+            <li *ngFor="let item of user.with">{{item}}</li>
+          </ul>
+        </ion-label>
+      </ion-item>
+    </div>
+ 
+  
+    
+    <div class="settings">
+      <ion-item-divider class="divider">
+        <ion-label>General</ion-label>
+      </ion-item-divider>
+      
+      <ion-item detail="true" (click)="openSupportModal()">
+        <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+        <ion-label text-wrap>
+          <p class="title">Help & Support</p>
+          <p>How can we help you?</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item detail="true" (click)="openSafetyTipsModal()">
+        <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+        <ion-label text-wrap>
+          <p class="title">Safety tips</p>
+          <p>Do's and don'ts</p>
+        </ion-label>
+      </ion-item> 
+
+      <ion-item detail="true" (click)="openTermsAndConditionsModal()">
+        <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+        <ion-label text-wrap>
+          <p class="title">Terms of service</p>
+        </ion-label>
+      </ion-item>
+    </div>
+
+    
+    <div class="settings">
+      <ion-item-divider class="divider">
+        <ion-label>Settings</ion-label>
+      </ion-item-divider>
+      
+      <ion-item detail="true" (click)="presentActionSheet()">
+        <ion-icon slot="start" name="settings-outline"></ion-icon>
+        <ion-label text-wrap>
+          <p class="title">Deactivate Account</p>
+          <p>You can reactivate your account by logging in</p>
+        </ion-label>
+      </ion-item>
+      <ion-item detail="true" (click)="logout()">
+        <ion-icon slot="start"  name="log-out-outline"></ion-icon>
+        <ion-label >
+          <p class="title">Logout</p>
+        </ion-label>
+      </ion-item>
+    </div>
+  </div>
+ 
+</ion-content>

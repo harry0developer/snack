@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>Welcome</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()" [strong]="true">Apply</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="preferences">
+  <ion-list [inset]="true">
+    <ion-card>
+      <ion-item class="title" [button]="true">
+        <ion-label>Location</ion-label>
+        <div slot="end">Midrand, Gauteng</div>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item class="title">
+        <ion-label>Distance</ion-label>
+        <div slot="end">{{distanceRange.value}} km</div>
+      </ion-item>
+      
+      <ion-item>
+        <ion-range aria-label="distance" 
+          [min]="distanceRange.min" 
+          [max]="distanceRange.max"
+          [pin]="distanceRange.pin"
+          [value]="distanceRange.value"
+          (ionChange)="handleDistanceRangeChange($event)">
+          <span slot="start">{{distanceRange.min}}</span>
+          <span slot="end">{{distanceRange.max}}</span>
+        </ion-range>
+      </ion-item>
+<!-- 
+      <ion-item>
+        <ion-label>
+          Show profiles beyond my distance range when I ran out of profiles to see.
+        </ion-label>
+        <ion-toggle (ionChange)="distanceOutOfRangeChange($event)" slot="end" class="ion-text-wrap"></ion-toggle>
+      </ion-item> -->
+    </ion-card>
+
+    <ion-card>
+      <ion-item class="title"> 
+        <ion-label>Age Range</ion-label>
+        <div slot="end">{{ageRange.lower}} - {{ageRange.upper}}</div>
+      </ion-item>
+      
+      <ion-item>
+        <ion-range aria-label="distance" 
+          [min]="ageRange.min" 
+          [max]="ageRange.max"
+          [pin]="ageRange.pin"
+          [dualKnobs]="true" 
+          [value]="{lower: ageRange.lower, upper: ageRange.upper }"
+          (ionChange)="handleAgeRangeChange($event)">
+          <span slot="start">{{ageRange.min}}</span>
+          <span slot="end">{{ageRange.max}}</span>
+        </ion-range>
+      </ion-item>
+      
+      <!-- <ion-item>
+        <ion-label>
+          Show profiles beyond my range when I ran out of profiles to see.
+        </ion-label>
+        <ion-toggle (ionChange)="profileOutOfRangeChange($event)" slot="end" class="ion-text-wrap"></ion-toggle>
+      </ion-item> -->
+    </ion-card>
+
+    <ion-card>
+      <ion-item class="title">
+        <ion-label>Minimum number of photos </ion-label>
+        <div slot="end">{{minNumberOfPhotos.value}} </div>
+      </ion-item>
+      <ion-item>
+        <ion-range aria-label="distance" 
+          [min]="minNumberOfPhotos.min" 
+          [max]="minNumberOfPhotos.max"
+          [pin]="minNumberOfPhotos.pin"
+          [value]="minNumberOfPhotos.value"
+          (ionChange)="handleMinNumberOfPhotoChange($event)">
+          <span slot="start">{{minNumberOfPhotos.min}}</span>
+          <span slot="end">{{minNumberOfPhotos.max}}</span>
+        </ion-range>
+      </ion-item>
+    </ion-card>
+
+  </ion-list>
+
+</ion-content>

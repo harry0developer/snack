@@ -1,0 +1,61 @@
+
+
+<ion-header [translucent]="true">
+ 
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+  
+  
+    <div class="text">
+      <h1>Welcome</h1>
+      <p>Match, meet, mingle</p>
+    </div>
+  
+    <div class="form-container">
+      <!-- <ion-card>
+        <ion-item>
+          <ion-input [(ngModel)]="username" placeholder="Email address"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="name"  placeholder="Name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="dob"  placeholder="Date of birth"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="password" type="password" placeholder="Password"></ion-input>
+        </ion-item>
+      </ion-card> -->
+
+
+      <ion-card>
+        <ion-item>
+          <ion-input [(ngModel)]="phoneNumber" type="text" placeholder="Phone number"></ion-input>
+        </ion-item>
+      </ion-card>
+
+      <div class="errors">
+        <p>{{error}}</p>
+      </div>
+    </div>
+
+
+   
+  
+    <div class="buttons">
+      <!-- <ion-button expand="block" [disabled]="!username || !password || !name || !dob" class="btn" (click)="createAccount()">Create Account</ion-button> -->
+      <ion-button expand="block" class="btn" (click)="sendOtp()">Create Account</ion-button>
+
+      <ion-button fill="clear" (click)="goToSignIn()">Do not have an account? Signup</ion-button>
+  
+    </div>
+  </div>
+</ion-content>
+
+

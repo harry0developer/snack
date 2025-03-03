@@ -1,0 +1,47 @@
+
+
+<ion-header [translucent]="true">
+ 
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+  
+  
+    <div class="text">
+      <h1>Welcome</h1>
+      <p>Match, meet, mingle</p>
+    </div>
+  
+    <div class="form-container">
+      <ion-card>
+        <ion-item>
+          <ion-input [(ngModel)]="username" placeholder="Email address"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="password" type="password" placeholder="Password"></ion-input>
+        </ion-item>
+      </ion-card>
+
+      <div class="errors">
+        <p>{{error}}</p>
+      </div>
+    </div>
+
+
+   
+  
+    <div class="buttons">
+      <ion-button expand="block" class="btn" (click)="login()">Login</ion-button>
+  
+      <ion-button fill="clear" (click)="goToCreateAccount()">Do not have an account? Signup</ion-button>
+  
+    </div>
+  </div>
+</ion-content>
+
+

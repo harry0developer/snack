@@ -1,0 +1,25 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
+    <ion-title class="title" text-center>
+      Chats
+    </ion-title>
+
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list lines="none" class="tab2">
+    <ion-card  *ngFor="let user of users; let i = index">
+      <ion-item [button]="true" (click)="openChats(user)">
+        <ion-avatar slot="start" >
+          <img [alt]="user?.name" [src]="img" />
+        </ion-avatar>  
+        <ion-label>
+          {{user?.name}}
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </ion-list> 
+
+</ion-content>

@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{user?.name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="imessage" *ngFor="let msg of messages">
+    <div class="from-me-date" *ngIf="isMessageFromMe(msg)">{{msg.timestamp}}</div>
+    <p class="from-me" *ngIf="isMessageFromMe(msg)"> {{msg.message}} </p>
+
+    <div class="from-them-date" *ngIf="!isMessageFromMe(msg)">{{msg.timestamp}}</div>
+    <p class="from-them" *ngIf="!isMessageFromMe(msg)"> {{msg.message}} </p>
+  </div>
+
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-item>
+      <ion-input [(ngModel)]="newMessage" placeholder="Type a message"></ion-input>
+      <ion-button (click)="sendMessage()">Send</ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

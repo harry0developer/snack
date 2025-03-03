@@ -1,0 +1,26 @@
+<div class="home">
+
+  <div class="logo" >
+    <img src="assets/brand/logo.svg" alt="">
+  </div>
+
+
+  <div class="text">
+    <h1>Welcome</h1>
+    <p>Match, meet, mingle</p>
+  </div>
+ 
+
+  <div class="buttons">
+    <ion-button id="open-modal" expand="block">Open Sheet Modal</ion-button>
+
+    <ion-button expand="block" class="btn" id="open-modal">Sign in</ion-button>
+    <ion-button expand="block" class="btn" (click)="goToCreateAccount()">Create account</ion-button>
+  </div>
+
+  <ion-modal trigger="open-modal" [initialBreakpoint]="1" [breakpoints]="[0, 1]">
+    <ng-template>
+      <div class="block">Block of Content</div>
+    </ng-template>
+  </ion-modal>
+</div>

@@ -1,0 +1,81 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
+    <ion-title class="title" text-center>
+      Users
+    </ion-title>
+    <ion-buttons slot="end">
+       <ion-button (click)="openModal()">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true"> 
+  <div class="center" *ngIf="showNoMoreUsers">
+    <app-no-users (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
+  </div>
+
+  <div class="center" *ngIf="loadingUsers">
+    <app-loading class="loading-spinner"></app-loading>
+  </div>
+
+  <div class="card-container" *ngIf="!showNoMoreUsers">
+    <div *ngFor="let card of swipeCards; let i = index" class="card" [attr.data-index]="i">
+      <ion-card class="swipe-card">
+        <div class="scrollable">
+          <div class="container">
+            <div class="panel" *ngFor="let img of card.images; let i = index">
+              <img [src]="img" alt="">
+              <div class="user-info" *ngIf="card.name && i == 0">
+                <h1>
+                  {{card.name}} 
+                  <span class="status">.</span>
+                  <span class="age">{{getAge(card.dob)}} </span>
+                </h1>
+               
+                <p>
+                  <ion-icon name="male-female-outline"></ion-icon>
+                  {{card.gender}} 
+                </p>
+                <p>
+                  <ion-icon name="location-outline"></ion-icon>
+                  {{card.location}}
+                </p>
+              </div>
+
+              <div class="user-info" *ngIf="card.about && card.about && i == 1">
+                <h1>{{card.name}}</h1>
+                <p class="title">
+                  <ion-icon name="person-outline"></ion-icon>
+                  About
+                </p>
+                <ion-chip [outline]="true"> {{card.about.race}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.about.bodyType}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.about.sexualOrientation}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.about.height}} </ion-chip>
+              </div>
+
+              <div class="user-info" *ngIf="card.interests  && card.interests.length > 0 && i == 2">
+                <h1>{{card.name}}</h1>
+                <p class="title">
+                  <ion-icon name="beer-outline"></ion-icon>
+                  Interests
+                </p>
+                <ion-chip [outline]="true" *ngFor="let in of card.interests"> {{in}} </ion-chip> 
+              </div>
+ 
+            </div>
+          </div>
+        </div>
+      </ion-card>
+    </div>
+  </div>
+
+  <div class="actions">
+    <ion-icon *ngIf="opacityHeart" [style.opacity]="opacityHeart" class="left" name="close-circle-outline"></ion-icon>
+    <ion-icon *ngIf="opacityClose" [style.opacity]="opacityClose" class="right" name="heart-outline"></ion-icon>
+  </div>
+</ion-content>
+
+ 

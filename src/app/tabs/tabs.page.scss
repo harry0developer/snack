@@ -1,0 +1,15 @@
+::ng-deep {
+
+    ion-tab-bar {
+        border: none;
+    } 
+
+    ion-tab-button {
+        background-color: #2F184B;
+        color:white;
+    }
+
+    .tab-selected {
+        color: #6c41a5;
+    }
+}

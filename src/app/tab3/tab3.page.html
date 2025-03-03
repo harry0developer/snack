@@ -1,0 +1,32 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
+    <ion-title class="title" text-center>
+      Profile
+    </ion-title>
+    <ion-buttons slot="end">
+       <ion-button (click)="openModal()">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="profile-page">
+ <div class="top">
+    <ion-avatar>
+      <img alt="Silhouette of a person's head" src="assets/profiles/1a.jpg" />
+    </ion-avatar>
+    <h1>{{me.name}}</h1>
+    <p>{{me.dob}}</p>
+ </div>
+
+ 
+ <div class="images-container container">
+    <div class="pins">
+      <div class="pin" *ngFor="let img of images">
+          <img [src]="img" >
+      </div>
+    </div>
+  </div>
+
+</ion-content>

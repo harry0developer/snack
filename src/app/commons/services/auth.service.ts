@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { STORAGE } from '../conts';
+import { TempUser, User } from '../model';
 
 @Injectable({
   providedIn: 'root',
@@ -56,19 +57,14 @@ export class AuthService {
     });
   }
 
-
-  sendOtp(phoneNumber: string) {
-    const user = {
-      username: 'me@test.com',
-      password: "qwerty",
-      name: "Harry Smith",
-      dob: "12/12/1995",
-      phoneNumber,
-      otp: "",
-      otpExpiresAt: ""
-    }
-    return this.http.post(`${this.apiUrl}/send-otp`, user);
+  sendOtp(otpRequest: any) {
+    return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);
   }
+
+  createAccount(user: User) {
+    return this.http.post(`${this.apiUrl}/create-account`,  user);
+  }
+
 
   verifyOtp(phoneNumber: string, otp: string) {
     const otpReq = {
@@ -77,6 +73,8 @@ export class AuthService {
     }
     return this.http.post(`${this.apiUrl}/verify-otp`, otpReq);
   }
+
+ 
 
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);

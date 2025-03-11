@@ -1,7 +1,7 @@
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CreateAccountComponentRoutingModule } from './create-account-routing.module';
 import { CreateAccountComponent } from './create-account.component';
@@ -11,6 +11,7 @@ import { CreateAccountComponent } from './create-account.component';
     IonicModule,
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     CreateAccountComponentRoutingModule
   ],
   declarations: [CreateAccountComponent]

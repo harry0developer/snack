@@ -7,46 +7,43 @@
 <ion-content [fullscreen]="true">
   <div class="page">
 
-    <div class="logo" >
-      <img src="assets/brand/logo.svg" alt="">
+  
+    <div class="text">
+      <h1>Verify OTP</h1>
+      <p>Please enter the OTP code sent to {{phoneNumber}}</p>
     </div>
   
-  
-    <!-- <div class="text">
-      <h1>Welcome</h1>
-      <p>Match, meet, mingle</p>
-    </div> -->
-  
-    <div class="container">
-      <div class="row justify-content-md-center">
-          <div class="col-md-4 text-center">
-            <div class="row">
-              <div class="col-sm-12 mt-5 otp">
-                <h1>Enter OTP</h1>
-                  <form class="mt-5">
-                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(1)"></ion-input>
-                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(2)"></ion-input>
-                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(3)"></ion-input>
-                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(4)"></ion-input>
-                    <!-- <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(5)"></ion-input>
-                    <ion-input class="otp" type="text" maxlength="1" (ionInput)="digitValidate($event)" (keyup)="tabChange(6)"></ion-input> -->
-                  </form>
-              </div>
-            </div>
-          </div>
+    <form [formGroup]="otpFG">
+      <div class="otp-container">
+        <ng-otp-input formControlName="otpControl" 
+        (onInputChange)="onOtpChange($event)"
+         [config]="{ length: 6, allowNumbersOnly: true }"></ng-otp-input>
       </div>
-    </div>
+      
+      <div class="error-message" >
+        <p>{{error}}</p>
+      </div>
+      
+     
 
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="resendOTP()">
+          Resend OTP
+        </ion-button>
 
-   
-  
-    <div class="buttons">
-      <ion-button expand="block" class="btn" (click)="verifyOtp()">Verify</ion-button>
+        <ion-button class="solid primary" [disabled]="!otpFG.valid" shape="round" (click)="verifyOtp()">
+          Verify OTP
+        </ion-button>
+      </div>
 
-      <ion-button fill="clear" (click)="goToSignIn()">Go to login</ion-button>
-  
-    </div>
+    </form>
   </div>
 </ion-content>
+
+
+<ion-footer>
+  <ion-button fill="clear" (click)="goToSignIn()">Go to login</ion-button>
+</ion-footer>
+
 
 

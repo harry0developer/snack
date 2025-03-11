@@ -5,6 +5,7 @@ import { AuthService } from '../commons/services/auth.service';
 import { STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
 import moment from 'moment';
+import { User } from '../commons/model';
  
 @Component({
   selector: 'app-tab1',
@@ -29,56 +30,108 @@ export class Tab1Page implements AfterViewInit, OnInit{
   loadingUsers: boolean = false;
 
 
-  swipeCards = [
+  swipeCards: User[] = [
     {
+      _id: '',
       name: 'Jon Doe',
       dob: '12/12/1991',
       gender: 'Male',
-      location: 'Midrand',
-      interests: ['tatoo', 'beard', 'ass', 'boobs', 'eyes', 'lips'],
-      about: {
-        race: 'Black',
-        bodyType: 'Slim',
-        sexualOrientation: 'Straight',
-        height: '1.66m'
-      }, 
-      images: ['assets/profiles/1a.jpg', 'assets/profiles/1b.jpg', 'assets/profiles/1c.jpg']
+      age: 34,
+      location: { name: 'Midrand', lat: -25.5999, lng: 28.0007 },
+      images: ['assets/profiles/1a.jpg', 'assets/profiles/1b.jpg', 'assets/profiles/1c.jpg'],
+      phoneNumber: '+27829390061',
+      username: '+27829390061',
+      password: 'qwerty',
+      ethnicity: 'Black',
+      bodyType: 'Slim',
+      sexualOrientation: 'Straight',
+      interests: ['Sky diving'],
+      preferences: {
+        ethnicity: ['Black', 'Asian'],
+        age: { lower: 18, upper: 27 },
+        want: ['One night stand', 'No string attached'],
+        with: ['Female'],
+        distance: 100
+      }
     },
 
     {
-      name: 'Kim Lu',
-      dob: '12/12/1991',
-      gender: 'Male',
-      location: 'Midrand',
-      interests: ['tatoo', 'beard', 'ass', 'boobs', 'eyes', 'lips'],
-      about: {
-        race: 'Black',
-        bodyType: 'Slim',
-        sexualOrientation: 'Straight',
-        height: '1.66m'
-      }, 
-      images: ['assets/profiles/2a.jpg', 'assets/profiles/2b.jpg', 'assets/profiles/2c.jpg']
-    },  
+      _id: '',
+      name: 'Keem Lue ',
+      dob: '04/04/1998',
+      gender: 'Female',
+      age: 34,
+      location: { name: 'South Gate', lat: -26.5999, lng: 28.0007 },
+      images: ['assets/profiles/2a.jpg', 'assets/profiles/2b.jpg', 'assets/profiles/2c.jpg'],
+      phoneNumber: '+278100099991',
+      username: '+278100099991',
+      password: 'qwerty',
+   
+      ethnicity: 'Asian',
+      bodyType: 'Slim',
+      sexualOrientation: 'Straight',
+      interests: ['Sky diving'],
+     
+      preferences: {
+        ethnicity: ['Black', 'Asian'],
+        age: { lower: 18, upper: 55 },
+        want: ['No string attached'],
+        with: ['Male'],
+        distance: 55
+      }
+    },
     
     {
-      name: 'Mandy Will',
-      dob: '12/12/1991',
+      _id: '',
+      name: 'Steve Madden',
+      dob: '19/12/2000',
       gender: 'Male',
-      location: 'Midrand',
-      interests: ['tatoo', 'beard', 'ass', 'boobs', 'eyes', 'lips'],
-      about: {
-        race: 'Black',
+      age: 34,
+      location: { name: 'Benoni', lat: -25.4444, lng: 27.9999 },
+      images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
+      phoneNumber: '+277400018800',
+      username: '+277400018800',
+      password: 'qwerty',
+        ethnicity: 'White',
         bodyType: 'Slim',
         sexualOrientation: 'Straight',
-        height: '1.66m'
-      }, 
-      images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg']
+        interests: ['Sky diving'],
+      preferences: {
+        ethnicity: ['Black', 'Asian'],
+        age: { lower: 18, upper: 27 },
+        want: ['One night stand', 'No string attached'],
+        with: ['Female'],
+        distance: 67
+      }
+    },
+    {
+      _id: '',
+      name: 'Page Book',
+      dob: '19/12/1999',
+      gender: 'Female',
+      age: 34,
+      images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
+      phoneNumber: '+277400018800',
+      username: '+277400018800',
+      password: 'qwerty',
+        ethnicity: 'White',
+        bodyType: 'Slim',
+        sexualOrientation: 'Straight',
+        interests: ['Sky diving'],
+      preferences: {
+        ethnicity: ['Black', 'Asian'],
+        age: { lower: 18, upper: 27 },
+        want: ['One night stand', 'No string attached'],
+        with: ['Female'],
+        distance: 67
+      }
     }
   ];
 
 
   cards = [
     {
+      _id: '',
       name: 'Shae Blue',
       age: 22,
       gender: 'Female',
@@ -98,7 +151,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
           img: 'assets/profiles/1b.jpg',
           title: 'About',
           about: {
-            race: 'black',// white, indian, colourd
+            ethnicity: 'black',// white, indian, colourd
             body: 'slim', //thick, slim-thick, bbw,
             skintone: 'melanin', //light-skin, white 
             orientation: 'straight' // bi, gay, lesbian, trans
@@ -116,6 +169,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     },
 
     {
+      _id: '',
       name: 'Bruce Wale',
       age: 37,
       gender: 'Male',
@@ -135,7 +189,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
           img: 'assets/profiles/2b.jpg',
           title: 'About',
           about: {
-            race: 'black',// white, indian, colourd
+            ethnicity: 'black',// white, indian, colourd
             body: 'slim', //thick, slim-thick, bbw,
             skintone: 'melanin', //light-skin, white 
             orientation: 'straight' // bi, gay, lesbian, trans
@@ -153,6 +207,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     },
 
     {
+      _id: '',
       name: 'Nancy Fine-One',
       age: 19,
       gender: 'Female',
@@ -172,7 +227,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
           img: 'assets/profiles/3b.jpg',
           title: 'About',
           about: {
-            race: 'black',// white, indian, colourd
+            ethnicity: 'black',// white, indian, colourd
             body: 'slim', //thick, slim-thick, bbw,
             skintone: 'melanin', //light-skin, white 
             orientation: 'straight' // bi, gay, lesbian, trans

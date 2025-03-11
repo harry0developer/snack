@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { STORAGE } from 'src/app/commons/conts';
+import { Country } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
+import { CountryCodeComponent } from '../country-code/country-code.component';
 
 @Component({
   selector: 'app-login',
@@ -15,16 +19,69 @@ export class LoginComponent  implements OnInit {
   username: string = '';
   password: string = '';
   error: string = '';
+  dob: string = '';
+  name: string = '';
+  code: string = '';
 
-  constructor(private router: Router, private authService: AuthService) { }
+  selectedCountryCode: string = '';
+  validations_form!: FormGroup;
+  phoneNumberFormGroup!: FormGroup;
+
+ 
+
+  phoneFormValidationMessages = {
+    'phone': [
+     { type: 'required', message: 'Phone number is required.' },
+     { type: 'minlength', message: 'Phone number must be at least 9 characters long.' }
+    ],
+    'passcode': [
+     { type: 'required', message: 'Passcode is required.' },
+     { type: 'minlength', message: 'Passcode must be 6 characters long.' },
+     { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
+
+    ]
+  };
+ 
+  country: Country = {
+    name: "South Africa",
+    flag: "🇿🇦",
+    code: "ZA",
+    dialCode: "+27"
+  };
+
+constructor(
+    private authService: AuthService, 
+    private formBuilder: FormBuilder,
+
+    private modalCtrl: ModalController,
+    private router: Router) {}
 
   ngOnInit() {
-    const token = this.authService.getToken();
+    console.log();
 
-    if(token) {
-      this.router.navigateByUrl('tabs/tab1');
-    }
+    this.phoneNumberFormGroup = this.formBuilder.group({
+      phone: new FormControl('', Validators.compose([
+        Validators.required,
+        Validators.minLength(9),
+      ])),
+      code: new FormControl('', Validators.compose([
+        Validators.required
+      ])),
+      passcode: new FormControl('', Validators.compose([
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(6),
+      ]))
+    });
   }
+
+  // ngOnInit() {
+  //   const token = this.authService.getToken();
+
+  //   if(token) {
+  //     this.router.navigateByUrl('tabs/tab1');
+  //   }
+  // }
 
   login() {
     this.authService.login(this.username, this.password).subscribe(
@@ -40,6 +97,22 @@ export class LoginComponent  implements OnInit {
       }
     );
   }
+
+  async openCountryCodeModal() {
+      const modal = await this.modalCtrl.create({
+        component: CountryCodeComponent,
+        componentProps: {
+          "code": this.code
+        }
+      });
+      modal.present();
+      const { data, role } = await modal.onWillDismiss();
+      if (role === 'save') {
+        console.log("applied", data);
+        this.selectedCountryCode = data.dial_code;
+      }
+    }
+    
   goToCreateAccount() {
     this.router.navigateByUrl('create-account');
   }

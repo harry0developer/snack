@@ -1,0 +1,73 @@
+
+
+<ion-header [translucent]="true">
+ 
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+<!-- 
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+   -->
+  
+    <!-- <div class="text">
+      <h1>What's your name </h1>
+      <p>Other users will see this</p>
+    </div> -->
+  
+    <form class="profile-form-container" [formGroup]="profileFormGroup">
+     
+      <div class="info" *ngIf="step === 1">
+        <ion-icon name="fitness-outline"></ion-icon>
+        <h1>Name</h1>
+        <ion-item>
+          <ion-input placeholder="name" formControlName="name"></ion-input>
+        </ion-item>
+     </div>
+
+      <div class="info" *ngIf="step === 2">
+        <ion-icon name="male-female-outline"></ion-icon>
+        <h1>Gender</h1>
+        <ion-item>
+        </ion-item>
+     </div>
+
+      <div class="info" *ngIf="step === 3">
+        <ion-icon name="egg-outline"></ion-icon>
+        <h1>Date of birth</h1>
+        <ion-item>
+          <ion-input placeholder="name" formControlName="name"></ion-input>
+        </ion-item>
+        
+     </div>
+      <!-- <ion-input type="text" placeholder="name" formControlName="name"></ion-input> -->
+<!--             
+      <div class="validation-errors">
+        <ng-container *ngFor="let validation of profileFormGroup.name">
+          <div class="error-message"
+            *ngIf="profileFormGroup.get('name')?.hasError(validation.type) && (profileFormGroup.get('name')?.dirty || profileFormGroup.get('name')?.touched)">
+            {{ validation.message }}
+          </div>
+        </ng-container>
+      </div>  -->
+
+      <div class="action-buttons">
+        <ion-button expand="block" class="btn-primary" (click)="next()">Next</ion-button>
+      </div>
+
+    </form>
+     
+  </div>
+
+
+
+  
+</ion-content>
+
+<ion-footer>
+  <ion-button fill="clear" (click)="goToSignIn()">Do not have an account? Signup</ion-button>
+</ion-footer>
+
+

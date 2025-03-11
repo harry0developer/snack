@@ -81,9 +81,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
 console.log("ENV ", dotenv.config());
-
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -164,54 +162,95 @@ app.get('/api/protected', (req, res) => {
 });
 
 
-//TWILLIO CODE 
 app.post('/api/send-otp', async (req, res) => {
-  const { phoneNumber } = req.body;
-
-  // Generate OTP (simple 6-digit random number)
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-  // Set expiration time for OTP (5 minutes)
   const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const { phoneNumber, type }= req.body;
+  
+  try {
+    const userExists = await User.findOne({ phoneNumber, type });
+    if (userExists) {
+      return res.status(500).json({ message: 'User already exists' });
+    }
+    return res.status(200).json({phoneNumber, otp, otpExpiresAt});
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+});
+
+
+app.post('/api/create-account', async (req, res) => { 
+  const { username, password } = req.body;
+  const userExists = await User.findOne({ username });
+  if (userExists) {
+    return res.status(400).json({ message: 'User already exists' });
+  }
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Create new user
+  const newUser = new User({
+    ...req.body,
+    password: hashedPassword
+  });
 
   try {
-    // Save the phone number and OTP in the database
-    let user = await User.findOne({ phoneNumber });
+    await newUser.save();
+    return res.send(user);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+app.post('/api/verify-otp', async (req, res) => {
+  const { phoneNumber, otp } = req.body;
+
+  try {
+    const user = await User.findOne({ phoneNumber });
+
+    console.log("Found user ", user);
+    
     if (!user) {
-      user = new User({ ...req.body });
-    } else {
-      user.otp = otp;
-      user.otpExpiresAt = otpExpiresAt;
+      return res.status(400).json({ message: 'User not found' });
     }
-    await user.save();
-
-    // Send OTP to the user's phone number
-    await sendOTP(phoneNumber, otp);
-
-    res.status(200).json({ message: 'OTP sent successfully' });
+    if (user.otp === otp && new Date() < user.otpExpiresAt) {
+      await User.findOneAndUpdate({phoneNumber}, {verified: true });
+      res.status(200).json({ message: 'OTP verified successfully' });
+    } else {
+      res.status(400).json({ message: 'Invalid or expired OTP: '+otp+ ' user otp: '+ user.otp });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// Route to verify OTP
-app.post('/api/verify-otp', async (req, res) => {
-  const { phoneNumber, otp } = req.body;
 
+//TWILLIO CODE 
+app.post('/api/send-twilio-otp', async (req, res) => {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const { username, password }= req.body;
   try {
-    // Find the user by phone number
-    const user = await User.findOne({ phoneNumber });
+    let user = await User.findOne({ username });
+    console.log("new user", user);
+    
+    if (user && user.verified) {
+      res.status(500).json({ message: 'Phone number already registered. Please login'});
+    } else if(user && !user.verified) {
+      await User.findOneAndUpdate({username}, {password, otp, otpExpiresAt })
+      res.status(200).json({ message: 'OTP sent successfully: OTP 2:' + otp });
 
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    // Check if OTP is correct and not expired
-    if (user.otp === otp && new Date() < user.otpExpiresAt) {
-      res.status(200).json({ message: 'OTP verified successfully' });
-    } else {
-      res.status(400).json({ message: 'Invalid or expired OTP' });
+    }else {
+      user = new User({ ...req.body, otpExpiresAt, otp });
+      await user.save();
+      res.status(200).json({ message: 'OTP sent successfully: OTP:' + otp });
     }
   } catch (error) {
     console.error(error);

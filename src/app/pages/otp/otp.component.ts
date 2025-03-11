@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
+import { STORAGE } from 'src/app/commons/conts';
 import { AuthService } from 'src/app/commons/services/auth.service';
+import { SignupPhoneModalPage } from 'src/app/signup-phone-modal/signup-phone-modal.component';
+import moment from 'moment';
+import { ACCOUNT_TYPE } from 'src/app/commons/model';
 
 @Component({
   selector: 'app-otp',
@@ -10,15 +16,31 @@ import { AuthService } from 'src/app/commons/services/auth.service';
 
 })
 export class OtpComponent  implements OnInit {
-otp: any;
+  enteredOtp: any;
   error: string = '';
+  @Input() phoneNumber: string = '';
+  @Input() otpExpiresAt!: Date;
+  @Input() otp: string = '';
 
-  phoneNumber: string = '';
+  isValid: boolean = false;
+  // phoneNumber: string = '';
 
+  otpFG!: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+        private formBuilder: FormBuilder,
+    private modalCtrl: ModalController) {}
   
   ngOnInit() {
+    this.otpFG = this.formBuilder.group({
+        otpControl: new FormControl('', Validators.compose([
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(6),
+        ]))
+    })
   }
  
 
@@ -26,33 +48,69 @@ otp: any;
     this.router.navigateByUrl('login')
   }
 
+ 
+  
+   verifyOtp() { 
 
-  digitValidate(ele: any){
-    console.log(ele.value);
-    ele.value = ele?.value?.replace(/[^0-9]/g,'');
-    console.log("Ele value ",ele.val);
+    const otp = this.otpFG.value.otpControl;
+
+    const expAt = moment(this.otpExpiresAt);
+    const today = moment(new Date(Date.now() + 5 * 60 * 1000));
+
+    if (expAt.isBefore(today) && otp === this.otp) {
+      this.modalCtrl.dismiss(null, 'verified');
+            
+    } else {
+      this.error = 'Invalid or expired OTP';
+    }
+      
     
-  }
-  
-  tabChange(val: any){
-      let ele = document.querySelectorAll('input');
-      if(ele[val] && ele[val-1].value != ''){
-        ele[val].focus()
-      }else if(ele[val-1].value == ''){
-        ele[val-2].focus()
-      }   
-      this.otp = ele;
+    // this.modalCtrl.dismiss(this.otp, 'verified');
+    // if (this.otp === this.enteredOtp && new Date() < this.otpExpiresAt) {
+    //    //otp verified
+    // } else {
+    //   this.error = 'Invalid or expired OTP'
+    //  }
+
    }
+
+   onOtpChange(event: any){
+    this.error = '';
+   }
+
+   resendOTP(){
+      this.error = '';
+       this.authService.storageSave(STORAGE.PHONE_NUMBER, this.phoneNumber);
+      const req = {phoneNumber: this.phoneNumber, type:  ACCOUNT_TYPE.PhoneNumber}
   
-  
-   verifyOtp() {
-    let Otpval = '';
-    this.otp.forEach((e: any)=> {
-      Otpval += e.value + ''
+      this.authService.sendOtp(req).subscribe((res: any) => {
+        console.log("OTP SENT", res.otp);
+        this.otp = res.otp;
+        this.otpExpiresAt = res.otpExpiresAt;
+        this.phoneNumber = res.phoneNumber;
+        this.error = "OTP sent, please enter the new OTP";
+        this.otpFG.reset();
+      },
+      err => {
+        console.log(err);
+        this.error = err.error.message
+      })
+   }
+
+
+   async openCreateAccountModal() {
+    const modal = await this.modalCtrl.create({
+      component: SignupPhoneModalPage,
+      initialBreakpoint: 0.8,
+      breakpoints: [0, 0.8],
+      backdropBreakpoint: 0,
+      backdropDismiss: false
     });
-    
-    const phoneNumber = this.authService.storageGet("phone");
-    this.authService.verifyOtp(phoneNumber, Otpval)
-   }
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'confirm') {
+      console.log("confirmed");
+    }
+  }
 
 }

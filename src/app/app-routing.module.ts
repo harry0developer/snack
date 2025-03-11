@@ -12,6 +12,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginComponentModule)
   },
   {
+    path: 'setup',
+    loadChildren: () => import('./pages/setup/setup.module').then( m => m.SetupComponentModule),
+  },
+  {
     path: 'create-account',
     loadChildren: () => import('./pages/create-account/create-account.module').then(m => m.CreateAccountComponentModule)
   },
@@ -24,6 +28,7 @@ const routes: Routes = [
     path: 'chat/:uid',
     loadChildren: () => import('./pages/chat/chat.module').then( m => m.ChatComponentModule),
   },
+
   {
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)

@@ -27,6 +27,7 @@
           <div class="container">
             <div class="panel" *ngFor="let img of card.images; let i = index">
               <img [src]="img" alt="">
+
               <div class="user-info" *ngIf="card.name && i == 0">
                 <h1>
                   {{card.name}} 
@@ -38,22 +39,21 @@
                   <ion-icon name="male-female-outline"></ion-icon>
                   {{card.gender}} 
                 </p>
-                <p>
+                <p *ngIf="card.location && card.location.name">
                   <ion-icon name="location-outline"></ion-icon>
-                  {{card.location}}
+                  {{card.location.name}}
                 </p>
               </div>
 
-              <div class="user-info" *ngIf="card.about && card.about && i == 1">
+              <div class="user-info" *ngIf="i == 1">
                 <h1>{{card.name}}</h1>
                 <p class="title">
                   <ion-icon name="person-outline"></ion-icon>
                   About
                 </p>
-                <ion-chip [outline]="true"> {{card.about.race}} </ion-chip>
-                <ion-chip [outline]="true"> {{card.about.bodyType}} </ion-chip>
-                <ion-chip [outline]="true"> {{card.about.sexualOrientation}} </ion-chip>
-                <ion-chip [outline]="true"> {{card.about.height}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.ethnicity}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.bodyType}} </ion-chip>
+                <ion-chip [outline]="true"> {{card.sexualOrientation}} </ion-chip>
               </div>
 
               <div class="user-info" *ngIf="card.interests  && card.interests.length > 0 && i == 2">

@@ -1,5 +1,88 @@
 
 
+<ion-header [translucent]="true"></ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+  
+    <div class="text">
+      <h1>Welcome</h1>
+      <p>Match, meet, mingle </p>
+    </div>
+  
+    <form class="modal-form" [formGroup]="phoneNumberFormGroup">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4">
+            <ion-item class="country-code">
+              <ion-input type="text" placeholder="+27" formControlName="code" (click)="openCountryCodeModal()"  [(ngModel)]="selectedCountryCode"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="8">
+            <ion-item class="phone-number">
+              <ion-input required type="text"
+                formControlName="phone"
+                (keypress)="($event.charCode >= 48 && $event.charCode < 58)"
+                placeholder="Phone number"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row> 
+        <div class="validation-errors">
+          <ng-container *ngFor="let validation of phoneFormValidationMessages.phone">
+            <div class="error-message"
+              *ngIf="phoneNumberFormGroup.get('phone')?.hasError(validation.type) && (phoneNumberFormGroup.get('phone')?.dirty || phoneNumberFormGroup.get('phone')?.touched)">
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div> 
+
+        <ion-row>
+          <ion-col size="12">
+            <ion-item class="phone-number">
+                <ion-input required type="text"
+                  formControlName="passcode"
+                  (keypress)="($event.charCode >= 48 && $event.charCode < 58)"
+                  placeholder="Passcode"></ion-input>
+              </ion-item>
+            </ion-col>
+        </ion-row>
+
+        <div class="validation-errors">
+          <ng-container *ngFor="let validation of phoneFormValidationMessages.passcode">
+            <div class="error-message"
+              *ngIf="phoneNumberFormGroup.get('passcode')?.hasError(validation.type) && (phoneNumberFormGroup.get('passcode')?.dirty || phoneNumberFormGroup.get('passcode')?.touched)">
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div> 
+
+        <div class="error-message">
+          <p>{{error}}</p>
+        </div>
+
+        <div class="buttons">
+          <ion-button expand="block" class="solid secondary" (click)="login()">Login</ion-button>
+        </div>
+      </ion-grid>
+    </form>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-button fill="clear" (click)="goToCreateAccount()">Create a new account</ion-button>
+</ion-footer>
+
+
+
+
+
+
+<!-- 
+
 <ion-header [translucent]="true">
  
 </ion-header>
@@ -30,18 +113,16 @@
       <div class="errors">
         <p>{{error}}</p>
       </div>
-    </div>
+    </div> 
 
-
-   
-  
     <div class="buttons">
-      <ion-button expand="block" class="btn" (click)="login()">Login</ion-button>
-  
-      <ion-button fill="clear" (click)="goToCreateAccount()">Do not have an account? Signup</ion-button>
-  
+      <ion-button expand="block" class="solid secondary"  (click)="login()">Login</ion-button>
     </div>
   </div>
 </ion-content>
 
+<ion-footer>
+  <ion-button fill="clear" (click)="goToCreateAccount()">Do not have an account? Signup</ion-button>
+</ion-footer>
 
+ -->

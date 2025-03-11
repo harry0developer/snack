@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar> 
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()">Done</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="container">
+  <ion-searchbar
+    [formControl]="searchControl"
+    (ionChange)="onSearchInput()"
+  ></ion-searchbar>
+
+  <div *ngIf="searching" class="spinner-container">
+    <ion-spinner></ion-spinner>
+  </div>
+  <ion-list>
+    <ion-item detail="true" *ngFor="let country of countries">
+      <p class="flag">{{country?.flag}}</p>
+      <ion-label (click)="selectCountry(country)">{{ country.name }} ({{ country.dial_code }})</ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

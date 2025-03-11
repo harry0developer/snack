@@ -5,13 +5,7 @@ export interface Range {
     pin: boolean;
 }
 
-
-export interface User {
-    username: string; 
-    name: string; 
-    dob: string; 
-    _id: string; 
-}
+ 
 
 export interface Message {
     message: string;
@@ -22,18 +16,70 @@ export interface Message {
 
 }
 
-export interface UserProfile {
+
+export interface TempUser {
+    username: string;
+    password: string;
+    phoneNumber?: string;
+    verified: boolean;
+    type?: string
+}
+
+export interface Location {
     name: string;
-    dob: string; // Date of Birth (string or Date type can be used based on preference)
-    gender: string;
-    location: string;
-    interests: string[]; // Array of interests
-    about: {
-      race?: string;
-      bodyType?: string;
-      sexualOrientation?: string;
-      height?: string;
-    }; // Optional about details
-    images: string[]; // Array of image URLs
+    lat: number;
+    lng: number;
   }
   
+  export interface Preferences {
+    ethnicity: string[];
+    age: {
+      lower: number;
+      upper: number;
+    };
+    want: string[];
+    with: string[];
+    distance: number;
+  }
+  
+  export interface User {
+    _id?: string;
+    name: string;
+    dob: string;
+    age: number;
+    gender: string;
+    location?: Location;
+    images?: string[];
+    phoneNumber: string;
+    username: string;
+    password: string;
+    ethnicity: string;
+    bodyType: string;
+    sexualOrientation: string;
+    interests: string[];
+    preferences: Preferences;
+  }
+  
+  export interface Country {
+    dialCode: string,
+    flag: string,
+    name: string
+    code: string;
+}
+
+export interface Flags {
+    flags: string,
+    country: string;
+    code: string;
+}
+
+export interface OTP {
+    phoneNumber: string;
+    otp: string;
+    otpExpiresAt: string;
+    
+}
+export enum ACCOUNT_TYPE {
+    PhoneNumber = 'PhoneNumber',
+    Email = 'Email',
+  }

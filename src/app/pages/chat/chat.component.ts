@@ -33,14 +33,15 @@ export class ChatComponent  implements OnInit{
   ngOnInit() {
     this.me = this.authService.storageGet(STORAGE.ME);
     this.user = this.authService.storageGet(STORAGE.USER);
+    if(this.me._id &&  this.user._id)  {
+      this.socketService.joinRoom(this.me._id, this.user._id);
 
-    this.socketService.joinRoom(this.me._id, this.user._id);
-
-    this.chatService.getChatHistory(this.me._id, this.user._id).subscribe((chats) => {
-      this.messages = chats;
-      console.log('Retutned chats ', chats);
-    }); 
-
+      this.chatService.getChatHistory(this.me._id, this.user._id).subscribe((chats) => {
+        this.messages = chats;
+        console.log('Retutned chats ', chats);
+      }); 
+    }
+ 
     console.log("ME ", this.me);
     console.log("Other ", this.user);
 
@@ -50,7 +51,7 @@ export class ChatComponent  implements OnInit{
   }
 
   sendMessage() {
-    if (this.newMessage.trim() !== '') {
+    if (this.newMessage.trim() !== '' && this.me._id && this.user._id) {
       this.socketService.sendMessage(this.me._id, this.user._id, this.newMessage);
       this.newMessage = '';  
     }

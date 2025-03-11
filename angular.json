@@ -31,7 +31,10 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/global.scss", "src/theme/variables.scss"],
+            "styles": ["src/global.scss", 
+              "node_modules/flag-icon-css/sass/flag-icon.scss",
+              "src/theme/variables.scss"
+            ],
             "scripts": []
           },
           "configurations": {

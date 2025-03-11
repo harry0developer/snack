@@ -1,5 +1,7 @@
+@import '../../../theme/colors.scss';
+
 .page {
-    background: #c89d1d;
+    background: $primary;
     height: 100vh;
     text-align: center;
     padding: 40px 10px;
@@ -9,42 +11,46 @@
     }
 
     .text {
+        margin-bottom: 40px;
+        padding: 0 30px;
+        color: $white;
         h1 {
-            color: #FFF;
             font-weight: bold;
             line-height: 1;
-            font-size: 40px;
+            font-size: 38px;
         }
-
         p {
             margin: 0;
-            color: #ebebeb;
-
+            font-size: 18px;
         }
     }
   
-    .buttons {
-        text-align: center;
-        ion-button.button-solid  {
-            margin: 40px auto;
-            width: 60%;
-            --background: #fff;
-            color: #580404;
-            font-weight: bold;
-        }
-    }
-
-    ion-button.ios.button.button-clear {
-        background: none;
-        color: white;
-    }
 
     .errors {
-        color: #af4040;
+        color: $secondary;
     }
  
-
- 
+    ion-item {
+        border-radius: 6px;
+    }
     
+    .error-message {
+        font-size: 15px;
+        color: $secondary;
+        margin: 10px 16px;
 
+    }
+    
+    .buttons {
+        margin: 20px 60px;
+    }
+
+}
+
+ion-footer {
+    color: $white;
+    text-align: center;
+    ion-button {
+        font-weight: bold;
+    }
 }

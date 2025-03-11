@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/commons/services/auth.service';
+import { CountryCodeComponent } from '../country-code/country-code.component';
+import { ACCOUNT_TYPE, Country, OTP, TempUser } from 'src/app/commons/model';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { STORAGE } from 'src/app/commons/conts';
+import { SignupPhoneModalPage } from 'src/app/signup-phone-modal/signup-phone-modal.component';
+import { OtpComponent } from '../otp/otp.component';
+import moment from 'moment';
 
 @Component({
   selector: 'app-create-account',
@@ -14,36 +22,127 @@ export class CreateAccountComponent  implements OnInit {
   name: string = '';
   password: string = '';
   error: string = '';
+  code: string = '';
+  selectedCountryCode: string = '';
 
-  phoneNumber: string = '';
 
+  validations_form!: FormGroup;
+  phoneNumberFormGroup!: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router) {}
+ 
+
+  phoneFormValidationMessages = {
+    'phone': [
+     { type: 'required', message: 'Phone number is required.' },
+     { type: 'minlength', message: 'Phone number must be at least 9 characters long.' }
+    ],
+    'passcode': [
+     { type: 'required', message: 'Passcode is required.' },
+     { type: 'minlength', message: 'Passcode must be 6 characters long.' },
+     { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
+
+    ]
+  };
+ 
+  country: Country = {
+    name: "South Africa",
+    flag: "🇿🇦",
+    code: "ZA",
+    dialCode: "+27"
+  };
+
+  constructor(
+    private authService: AuthService, 
+    private formBuilder: FormBuilder,
+
+    private modalCtrl: ModalController,
+    private router: Router) {}
   
   ngOnInit() {
+    console.log();
+
+    this.phoneNumberFormGroup = this.formBuilder.group({
+      phone: new FormControl('', Validators.compose([
+        Validators.required,
+        Validators.minLength(9),
+      ])),
+      code: new FormControl('', Validators.compose([
+        Validators.required
+      ])),
+      // passcode: new FormControl('', Validators.compose([
+      //   Validators.required,
+      //   Validators.minLength(6),
+      //   Validators.maxLength(6),
+      // ]))
+    });
   }
 
-  createAccount() {
-    this.authService.register(this.username, this.password, this.name, this.dob).subscribe(
-      (response) => {
-        console.log('User registered successfully', response);
-        this.router.navigate(['/login']);
-      },
-      (error) => {
-        console.error('Error registering user', error);
+  async openCountryCodeModal() {
+    const modal = await this.modalCtrl.create({
+      component: CountryCodeComponent,
+      componentProps: {
+        "code": this.code
       }
-    );
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'save') {
+      console.log("applied", data);
+      this.selectedCountryCode = data.dial_code;
+    }
   }
 
-  sendOtp() {
-          this.authService.storageSave("phone", this.phoneNumber)
-this.router.navigateByUrl('otp')
-    // this.authService.sendOtp(this.phoneNumber).subscribe((res) => {
-    //   console.log("Send ", res);
-    //   this.authService.storageSave("phone", this.phoneNumber)
-    // },err => console.log(err))
+
+  createAccount() { 
+    const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
+    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber}
+    this.authService.sendOtp(req).subscribe((res: any) => {
+      this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
+      this.openOTPModal(res);
+    }, err => {
+      console.log(err.error);
+      
+    })
+  }
+   
+
+  async openOTPModal(phoneAndOtp: OTP) {
+    const modal = await this.modalCtrl.create({
+      component: OtpComponent,
+      componentProps: {
+        phoneNumber: phoneAndOtp.phoneNumber,
+        otp: phoneAndOtp.otp,
+        otpExpiresAt: phoneAndOtp.otpExpiresAt
+      },
+      initialBreakpoint: 0.8,
+      breakpoints: [0, 0.8],
+      backdropBreakpoint: 0,
+      backdropDismiss: false
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'verified') {
+      this.openCreateAccountModal();
+      console.log("All good, create account and, go to profile");
+      
+    }
   }
 
+  async openCreateAccountModal() {
+    const modal = await this.modalCtrl.create({
+      component: SignupPhoneModalPage,
+      initialBreakpoint: 0.8,
+      breakpoints: [0, 0.8],
+      backdropBreakpoint: 0,
+      backdropDismiss: false
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'save') {
+      console.log("confirmed", data);
+      // this.sendOtp(this.authService.storageGet(STORAGE.PHONE_NUMBER))
+    }
+  }
 
   goToSignIn(){
     this.router.navigateByUrl('login')

@@ -21,11 +21,11 @@ export class AuthService {
   }
 
   saveToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(STORAGE.AUTH_TOKEN, token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem(STORAGE.AUTH_TOKEN);
   }
 
  
@@ -48,7 +48,7 @@ export class AuthService {
       formData.append('profileImages', files[i], files[i].name);
     }
 
-    const token = localStorage.getItem('authToken'); // Get the JWT token
+    const token = localStorage.getItem(STORAGE.AUTH_TOKEN); // Get the JWT token
 
     return this.http.post(`${this.apiUrl}/upload-images`, formData, {
       headers: {

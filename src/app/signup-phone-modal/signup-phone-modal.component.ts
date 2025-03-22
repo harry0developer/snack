@@ -9,7 +9,7 @@ import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter, IonContent, Ion
 import moment from 'moment';
 import { User } from '../commons/model';
 import { AuthService } from '../commons/services/auth.service';
-import { STORAGE } from '../commons/conts';
+import { APP_ROUTES, STORAGE } from '../commons/conts';
 
 @Component({
   selector: 'app-signup-phone-modal',
@@ -210,6 +210,16 @@ export class SignupPhoneModalPage implements OnInit {
 
     this.authService.createAccount(user).subscribe((res: any) => {
       console.log("Response ", user);
+      this.modalCtrl.dismiss().then(() => {
+        this.authService.login(user.username, user.password).subscribe((auth) => {
+          this.router.navigateByUrl(APP_ROUTES.HOME);
+          this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
+          this.authService.storageSave(STORAGE.USER, auth)
+        }, err => {
+          console.log(err);
+          
+        })
+      })
     }, err => {
       console.log(err.error);
       

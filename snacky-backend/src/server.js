@@ -188,19 +188,18 @@ app.post('/api/create-account', async (req, res) => {
     return res.status(400).json({ message: 'User already exists' });
   }
 
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  // Create new user
-  const newUser = new User({
-    ...req.body,
-    password: hashedPassword
-  });
-
   try {
-    await newUser.save();
-    return res.send(user);
+    const salt = await bcrypt.genSalt(10);
+    req.body.password = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      ...req.body,
+    });
+
+    await newUser.save().then(() => {
+      return res.send(newUser);
+    })
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });

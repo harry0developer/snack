@@ -7,9 +7,9 @@ import { ActionSheetController, AlertController, LoadingController, ModalControl
 import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectModal, IonSelectOption,  } from '@ionic/angular/standalone';
  
 import moment from 'moment';
-import { User } from '../commons/model';
-import { AuthService } from '../commons/services/auth.service';
-import { APP_ROUTES, STORAGE } from '../commons/conts';
+import { User } from '../../commons/model';
+import { AuthService } from '../../commons/services/auth.service';
+import { APP_ROUTES, STORAGE } from '../../commons/conts';
 
 @Component({
   selector: 'app-signup-phone-modal',
@@ -214,7 +214,7 @@ export class SignupPhoneModalPage implements OnInit {
         this.authService.login(user.username, user.password).subscribe((auth) => {
           this.router.navigateByUrl(APP_ROUTES.HOME);
           this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
-          this.authService.storageSave(STORAGE.USER, auth)
+          this.authService.storageSave(STORAGE.ME, auth.user);
         }, err => {
           console.log(err);
           

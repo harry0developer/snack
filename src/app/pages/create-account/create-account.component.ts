@@ -6,7 +6,7 @@ import { CountryCodeComponent } from '../country-code/country-code.component';
 import { ACCOUNT_TYPE, Country, OTP, TempUser } from 'src/app/commons/model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { STORAGE } from 'src/app/commons/conts';
-import { SignupPhoneModalPage } from 'src/app/signup-phone-modal/signup-phone-modal.component';
+import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
 import { OtpComponent } from '../otp/otp.component';
 import moment from 'moment';
 

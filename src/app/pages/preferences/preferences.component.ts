@@ -17,7 +17,7 @@ import {
   IonAvatar, IonIcon, 
 } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular';
-import { Range } from '../commons/model';
+import { Range } from '../../commons/model';
 
 export interface AgeRange { 
   min: number, max: number, pin: boolean, lower: number, upper: number

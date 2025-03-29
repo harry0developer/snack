@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Tab3Page } from './tab3.page';
 
 import { Tab3PageRoutingModule } from './tab3-routing.module';
-import { SettingsComponent } from '../settings/settings.component';
+import { SettingsComponent } from '../pages/settings/settings.component';
 
 @NgModule({
   imports: [

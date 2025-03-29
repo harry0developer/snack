@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { STORAGE } from '../conts';
 import { TempUser, User } from '../model';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { TempUser, User } from '../model';
 export class AuthService {
   private apiUrl = 'http://localhost:5001/api';  
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   register(username: string, password: string, name: string, dob: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, { username, password, name, dob });
@@ -57,6 +58,22 @@ export class AuthService {
     });
   }
 
+  uploadImage(files: any, uid: any ): Observable<any> {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('profileImages', files[i], files[i].name);
+    }
+
+    const token = localStorage.getItem(STORAGE.AUTH_TOKEN); // Get the JWT token
+
+    return this.http.post(`${this.apiUrl}/upload`, formData, {
+      headers: {
+        Authorization: token ? token : '',
+        uid
+      },
+    });
+  }
+
   sendOtp(otpRequest: any) {
     return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);
   }
@@ -80,7 +97,6 @@ export class AuthService {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);
     localStorage.removeItem(STORAGE.ME);
     localStorage.removeItem(STORAGE.USER);
-
   }
 
 

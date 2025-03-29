@@ -7,7 +7,7 @@ import { IonAvatar, IonButton, IonButtons, IonCard, IonCardContent,
 import { Preferences, AgeRange } from '../preferences/preferences.component';
 import { FormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-import { AuthService } from '../commons/services/auth.service';
+import { AuthService } from '../../commons/services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -135,7 +135,9 @@ export class SettingsComponent  implements OnInit {
 
 
   async logout() {
-    this.authService.logout();
-    this.router.navigateByUrl('login')
+    this.modalCtrl.dismiss().then(() => {
+      this.authService.logout();
+      this.router.navigateByUrl('login')
+    })
   }
 }

@@ -7,7 +7,7 @@ import { Tab1Page } from './tab1.page';
 import { Tab1PageRoutingModule } from './tab1-routing.module';
 import { LoadingComponent } from '../components/loading/loading.component';
 import { NoUsersComponent } from '../components/no-users/no-users.component';
-import { PreferencesComponent } from '../preferences/preferences.component';
+import { PreferencesComponent } from '../pages/preferences/preferences.component';
 
 @NgModule({
   imports: [

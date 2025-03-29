@@ -1,11 +1,11 @@
 import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, ElementRef, OnInit } from '@angular/core';
 import { GestureController, Gesture, GestureDetail, ModalController } from '@ionic/angular';
-import { Preferences, PreferencesComponent } from '../preferences/preferences.component';
+import { Preferences, PreferencesComponent } from '../pages/preferences/preferences.component';
 import { AuthService } from '../commons/services/auth.service';
 import { STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
-import moment from 'moment';
 import { User } from '../commons/model';
+import { UtilService } from '../commons/services/util.service';
  
 @Component({
   selector: 'app-tab1',
@@ -260,6 +260,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     private modalCtrl: ModalController,
     private authService: AuthService,
     private router: Router,
+    private utilService: UtilService,
     private cdRef: ChangeDetectorRef) {}
 
 
@@ -282,7 +283,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
   }
 
   getAge(dob: string) {
-    return moment().diff(dob, 'years',false);
+    return this.utilService.getAge(dob);
   }
 
   async openModal() {

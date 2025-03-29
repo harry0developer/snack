@@ -12,6 +12,7 @@ const fs = require('fs');
 const sendOTP = require('./services/twilio');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const expressHandler = require("express-async-handler");
 
 mongoose.set("debug", true);
 dotenv.config();
@@ -20,8 +21,16 @@ dotenv.config();
 const userRoutes = require('./routes/users');
 const chatRoutes = require('./routes/chats');
 
+
+const { postImage } = require('./controllers/images');
+
 const Chat = require('./models/chat');  
 const User = require('./models/user');  
+
+const { connect } = require('./connect');
+const { router } = require('./routes/images');
+
+const { attachUserId } = require('./middleware/attach');
 
 const app = express();
 const server = http.createServer(app);
@@ -91,6 +100,7 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch((err) => console.log(err));
 
+// connect();
 
 app.post('/api/register', async (req, res) => {
   const { username, password, name, dob } = req.body;
@@ -229,6 +239,10 @@ app.post('/api/verify-otp', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+ 
+ 
+app.use('/api/upload', attachUserId, router);
 
 
 //TWILLIO CODE 

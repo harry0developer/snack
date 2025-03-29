@@ -1,32 +1,92 @@
-<ion-header class="ion-no-border">
+<ion-header [translucent]="true"class="ion-no-border">
   <ion-toolbar mode="md">
     <ion-title class="title" text-center>
       Profile
     </ion-title>
-    <ion-buttons slot="end">
-       <ion-button (click)="openModal()">
+
+    <ion-buttons slot="secondary">
+      <ion-button (click)="openSettingsModal()">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="profile-page">
- <div class="top">
-    <ion-avatar>
-      <img alt="Silhouette of a person's head" src="assets/profiles/1a.jpg" />
-    </ion-avatar>
-    <h1>{{me.name}}</h1>
-    <p>{{me.dob}}</p>
- </div>
+<ion-content [fullscreen]="true"> 
 
- 
- <div class="images-container container">
-    <div class="pins">
-      <div class="pin" *ngFor="let img of images">
-          <img [src]="img" >
+
+  <div class="container" *ngIf="!isLoading; else emptyTemplate">
+    <div class="top">
+      <div class="user-avatar">
+        <img *ngIf="user && !user.profile_picture" src="../../../assets/default.jpg" alt="">
+        <img *ngIf="user && user.profile_picture" [src]="user.profile_picture" alt="">
+      </div>
+      <div class="user-info">
+        <h1>{{user?.name}}, {{user.age}}</h1>
+        <ion-badge *ngIf="!user?.isVerified" class="badge unverified">Unverified</ion-badge>
+        <ion-badge *ngIf="user?.isVerified" class="badge verified">verified</ion-badge>
       </div>
     </div>
+    <div class="bottom">
+      <ion-list lines="none">
+        <ion-item-divider class="divider">
+          <ion-label>Your details</ion-label>
+        </ion-item-divider>
+        <ion-item >
+          <ion-icon slot="start"  class="icon" name="calendar-clear-outline"></ion-icon>
+          <ion-label>
+            <h3> {{user?.dob}}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item >
+          <ion-icon slot="start" class="gender icon" name="man-outline" *ngIf="user.gender == 'Male'  "></ion-icon>
+          <ion-icon slot="start" class="gender icon" name="woman-outline" *ngIf="user.gender == 'Female' "></ion-icon>
+          <ion-icon slot="start" class="gender icon" name="grid-outline" *ngIf="user.gender == 'Gay Couple' || user.gender == 'Lesbian Couple' "></ion-icon>
+          <ion-label>
+            <h3>{{user?.gender}}</h3>
+          </ion-label>
+        </ion-item> 
+      </ion-list>
+      
+
+      <ion-item-divider class="divider">
+        <ion-label>
+          Your Photos
+          <p>You can click on each photo to manage it</p>
+
+        </ion-label>
+      </ion-item-divider>
+
+      <ion-grid class="photo-grid" >
+        <ion-row *ngIf="user && user.images.length > 0">
+          <ion-col class="user-image" size="4" *ngFor="let u of user.images; let i=index">
+            <img [src]="u" alt="" (click)="openImageActionSheet(i)">
+          </ion-col>  
+          <ion-col size="4" >
+            <div *ngIf="user.images.length < 6" class="img-placeholder" (click)="selectImageActionSheet()">
+              <ion-icon name="add-circle-outline"></ion-icon>
+            </div>
+          </ion-col> 
+        </ion-row>
+
+        <ion-row *ngIf="user && user.images.length < 1">
+          <ion-col size="4" >
+            <div *ngIf="user.images.length < 6" class="img-placeholder" (click)="selectImageActionSheet()">
+              <ion-icon name="add-circle-outline"></ion-icon>
+            </div>
+          </ion-col> 
+        </ion-row>
+      </ion-grid>
+    </div>
   </div>
+
+  <ng-template #emptyTemplate>
+    <div class="is-loading">
+      <img src="../../../assets/loading.gif" alt="">
+      <h1>Loading Profile...</h1>
+      <p>This should not take long. Hang on tight...</p>
+    </div>
+  </ng-template> 
+
 
 </ion-content>

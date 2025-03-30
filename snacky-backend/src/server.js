@@ -177,9 +177,14 @@ app.get('/api/protected', (req, res) => {
 
 app.post('/api/send-otp', async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  // const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
   const { phoneNumber, type }= req.body;
   
+
+  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toLocaleString('en-US', {
+    timeZone: 'Europe/London'
+  });
+
   try {
     const userExists = await User.findOne({ phoneNumber, type });
     if (userExists) {
@@ -244,17 +249,16 @@ app.post('/api/verify-otp', async (req, res) => {
 });
 
 app.post('/api/upload', express.json({ limit: '50mb' }), async (req, res) => {
-  // const { photo } = req.body;
-// 
+ 
   try {
     const {uid, images} = req.body;
  
     const user = await User.findOneAndUpdate(
       { _id: uid },
       {
-        $push: { images: { $each: images } },  // Update array by adding new items
+        $push: { images: { $each: images } }, 
       },
-      { upsert: true }  // Create if not exists and return the updated document
+      { upsert: true }  
     );
 
     await user.save();

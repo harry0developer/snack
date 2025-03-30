@@ -90,6 +90,10 @@ constructor(
     );
   }
 
+  resetLogin(){
+    this.router.navigateByUrl('login')
+  }
+
   async openCountryCodeModal() {
     const modal = await this.modalCtrl.create({
       component: CountryCodeComponent,

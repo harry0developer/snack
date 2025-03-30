@@ -17,8 +17,8 @@
       <ion-item detail="false">
         <ion-icon slot="start" name="person-outline"></ion-icon>
         <ion-label>
-          <p class="title">My Email Address</p>
-          <p>{{user?.email}}</p>
+          <p class="title">Phone Number</p>
+          <p>{{user?.phoneNumber}}</p>
         </ion-label>
       </ion-item>
 
@@ -34,7 +34,7 @@
         <ion-icon slot="start" name="person-outline"></ion-icon>
         <ion-label>
           <p class="title">Date Of Birth</p>
-          <p>{{dateOfBirth}}</p>
+          <p>{{user?.dob}}</p>
         </ion-label>
       </ion-item>
     </div>
@@ -50,7 +50,7 @@
         <ion-label>
           <p class="title">Looking for</p>
           <ul class="looking-for">
-            <li *ngFor="let item of user?.want">{{item}}</li>
+            <li *ngFor="let item of user?.preferences?.want">{{item}}</li>
           </ul>
         </ion-label>
       </ion-item>
@@ -60,7 +60,7 @@
         <ion-label>
           <p class="title">With</p>
           <ul class="looking-for">
-            <li *ngFor="let item of user.with">{{item}}</li>
+            <li *ngFor="let item of user?.preferences?.with">{{item}}</li>
           </ul>
         </ion-label>
       </ion-item>

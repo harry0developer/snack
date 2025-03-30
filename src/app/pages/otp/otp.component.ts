@@ -23,10 +23,11 @@ export class OtpComponent  implements OnInit {
   @Input() otp: string = '';
 
   isValid: boolean = false;
-  // phoneNumber: string = '';
+  remainingSeconds: number = 0;
+  intervalId: any;
+
 
   otpFG!: FormGroup;
-
   constructor(
     private authService: AuthService, 
     private router: Router,
@@ -40,7 +41,12 @@ export class OtpComponent  implements OnInit {
           Validators.minLength(6),
           Validators.maxLength(6),
         ]))
-    })
+    });
+
+    this.remainingSeconds = this.calculateRemainingSeconds();
+    this.intervalId = setInterval(() => {
+      this.remainingSeconds = this.calculateRemainingSeconds();
+    }, 1000);
   }
  
 
@@ -63,16 +69,19 @@ export class OtpComponent  implements OnInit {
     } else {
       this.error = 'Invalid or expired OTP';
     }
-      
     
-    // this.modalCtrl.dismiss(this.otp, 'verified');
-    // if (this.otp === this.enteredOtp && new Date() < this.otpExpiresAt) {
-    //    //otp verified
-    // } else {
-    //   this.error = 'Invalid or expired OTP'
-    //  }
 
    }
+
+
+  calculateRemainingSeconds(): number {
+
+    const now = new Date(Date.now()).toLocaleString('en-US', {
+      timeZone: 'Europe/London'
+    });
+
+    return moment(this.otpExpiresAt).diff(now, 'seconds');
+  }
 
    onOtpChange(event: any){
     this.error = '';
@@ -113,4 +122,8 @@ export class OtpComponent  implements OnInit {
     }
   }
 
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalId);
+  }
 }

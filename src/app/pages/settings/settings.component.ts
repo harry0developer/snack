@@ -10,6 +10,10 @@ import { ModalController } from '@ionic/angular';
 import { AuthService } from '../../commons/services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { User } from 'src/app/commons/model';
+import { SafetyTipsComponent } from 'src/app/safety-tips/safety-tips.component';
+import { SupportComponent } from 'src/app/support/support.component';
+import { TermsComponent } from 'src/app/terms/terms.component';
 
 @Component({
   selector: 'app-settings',
@@ -38,26 +42,21 @@ import { CommonModule } from '@angular/common';
 })
 export class SettingsComponent  implements OnInit {
   name!: string;
-  user: any = {
-    gender: "Male",
-    email:'text@test.com',
-    want: ['Hookuos', 'money']
-
-  };
-  dateOfBirth: string = '01/01/1991';
+  user!: User;
   wantList: string[] = [];
   withList: string[] = [];
  
   constructor(
     private modalCtrl: ModalController,
     private router: Router,
-    private authService: AuthService
-    // public actionSheetController: ActionSheetController,
-    // private firebaseService: FirebaseService
+    private authService: AuthService 
   ) {
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.user);
+
+  }
 
   async openPreferencesModal() {
     // const modal = await this.modalCtrl.create({
@@ -122,15 +121,15 @@ export class SettingsComponent  implements OnInit {
   }
 
   openTermsAndConditionsModal() {
-    // this.openModal(TermsPage);
+    this.openModal(TermsComponent);
   }
 
   openSafetyTipsModal() {
-    // this.openModal(SafetyTipsPage);
+    this.openModal(SafetyTipsComponent);
   }
 
   openSupportModal() {
-    // this.openModal(SupportPage);
+    this.openModal(SupportComponent);
   }
 
 

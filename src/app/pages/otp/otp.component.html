@@ -10,7 +10,9 @@
   
     <div class="text">
       <h1>Verify OTP</h1>
-      <p>Please enter the OTP code sent to {{phoneNumber}}</p>
+      <p>Please enter the OTP code sent to <b>{{phoneNumber}}</b></p>
+      <br>
+      <p>Your OTP will expire in <b>{{remainingSeconds}}</b> sec</p>
     </div>
   
     <form [formGroup]="otpFG">
@@ -24,8 +26,6 @@
         <p>{{error}}</p>
       </div>
       
-     
-
       <div class="buttons">
         <ion-button class="clear primary" shape="round" (click)="resendOTP()">
           Resend OTP

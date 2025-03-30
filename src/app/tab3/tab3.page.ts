@@ -179,7 +179,7 @@ export class Tab3Page implements OnInit{
   }
 
   private async deletePhoto(index: number) {
-    const loading = await this.loadingCtrl.create({message: "Deleting photo, please wait..."});
+    const loading = await this.loadingCtrl.create({message: "Deleting photo..."});
     await loading.present();
 
     const imgs = this.currentUser.images.splice(index, 1);

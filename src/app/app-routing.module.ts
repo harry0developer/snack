@@ -12,6 +12,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginComponentModule)
   },
   {
+    path: 're-login',
+    loadChildren: () => import('./pages/re-auth/re-auth-routing.module').then(m => m.ReAuthComponentRoutingModule) 
+  },
+  {
     path: 'setup',
     loadChildren: () => import('./pages/setup/setup.module').then( m => m.SetupComponentModule),
   },

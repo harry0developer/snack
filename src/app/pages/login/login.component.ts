@@ -25,7 +25,7 @@ export class LoginComponent  implements OnInit {
 
   selectedCountryCode: string = '';
   validations_form!: FormGroup;
-  phoneNumberFormGroup!: FormGroup;
+  loginFormGroup!: FormGroup;
 
  
 
@@ -59,20 +59,17 @@ constructor(
   ngOnInit() {
     console.log();
 
-    this.phoneNumberFormGroup = this.formBuilder.group({
-      phone: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(9),
-      ])),
-      code: new FormControl('', Validators.compose([
-        Validators.required
-      ])),
-      passcode: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(6),
-        Validators.maxLength(6),
-      ]))
+    this.loginFormGroup = this.formBuilder.group({
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],  
+      code: ['', [Validators.required]],  
+      passcode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
+  }
+
+ 
+
+  get passcode() {
+    return this.loginFormGroup.controls['passcode'].value;
   }
 
   // ngOnInit() {
@@ -84,7 +81,16 @@ constructor(
   // }
 
   login() {
-    this.authService.login(this.username, this.password).subscribe(
+    const p = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
+
+    console.log("phone",p)
+    const data = {
+      phoneNumber:  p,
+      passcode: this.passcode
+    };
+
+
+    this.authService.login(data).subscribe(
       (response: any) => {
         console.log('User logged in successfully', response);
         this.authService.saveToken(response.token); 

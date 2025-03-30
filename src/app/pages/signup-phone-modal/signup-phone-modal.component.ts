@@ -194,6 +194,9 @@ export class SignupPhoneModalPage implements OnInit {
       bodyType: f.bodyType,
       sexualOrientation: f.sexualOrientation,
       interests: [],
+      images: [],
+      profilePic: '',
+      verified: false,
       preferences: {
         ethnicity: [],
         age: {
@@ -211,7 +214,11 @@ export class SignupPhoneModalPage implements OnInit {
     this.authService.createAccount(user).subscribe((res: any) => {
       console.log("Response ", user);
       this.modalCtrl.dismiss().then(() => {
-        this.authService.login(user.username, user.password).subscribe((auth) => {
+        const data = {
+          phoneNumber: user.username, passcode: user.password
+        };
+    
+        this.authService.login(data).subscribe((auth) => {
           this.router.navigateByUrl(APP_ROUTES.HOME);
           this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
           this.authService.storageSave(STORAGE.ME, auth.user);

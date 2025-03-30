@@ -1,0 +1,53 @@
+
+
+<ion-header [translucent]="true"></ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page">
+
+    <div class="logo" >
+      <img src="assets/brand/logo.svg" alt="">
+    </div>
+  
+    <div class="text" *ngIf="user &&  user.name">
+      <h1>Welcome Back {{user.name}}</h1>
+      <p>Match, meet, mingle </p>
+    </div>
+  
+    <form class="modal-form" [formGroup]="passcodeFormGroup">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12">
+            <ion-item class="phone-number">
+                <ion-input required type="text"
+                  formControlName="passcode"
+                  (keypress)="($event.charCode >= 48 && $event.charCode < 58)"
+                  placeholder="Passcode"></ion-input>
+              </ion-item>
+            </ion-col>
+        </ion-row>
+
+        <div class="validation-errors">
+          <ng-container *ngFor="let validation of phoneFormValidationMessages.passcode">
+            <div class="error-message"
+              *ngIf="passcodeFormGroup.get('passcode')?.hasError(validation.type) && (passcodeFormGroup.get('passcode')?.dirty || passcodeFormGroup.get('passcode')?.touched)">
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div> 
+
+        <div *ngIf="(passcodeFormGroup.get('passcode')?.dirty || passcodeFormGroup.get('passcode')?.touched)" class="error-message">
+          <p> {{error}}</p>
+        </div>
+
+        <div class="buttons">
+          <ion-button expand="block" [disabled]="!passcodeFormGroup.valid" class="solid secondary" (click)="login()">Login</ion-button>
+        </div>
+      </ion-grid>
+    </form>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-button fill="clear" (click)="goToCreateAccount()">Create a new account</ion-button>
+</ion-footer>

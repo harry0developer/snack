@@ -1,0 +1,53 @@
+@import '../../../theme/colors.scss';
+
+.page {
+    background: $primary;
+    height: 100vh;
+    text-align: center;
+    padding: 40px 10px;
+    .logo {
+        width: 160px;
+        margin: 20% auto;
+    }
+
+    .text {
+        margin-bottom: 40px;
+        color: $white;
+        h1 {
+            font-weight: bold;
+            line-height: 1;
+            font-size: 38px;
+        }
+        p {
+            margin: 0;
+            font-size: 18px;
+        }
+    } 
+
+    .errors {
+        color: $secondary;
+    }
+ 
+    ion-item {
+        border-radius: 6px;
+    }
+    
+    .error-message {
+        font-size: 15px;
+        color: $secondary;
+        margin: 10px 16px;
+
+    }
+
+    .buttons {
+        margin: 20px 60px;
+    }
+
+}
+
+
+ion-footer {
+    color: $white;
+    text-align: center; 
+}
+ 

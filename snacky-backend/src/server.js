@@ -33,9 +33,11 @@ const { router } = require('./routes/images');
 const { attachUserId } = require('./middleware/attach');
 
 const app = express();
-const server = http.createServer(app);
+app.use(express.json({ limit: '50mb' }));  // increase the limit as needed
+app.use(express.urlencoded({ limit: '50mb', extended: true }));  // for form-data or URL encoded payloads
 
 const port = 5001;
+const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
@@ -58,36 +60,37 @@ app.use(cors({
 app.use('/api', userRoutes);
 app.use('/api', chatRoutes);
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const token = req.headers['authorization'];
-    if (!token) {
-      return cb(new Error('No token provided'), false);
-    }
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     const token = req.headers['authorization'];
+//     if (!token) {
+//       return cb(new Error('No token provided'), false);
+//     }
 
-    jwt.verify(token, 'secretKey', (err, decoded) => {
-      if (err) {
-        return cb(new Error('Invalid token'), false);
-      }
+//     jwt.verify(token, 'secretKey', (err, decoded) => {
+//       if (err) {
+//         return cb(new Error('Invalid token'), false);
+//       }
 
-      // Create a directory based on user ID
-      const userId = decoded.userId;
-      const userDirectory = path.join(__dirname, 'uploads', userId);
+//       // Create a directory based on user ID
+//       const userId = decoded.userId;
+//       const userDirectory = path.join(__dirname, 'uploads', userId);
 
-      // Check if directory exists; if not, create it
-      if (!fs.existsSync(userDirectory)) {
-        fs.mkdirSync(userDirectory, { recursive: true });
-      }
+//       // Check if directory exists; if not, create it
+//       if (!fs.existsSync(userDirectory)) {
+//         fs.mkdirSync(userDirectory, { recursive: true });
+//       }
 
-      // Set destination folder to user-specific directory
-      cb(null, userDirectory);
-    });
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  },
-});
+//       // Set destination folder to user-specific directory
+//       cb(null, userDirectory);
+//     });
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+//     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+//   },
+// });
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 console.log("ENV ", dotenv.config());
@@ -240,10 +243,75 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
+app.post('/api/upload', express.json({ limit: '50mb' }), async (req, res) => {
+  // const { photo } = req.body;
+// 
+  try {
+    const {uid, images} = req.body;
  
- 
-app.use('/api/upload', attachUserId, router);
+    const user = await User.findOneAndUpdate(
+      { _id: uid },
+      {
+        $push: { images: { $each: images } },  // Update array by adding new items
+      },
+      { upsert: true }  // Create if not exists and return the updated document
+    );
 
+    await user.save();
+
+    const newUser = await User.find({ _id: uid});
+    return res.status(200).json(newUser);
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+ 
+app.put('/api/update-images/:_id', async (req, res) => {
+  const { _id } = req.params;
+  const { images } = req.body; 
+  if (!Array.isArray(images)) {
+    return res.status(400).json({ message: 'newImages must be an array of base64 encoded strings' });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id },
+      { images: images },  // Replace the entire images array with newImages
+      { new: true, runValidators: true }  // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.put('/api/update-profile-picture/:_id', async (req, res) => {
+  const { _id } = req.params;
+  const { profilePic } = req.body; 
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id },
+      { profilePic: profilePic },   
+      { new: true, runValidators: true }  
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 //TWILLIO CODE 
 app.post('/api/send-twilio-otp', async (req, res) => {

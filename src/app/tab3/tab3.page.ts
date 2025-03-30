@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AlertController, LoadingController, ModalController, Platform } from '@ionic/angular';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AlertController, LoadingController, ModalController, Platform, ToastController } from '@ionic/angular';
  import { ActionSheetController } from '@ionic/angular';
 import { Camera,  CameraResultType, CameraSource } from '@capacitor/camera';
  
@@ -30,7 +30,7 @@ export class Tab3Page implements OnInit{
   galleryId = 'myLightbox';
 
   galImages: GalleryItem[] = [];
- 
+  
   constructor(
     private modalCtrl: ModalController,
     private actionSheetController: ActionSheetController,
@@ -38,13 +38,17 @@ export class Tab3Page implements OnInit{
     private alertCtrl: AlertController,
     private authService: AuthService,
     private utilService: UtilService,
-    public gallery: Gallery, private lightbox: Lightbox
+    public gallery: Gallery, private lightbox: Lightbox,
+    private cdr: ChangeDetectorRef,
+    private toastController: ToastController
     ) {} 
-
+// "+22908900002000"
   async ngOnInit() {
     this.isLoading = false;
     this.currentUser = this.authService.storageGet(STORAGE.ME); 
-    this.user = this.currentUser;
+    this.profilePicture =  'data:image/jpeg;base64, ' + this.currentUser.profilePic;
+    console.log("Current User", this.currentUser);
+    this.images = this.currentUser.images.map((i: any) =>  'data:image/jpeg;base64, ' + i)
   }
 
   initialiseGallery(user: User) {
@@ -64,15 +68,18 @@ export class Tab3Page implements OnInit{
 
   }
 
-  
-  showImage(index: number) {
-    this.lightbox.open(index, this.galleryId, {
-      panelClass: 'fullscreen'
+  async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 1500,
+      position: position,
     });
+
+    await toast.present();
   }
 
   private viewPhoto(index: number) {
-    this.showImage(index);
+    // this.showImage(index);
   }
 
   getAge(dob: string) {
@@ -93,7 +100,7 @@ export class Tab3Page implements OnInit{
     const modal = await this.modalCtrl.create({
       component: SettingsComponent,
       componentProps: {
-        "user": this.user
+        "user": this.currentUser
       }
     });
     modal.present();
@@ -104,10 +111,10 @@ export class Tab3Page implements OnInit{
   }
 
   getUserAge(): number {
-    console.log("Age ", this.user);
+    console.log("Age ", this.currentUser);
     
-    if(this.user && !!this.user.dob) {
-      return this.utilService.getAge(this.user.dob);
+    if(this.currentUser && !!this.currentUser.dob) {
+      return this.utilService.getAge(this.currentUser.dob);
     }
     return 99;
   }
@@ -118,7 +125,7 @@ export class Tab3Page implements OnInit{
 
   showGallery(index: number) {
     let imgs: any[] = [];
-    for(let img of this.user.images ) {
+    for(let img of this.currentUser.images ) {
       imgs.push({path: img})
     }
     let prop = {
@@ -132,6 +139,8 @@ export class Tab3Page implements OnInit{
 
 
   async uploadImage(source: CameraSource) {
+    const loading = await this.loadingCtrl.create({message: "Updating profile picture..."});
+    await loading.present();
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
@@ -139,78 +148,57 @@ export class Tab3Page implements OnInit{
       source: source
     });
     
-    if(image) {
-
-      console.log("IMAGE UPLOAD ", image);
-      
-
-      this.authService.uploadImage(source, this.currentUser._uid).subscribe(res => {
-        console.log("Images uploaded ", res);
-        
+    if(image && image.base64String) { 
+      this.authService.uploadImage(image.base64String, this.currentUser._id).subscribe(res => {
+        this.updateCurrentUser(res[0]);
+        this.presentToast("Image uploaded successfully", 'bottom');
+        loading.dismiss();
       }, err => {
+        loading.dismiss();
+        this.presentToast("An error occured while uploading the image", 'bottom');
         console.log("Images upload error ", err);
-
       })
-
-      // const loading = await this.loadingCtrl.create({message: "Uploading image, please wait..."});
-      // await loading.present();
-
-      // // const img = await this.firebaseService.savePictureInFirebaseStorage(image);
-      
-      // if(this.user.images.length < 1 && !this.user.profile_picture) {
-      //   this.user.profile_picture = img;
-      // }
-      // this.user.images.push(img);
-      // await this.firebaseService.addDocumentToFirebaseWithCustomID(COLLECTION.USERS,this.user).then(() => {
-      //   loading.dismiss();
-      // }).catch(err => {
-      //   loading.dismiss();
-      // })
-
     }
   }
 
-  
+
   private async setProfilePicture(index: number) {
-    const loading = await this.loadingCtrl.create({message: "Updating profile picture, please wait..."});
+    const loading = await this.loadingCtrl.create({message: "Updating profile picture..."});
     await loading.present();
-    this.user.profile_picture = this.user.images[index];
-    // this.firebaseService.updateUserProfilePicture(this.user).then(() => {
-    //   loading.dismiss();
-    // }).catch(err => {
-    //   console.log(err);
-    //   loading.dismiss()
-    // })
+
+    this.authService.updateProfilePic(this.currentUser.images[index], this.currentUser._id).subscribe(res => {
+      this.updateCurrentUser(res);
+      this.presentToast("Image uploaded successfully", 'bottom');
+      loading.dismiss();
+    }, err => {
+      loading.dismiss();
+      this.presentToast("An error occured while uploading the image", 'bottom');
+      console.log("Images upload error ", err);
+    })
     
   }
 
   private async deletePhoto(index: number) {
-    const delLoading = await this.loadingCtrl.create({message: "Deleting photo, please wait..."});
-    await delLoading.present();
-    const updateLoading = await this.loadingCtrl.create({message: "Updating your profile, please wait..."});
-    // this.firebaseService.deletePhotoFromFirebaseStorage(this.user, this.user.images[index])
-    // .then((res) => {
-    //   delLoading.dismiss();
-    //   console.log("Photo deleted successfully", res);
-    //    updateLoading.present();
+    const loading = await this.loadingCtrl.create({message: "Deleting photo, please wait..."});
+    await loading.present();
 
-    //   this.firebaseService.updateUserPhotoList(this.user, this.user.images[index]).then(img => {
-    //     console.log("User profile updated");
-    //     updateLoading.dismiss();
-        
-    //   }).catch(err => {
-    //     console.log("User Profile not updated", err);
-    //     updateLoading.dismiss();
-        
-    //   })
-      
-    // }).catch((error) => {
-    //   console.log(error);
-    //   delLoading.dismiss();
+    const imgs = this.currentUser.images.splice(index, 1);
+    
+    this.authService.updateImages(this.currentUser.images, this.currentUser._id).subscribe(res => {
+      this.updateCurrentUser(res);
+      loading.dismiss();
+    }, err => {
+      loading.dismiss();
+      console.log(err.error.message);
+    })
+   }
 
-    // });
-
-  }
+   private updateCurrentUser(user: any) {
+      this.currentUser = user;
+      this.authService.storageSave(STORAGE.ME, user);
+      this.images = user.images.map((i: any) =>  'data:image/jpeg;base64, ' + i);
+      this.cdr.detectChanges();
+   }
 
   async openImageActionSheet(index: number) {
     const actionSheet = await this.actionSheetController.create({

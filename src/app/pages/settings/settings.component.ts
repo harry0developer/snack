@@ -137,7 +137,7 @@ export class SettingsComponent  implements OnInit {
   async logout() {
     this.modalCtrl.dismiss().then(() => {
       this.authService.logout();
-      this.router.navigateByUrl('login')
+      this.router.navigateByUrl('re-login')
     })
   }
 }

@@ -38,6 +38,8 @@ export class Tab1Page implements AfterViewInit, OnInit{
       gender: 'Male',
       age: 34,
       location: { name: 'Midrand', lat: -25.5999, lng: 28.0007 },
+      profilePic: '',
+      verified: false,
       images: ['assets/profiles/1a.jpg', 'assets/profiles/1b.jpg', 'assets/profiles/1c.jpg'],
       phoneNumber: '+27829390061',
       username: '+27829390061',
@@ -61,6 +63,8 @@ export class Tab1Page implements AfterViewInit, OnInit{
       dob: '04/04/1998',
       gender: 'Female',
       age: 34,
+      profilePic: '',
+      verified: false,
       location: { name: 'South Gate', lat: -26.5999, lng: 28.0007 },
       images: ['assets/profiles/2a.jpg', 'assets/profiles/2b.jpg', 'assets/profiles/2c.jpg'],
       phoneNumber: '+278100099991',
@@ -87,6 +91,8 @@ export class Tab1Page implements AfterViewInit, OnInit{
       dob: '19/12/2000',
       gender: 'Male',
       age: 34,
+      profilePic: '',
+      verified: false,
       location: { name: 'Benoni', lat: -25.4444, lng: 27.9999 },
       images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
       phoneNumber: '+277400018800',
@@ -104,12 +110,15 @@ export class Tab1Page implements AfterViewInit, OnInit{
         distance: 67
       }
     },
+    
     {
       _id: '',
       name: 'Page Book',
       dob: '19/12/1999',
       gender: 'Female',
       age: 34,
+      profilePic: '',
+      verified: false,
       images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
       phoneNumber: '+277400018800',
       username: '+277400018800',

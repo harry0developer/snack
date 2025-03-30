@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     type: [String],
     required: false,
   },
+  profilePic: {
+    type: String,
+    required: false,
+  },
   phoneNumber: {
     type: String,
     required: true,
@@ -93,6 +97,10 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
+  verfied: {
+    type: Boolean,
+    required: false
+  }
 });
 
 const User = mongoose.model('User', userSchema);

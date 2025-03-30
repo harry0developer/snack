@@ -49,7 +49,9 @@ export interface Location {
     age: number;
     gender: string;
     location?: Location;
-    images?: string[];
+    profilePic: string;
+    verified: boolean;
+    images: string[];
     phoneNumber: string;
     username: string;
     password: string;

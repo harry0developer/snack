@@ -17,8 +17,8 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, { username, password, name, dob });
   }
 
-  login(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { username, password });
+  login(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { username: data.phoneNumber,  phoneNumber: data.phoneNumber, password: data.passcode  });
   }
 
   saveToken(token: string): void {
@@ -58,20 +58,22 @@ export class AuthService {
     });
   }
 
-  uploadImage(files: any, uid: any ): Observable<any> {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('profileImages', files[i], files[i].name);
-    }
+  uploadImage(image: any, uid: any ): Observable<any> {
+    let images: string[] = [];
+    images.push(image);
+    const data = {uid, images};
+    return this.http.post(`${this.apiUrl}/upload`,  data);
 
-    const token = localStorage.getItem(STORAGE.AUTH_TOKEN); // Get the JWT token
+  }
 
-    return this.http.post(`${this.apiUrl}/upload`, formData, {
-      headers: {
-        Authorization: token ? token : '',
-        uid
-      },
-    });
+  updateImages(images: any[], uid: string): Observable<any> {
+    const data = {uid, images};
+    return this.http.put(`${this.apiUrl}/update-images/${uid}`,  data);
+  }
+
+  updateProfilePic(profilePic: string, uid: string): Observable<any> {
+    const data = {uid, profilePic};
+    return this.http.put(`${this.apiUrl}/update-profile-picture/${uid}`,  data);
   }
 
   sendOtp(otpRequest: any) {
@@ -95,7 +97,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);
-    localStorage.removeItem(STORAGE.ME);
+    // localStorage.removeItem(STORAGE.ME);
     localStorage.removeItem(STORAGE.USER);
   }
 

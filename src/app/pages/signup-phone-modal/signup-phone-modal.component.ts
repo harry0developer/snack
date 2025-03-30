@@ -2,19 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ActionSheetController, AlertController, LoadingController, ModalController} from '@ionic/angular';
+import { ActionSheetController, AlertController, LoadingController, ModalController, ToastController} from '@ionic/angular';
 
-import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectModal, IonSelectOption,  } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter, IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectModal, IonSelectOption,  } from '@ionic/angular/standalone';
  
 import moment from 'moment';
 import { User } from '../../commons/model';
 import { AuthService } from '../../commons/services/auth.service';
 import { APP_ROUTES, STORAGE } from '../../commons/conts';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-signup-phone-modal',
   templateUrl: './signup-phone-modal.component.html',
   styleUrls: ['./signup-phone-modal.component.scss'],
+  standalone: true,
   imports: [
     IonHeader,
     IonContent,
@@ -28,8 +30,11 @@ import { APP_ROUTES, STORAGE } from '../../commons/conts';
     IonSelectOption,
     IonDatetime,
     IonCard,
+    IonIcon,
+    IonCol,
     IonFooter,
-    CommonModule,ReactiveFormsModule
+    CommonModule,
+    ReactiveFormsModule
 
   ]
 })
@@ -76,6 +81,7 @@ export class SignupPhoneModalPage implements OnInit {
     ]
   };
  
+  profilePic: string = '';
   profilePicture: string = '';
   user: any;
   currentUser: any;
@@ -94,6 +100,7 @@ export class SignupPhoneModalPage implements OnInit {
     private authService: AuthService,
     private modalCtrl: ModalController,
     public actionSheetController: ActionSheetController,
+    private presentToast: ToastController,
     private loadingCtrl:LoadingController
   ) { } 
 
@@ -119,9 +126,7 @@ export class SignupPhoneModalPage implements OnInit {
   get preferenceWith() {
     return this.userFormGroup.get('preferenceWith')?.value;
   }
- 
- 
- 
+
   ngOnInit() {    
     this.setMaxDate();
     this.userFormGroup = this.formBuilder.group({
@@ -149,7 +154,7 @@ export class SignupPhoneModalPage implements OnInit {
       ])),
       preferenceWith: new FormControl('', Validators.compose([
         Validators.required
-      ])),
+      ])), 
       passcode: new FormControl('', Validators.compose([
         Validators.required,
         Validators.minLength(6),
@@ -158,7 +163,6 @@ export class SignupPhoneModalPage implements OnInit {
     });
   
   }
-
 
   back() {
     if(this.activeStep > 0) {
@@ -194,8 +198,8 @@ export class SignupPhoneModalPage implements OnInit {
       bodyType: f.bodyType,
       sexualOrientation: f.sexualOrientation,
       interests: [],
-      images: [],
-      profilePic: '',
+      images: [this.profilePic],
+      profilePic: this.profilePic,
       verified: false,
       preferences: {
         ethnicity: [],
@@ -278,4 +282,42 @@ export class SignupPhoneModalPage implements OnInit {
     }
   }
 
+  async uploadImage(source: CameraSource) {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: source
+    });
+    
+    if(image && image.base64String) { 
+      this.profilePic = image.base64String;
+      this.profilePicture = 'data:image/jpeg;base64, ' + image.base64String;
+    }
+  }
+
+  async selectImageActionSheet() {
+    const actionSheet = await this.actionSheetController.create({
+      header: "Select Image",
+      buttons: [{
+        text: 'Load from Library',
+        handler: () => {
+          this.uploadImage(CameraSource.Photos)
+        }
+      },
+      {
+        text: 'Use Camera',
+        handler: () => {
+          this.uploadImage(CameraSource.Camera)
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+      ]
+    });
+    await actionSheet.present();
+  }
+  
 }

@@ -268,12 +268,11 @@
    <!-- Step 6  -->
    <div class="container" *ngIf="activeStep == 7">
     <div class="title">
-      <h1>Lastly, Setup a 6 digit Passcode</h1>
+      <h1>Setup a 6 digit Passcode</h1>
       <p>This is required to login</p>
     </div>
     <form class="modal-form" [formGroup]="userFormGroup">
       <ion-card>
-
         <ion-item mode="ios" lines="none">
           <ion-input class="border" placeholder="Enter a passcode" type="text" formControlName="passcode"></ion-input>
         </ion-item>
@@ -296,12 +295,44 @@
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round" (click)="createAccount()">
-          All set
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round" (click)="next()">
+         Next
         </ion-button>
       </div>
       
     </form>
+  </div>
+
+
+   <!-- Step 7  -->
+   <div class="container" *ngIf="activeStep == 8">
+    <div class="title">
+      <h1>Lastly, Upload a profile pic</h1>
+      <p>This is what others will see</p>
+    </div>
+
+    <div class="profile-pic" *ngIf="profilePicture">
+      <img  [src]="profilePicture" alt="">
+    </div>
+
+    <div class="modal-form" >
+      <ion-col size="4" >
+        <div class="img-placeholder" (click)="selectImageActionSheet()">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+      </ion-col> 
+        
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="back()">
+          Back
+        </ion-button>
+
+        <ion-button class="solid primary" [disabled]="!profilePicture" shape="round" (click)="createAccount()">
+          All set
+        </ion-button>
+      </div>
+      
+    </div>
   </div>
  
 

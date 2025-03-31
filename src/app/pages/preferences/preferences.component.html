@@ -3,7 +3,6 @@
     <ion-buttons slot="start">
       <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>Welcome</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="confirm()" [strong]="true">Apply</ion-button>
     </ion-buttons>
@@ -13,6 +12,7 @@
 <ion-content class="preferences">
   <ion-list [inset]="true">
     <ion-card>
+      <p>Match people within and around this area</p>
       <ion-item class="title" [button]="true">
         <ion-label>Location</ion-label>
         <div slot="end">Midrand, Gauteng</div>
@@ -20,6 +20,8 @@
     </ion-card>
 
     <ion-card>
+      <p>Match people within this distance</p>
+
       <ion-item class="title">
         <ion-label>Distance</ion-label>
         <div slot="end">{{distanceRange.value}} km</div>
@@ -46,6 +48,8 @@
     </ion-card>
 
     <ion-card>
+      <p>Match people within this age range</p>
+
       <ion-item class="title"> 
         <ion-label>Age Range</ion-label>
         <div slot="end">{{ageRange.lower}} - {{ageRange.upper}}</div>
@@ -73,6 +77,8 @@
     </ion-card>
 
     <ion-card>
+      <p>Only people with this number of photos</p>
+
       <ion-item class="title">
         <ion-label>Minimum number of photos </ion-label>
         <div slot="end">{{minNumberOfPhotos.value}} </div>

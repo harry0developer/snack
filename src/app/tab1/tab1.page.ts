@@ -6,6 +6,7 @@ import { STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
 import { User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
+import { UserService } from '../commons/services/user.service';
  
 @Component({
   selector: 'app-tab1',
@@ -30,113 +31,10 @@ export class Tab1Page implements AfterViewInit, OnInit{
   loadingUsers: boolean = false;
 
 
-  swipeCards: User[] = [
-    {
-      _id: '',
-      name: 'Jon Doe',
-      dob: '12/12/1991',
-      gender: 'Male',
-      age: 34,
-      location: { name: 'Midrand', lat: -25.5999, lng: 28.0007 },
-      profilePic: '',
-      verified: false,
-      images: ['assets/profiles/1a.jpg', 'assets/profiles/1b.jpg', 'assets/profiles/1c.jpg'],
-      phoneNumber: '+27829390061',
-      username: '+27829390061',
-      password: 'qwerty',
-      ethnicity: 'Black',
-      bodyType: 'Slim',
-      sexualOrientation: 'Straight',
-      interests: ['Sky diving'],
-      preferences: {
-        ethnicity: ['Black', 'Asian'],
-        age: { lower: 18, upper: 27 },
-        want: ['One night stand', 'No string attached'],
-        with: ['Female'],
-        distance: 100
-      }
-    },
+  users: User[] = [];
 
-    {
-      _id: '',
-      name: 'Keem Lue ',
-      dob: '04/04/1998',
-      gender: 'Female',
-      age: 34,
-      profilePic: '',
-      verified: false,
-      location: { name: 'South Gate', lat: -26.5999, lng: 28.0007 },
-      images: ['assets/profiles/2a.jpg', 'assets/profiles/2b.jpg', 'assets/profiles/2c.jpg'],
-      phoneNumber: '+278100099991',
-      username: '+278100099991',
-      password: 'qwerty',
-   
-      ethnicity: 'Asian',
-      bodyType: 'Slim',
-      sexualOrientation: 'Straight',
-      interests: ['Sky diving'],
-     
-      preferences: {
-        ethnicity: ['Black', 'Asian'],
-        age: { lower: 18, upper: 55 },
-        want: ['No string attached'],
-        with: ['Male'],
-        distance: 55
-      }
-    },
-    
-    {
-      _id: '',
-      name: 'Steve Madden',
-      dob: '19/12/2000',
-      gender: 'Male',
-      age: 34,
-      profilePic: '',
-      verified: false,
-      location: { name: 'Benoni', lat: -25.4444, lng: 27.9999 },
-      images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
-      phoneNumber: '+277400018800',
-      username: '+277400018800',
-      password: 'qwerty',
-        ethnicity: 'White',
-        bodyType: 'Slim',
-        sexualOrientation: 'Straight',
-        interests: ['Sky diving'],
-      preferences: {
-        ethnicity: ['Black', 'Asian'],
-        age: { lower: 18, upper: 27 },
-        want: ['One night stand', 'No string attached'],
-        with: ['Female'],
-        distance: 67
-      }
-    },
-    
-    {
-      _id: '',
-      name: 'Page Book',
-      dob: '19/12/1999',
-      gender: 'Female',
-      age: 34,
-      profilePic: '',
-      verified: false,
-      images: ['assets/profiles/3a.jpg', 'assets/profiles/3b.jpg', 'assets/profiles/3c.jpg'],
-      phoneNumber: '+277400018800',
-      username: '+277400018800',
-      password: 'qwerty',
-        ethnicity: 'White',
-        bodyType: 'Slim',
-        sexualOrientation: 'Straight',
-        interests: ['Sky diving'],
-      preferences: {
-        ethnicity: ['Black', 'Asian'],
-        age: { lower: 18, upper: 27 },
-        want: ['One night stand', 'No string attached'],
-        with: ['Female'],
-        distance: 67
-      }
-    }
-  ];
 
+  me!: User;
 
   cards = [
     {
@@ -269,6 +167,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     private modalCtrl: ModalController,
     private authService: AuthService,
     private router: Router,
+    private userService: UserService,
     private utilService: UtilService,
     private cdRef: ChangeDetectorRef) {}
 
@@ -279,6 +178,11 @@ export class Tab1Page implements AfterViewInit, OnInit{
       this.authService.logout();
       this.router.navigateByUrl('login');
     }
+    const u = this.authService.storageGet(STORAGE.ME);
+    u.images = this.utilService.getBase64Images(u.images);
+    u.profilePic = this.utilService.getBase64Image(u.profilePic);
+    this.me = u;
+    this.getUsers();
   }
 
 
@@ -291,8 +195,17 @@ export class Tab1Page implements AfterViewInit, OnInit{
     }, 1300);
   }
 
-  getAge(dob: string) {
-    return this.utilService.getAge(dob);
+  getUsers() {
+    this.userService.getUsers().subscribe((users: any) => {
+      this.users = users.filter((u: User) => u._id !== this.me._id);
+      if(this.users && this.users.length > 0) {
+        this.users.forEach((u,i) => {
+          this.users[i].images = this.utilService.getBase64Images(u.images);
+        });
+      }
+      console.log("Base64 ", this.users);
+      
+    });
   }
 
   async openModal() {
@@ -374,7 +287,6 @@ export class Tab1Page implements AfterViewInit, OnInit{
     }
    
   }
-  
 
   onSwipeRight(index: number) {
     console.log('Card accepted:', this.cards[index]);
@@ -396,12 +308,14 @@ export class Tab1Page implements AfterViewInit, OnInit{
 
   handleNoMoreUsersChange(event: any){
     console.log("No more user ", event);
+ 
     setTimeout(() => {
       this.initializeGestures();
-      this.cdRef.detectChanges();
       this.loadingUsers = false;
-
+      this.showNoMoreUsers = false;
+      this.getUsers();
     }, 1300);
+    this.cdRef.detectChanges();
 
   }
   

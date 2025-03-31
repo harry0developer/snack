@@ -1,10 +1,13 @@
+@import '../../../theme/colors.scss';
+
 .no-users {
     text-align: center;
-    color: #FFF;
+    color: $white;
     padding-top: 30%;
     padding-left: 30px;
     padding-right: 30px;
-
+    background-color: $secondary;
+    height: 100vh;
     .profile{
         width: 90px;
         height: 90px;

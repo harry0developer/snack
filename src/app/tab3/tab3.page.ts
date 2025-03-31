@@ -48,7 +48,8 @@ export class Tab3Page implements OnInit{
     this.currentUser = this.authService.storageGet(STORAGE.ME); 
     this.profilePicture =  'data:image/jpeg;base64, ' + this.currentUser.profilePic;
     console.log("Current User", this.currentUser);
-    this.images = this.currentUser.images.map((i: any) =>  'data:image/jpeg;base64, ' + i)
+    this.images = this.currentUser.images.map((i: any) =>  'data:image/jpeg;base64, ' + i);
+    this.cdr.detectChanges();
   }
 
   initialiseGallery(user: User) {
@@ -139,8 +140,6 @@ export class Tab3Page implements OnInit{
 
 
   async uploadImage(source: CameraSource) {
-    const loading = await this.loadingCtrl.create({message: "Updating profile picture..."});
-    await loading.present();
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
@@ -152,13 +151,11 @@ export class Tab3Page implements OnInit{
       this.authService.uploadImage(image.base64String, this.currentUser._id).subscribe(res => {
         this.updateCurrentUser(res[0]);
         this.presentToast("Image uploaded successfully", 'bottom');
-        loading.dismiss();
       }, err => {
-        loading.dismiss();
         this.presentToast("An error occured while uploading the image", 'bottom');
         console.log("Images upload error ", err);
       })
-    }
+    }  
   }
 
 

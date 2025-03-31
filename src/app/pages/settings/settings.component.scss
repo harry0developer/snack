@@ -1,12 +1,13 @@
+@import '../../../theme/colors.scss';
 
 .container {
     margin-bottom: 40px;
     .divider {
-        background-color: #FFF;
+        background-color: $white;
         padding: 19px 20px;
         font-size: 18px;
         font-weight: bold;
-        color: #000;
+        color: $dark;
     }
 
     ion-item {
@@ -22,7 +23,7 @@
             }  
         }
         ion-icon {
-            color: #762b69;
+            color: $secondary;
         }
     }
 
@@ -32,7 +33,7 @@
             text-align: center;
         }
         p {
-            color: #000;
+            color: $dark;
         }
         .title {
             font-weight: 700;
@@ -40,7 +41,7 @@
         }
 
         .looking-for {
-            list-style:disc;
+            list-style: disc;
             padding-left: 0;
 
         }

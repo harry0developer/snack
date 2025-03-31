@@ -1,13 +1,24 @@
+@import '../../../theme/colors.scss';
+ 
+
+// ion-toolbar {
+//     --background: #2F184B;
+//     color: white;
+//     opacity: 1;
+// }
+
 .preferences {
-    --background: #2f174b;
-    .title {
-        font-weight: bold;
+    --background: $light;
+    ion-list {
+        margin: 0;
+        p {
+            margin-left: 14px;
+            font-weight: bold;
+        }
+
+        [slot]{
+            color: $secondary;
+            font-weight: bold;
+        }
     }
 }
-
-ion-toolbar {
-    --background: #2F184B;
-    color: white;
-    opacity: 1;
-}
-

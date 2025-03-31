@@ -1,3 +1,5 @@
+@import '../../theme/colors.scss';
+
 ::ng-deep {
 
     ion-tab-bar {
@@ -5,11 +7,28 @@
     } 
 
     ion-tab-button {
-        background-color: #2F184B;
-        color:white;
+        background-color: $secondary;
+        color:$white;
     }
 
     .tab-selected {
-        color: #6c41a5;
+        color: $dark;
     }
+
+
+    ion-toolbar {
+        --background: #FFF;
+        color: #d9a817;
+        opacity: 1;
+    }
+
+      
+  ion-chip {
+    background: $light;
+    color: $dark;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
 }
+ 

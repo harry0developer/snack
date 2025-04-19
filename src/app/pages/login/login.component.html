@@ -65,7 +65,7 @@
         </div>
 
         <div class="buttons">
-          <ion-button expand="block" class="solid secondary" (click)="login()">Login</ion-button>
+          <ion-button expand="block" [disabled]="!loginFormGroup.valid" class="solid secondary" (click)="login()">Login</ion-button>
         </div>
       </ion-grid>
     </form>

@@ -12,29 +12,24 @@ const fs = require('fs');
 const sendOTP = require('./services/twilio');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
-const expressHandler = require("express-async-handler");
+const { GridFsStorage } = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+const util = require('util')
 
 mongoose.set("debug", true);
-dotenv.config();
 
+dotenv.config();
 
 const userRoutes = require('./routes/users');
 const chatRoutes = require('./routes/chats');
-
-
-const { postImage } = require('./controllers/images');
-
-const Chat = require('./models/chat');  
-const User = require('./models/user');  
-
-const { connect } = require('./connect');
-const { router } = require('./routes/images');
-
-const { attachUserId } = require('./middleware/attach');
-
+ 
+const Chat = require('./models/chat');
+const User = require('./models/user');
+  
+ 
 const app = express();
-app.use(express.json({ limit: '50mb' }));  // increase the limit as needed
-app.use(express.urlencoded({ limit: '50mb', extended: true }));  // for form-data or URL encoded payloads
+// app.use(express.json({ limit: '50mb' }));  // increase the limit as needed
+// app.use(express.urlencoded({ limit: '50mb', extended: true }));  // for form-data or URL encoded payloads
 
 const port = 5001;
 const server = http.createServer(app);
@@ -49,65 +44,121 @@ const io = socketIo(server, {
 });
 
 // Middleware
-app.use(bodyParser.json());
-app.use('/uploads', express.static('uploads')); 
+// app.use(bodyParser.json());
+app.use('/uploads', express.static('uploads'));
 
-app.use(cors({
-    origin: '*'
-}));
+app.use(cors());
+ 
+
+// Middleware to parse JSON and form data before multer
+app.use(express.json());  // To parse JSON bodies
+app.use(express.urlencoded({ extended: true }));  // To parse form fields (for 'uid')
+
 
 // Routes
 app.use('/api', userRoutes);
 app.use('/api', chatRoutes);
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     const token = req.headers['authorization'];
-//     if (!token) {
-//       return cb(new Error('No token provided'), false);
-//     }
 
-//     jwt.verify(token, 'secretKey', (err, decoded) => {
-//       if (err) {
-//         return cb(new Error('Invalid token'), false);
-//       }
-
-//       // Create a directory based on user ID
-//       const userId = decoded.userId;
-//       const userDirectory = path.join(__dirname, 'uploads', userId);
-
-//       // Check if directory exists; if not, create it
-//       if (!fs.existsSync(userDirectory)) {
-//         fs.mkdirSync(userDirectory, { recursive: true });
-//       }
-
-//       // Set destination folder to user-specific directory
-//       cb(null, userDirectory);
-//     });
-//   },
-//   filename: function (req, file, cb) {
-//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-//     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-//   },
-// });
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
 
 console.log("ENV ", dotenv.config());
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.log(err));
-
 // connect();
+
+const conn = mongoose.createConnection(process.env.MONGO_ATLAS);
+
+// Init gfs
+ 
+
+let gfs;
+conn.once('open', () => {
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: 'images', // same as in your GridFsStorage config
+  });
+});
+
+
+const storage = new GridFsStorage({
+  url: process.env.MONGO_ATLAS,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const { uid } = req.body;  
+        if (!uid) {
+          return reject(new Error('No UID provided'));
+        }
+
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) return reject(err);
+          const filename = buf.toString('hex') + path.extname(file.originalname); 
+
+          resolve({
+            filename,   
+            bucketName: `images`,   
+            metadata: {
+              uid: uid,
+              originalName: file.originalname,
+            },
+          });
+        });
+      } catch (error) {
+        reject(error);  
+      }
+    });
+  },
+});
+
+const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
+
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  res.json({
+    message: 'File uploaded successfully',
+    file: req.file,
+  });
+});
+ 
+app.get('/api/images/:uid', async (req, res) => {
+  const uid = req.params.uid;
+
+  if (!gfs) {
+    return res.status(500).json({ message: 'GFS not initialized' });
+  }
+
+  const files = await gfs.find({ 'metadata.uid': uid }).toArray();
+
+  if (!files || files.length === 0) {
+    return res.status(404).json({ message: 'No files found for this user' });
+  }
+  
+  res.json(files);
+ 
+})
+ 
+
+app.get('/api/image/:uid/:filename', async(req, res) => {
+  const { uid, filename } = req.params;
+  const file = await gfs.find({ filename, 'metadata.uid': uid }).toArray();
+
+  if (!file) {
+    return res.status(404).json({ message: 'No files found for this user' });
+  }
+
+   const downloadStream = gfs.openDownloadStreamByName(filename);
+
+  downloadStream.on('error', err => {
+    console.error('Stream error:', err);
+    return res.status(500).json({ error: 'Error reading image' });
+  });
+
+  return downloadStream.pipe(res);
+ 
+});
 
 app.post('/api/register', async (req, res) => {
   const { username, password, name, dob } = req.body;
-  
+
   // Check if user already exists
   const userExists = await User.findOne({ username });
   if (userExists) {
@@ -154,7 +205,7 @@ app.post('/api/login', async (req, res) => {
 
   // Create JWT token
   const token = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
-  
+
   res.json({ token, user });
 });
 
@@ -178,8 +229,8 @@ app.get('/api/protected', (req, res) => {
 app.post('/api/send-otp', async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   // const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
-  const { phoneNumber, type }= req.body;
-  
+  const { phoneNumber, type } = req.body;
+
 
   const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toLocaleString('en-US', {
     timeZone: 'Europe/London'
@@ -190,8 +241,10 @@ app.post('/api/send-otp', async (req, res) => {
     if (userExists) {
       return res.status(500).json({ message: 'User already exists' });
     }
-    return res.status(200).json({phoneNumber, otp, otpExpiresAt});
-  }catch (error) {
+    console.log({ phoneNumber, otp, otpExpiresAt });
+
+    return res.status(200).json({ phoneNumber, otp, otpExpiresAt });
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -199,7 +252,7 @@ app.post('/api/send-otp', async (req, res) => {
 });
 
 
-app.post('/api/create-account', async (req, res) => { 
+app.post('/api/create-account', async (req, res) => {
   const { username, password } = req.body;
   const userExists = await User.findOne({ username });
   if (userExists) {
@@ -232,15 +285,15 @@ app.post('/api/verify-otp', async (req, res) => {
     const user = await User.findOne({ phoneNumber });
 
     console.log("Found user ", user);
-    
+
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
     }
     if (user.otp === otp && new Date() < user.otpExpiresAt) {
-      await User.findOneAndUpdate({phoneNumber}, {verified: true });
+      await User.findOneAndUpdate({ phoneNumber }, { verified: true });
       res.status(200).json({ message: 'OTP verified successfully' });
     } else {
-      res.status(400).json({ message: 'Invalid or expired OTP: '+otp+ ' user otp: '+ user.otp });
+      res.status(400).json({ message: 'Invalid or expired OTP: ' + otp + ' user otp: ' + user.otp });
     }
   } catch (error) {
     console.error(error);
@@ -248,91 +301,24 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
-app.post('/api/upload', express.json({ limit: '50mb' }), async (req, res) => {
+
  
-  try {
-    const {uid, images} = req.body;
- 
-    const user = await User.findOneAndUpdate(
-      { _id: uid },
-      {
-        $push: { images: { $each: images } }, 
-      },
-      { upsert: true }  
-    );
-
-    await user.save();
-
-    const newUser = await User.find({ _id: uid});
-    return res.status(200).json(newUser);
-    
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
- 
-app.put('/api/update-images/:_id', async (req, res) => {
-  const { _id } = req.params;
-  const { images } = req.body; 
-  if (!Array.isArray(images)) {
-    return res.status(400).json({ message: 'newImages must be an array of base64 encoded strings' });
-  }
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id },
-      { images: images },  // Replace the entire images array with newImages
-      { new: true, runValidators: true }  // Return the updated document
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-app.put('/api/update-profile-picture/:_id', async (req, res) => {
-  const { _id } = req.params;
-  const { profilePic } = req.body; 
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id },
-      { profilePic: profilePic },   
-      { new: true, runValidators: true }  
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
 //TWILLIO CODE 
 app.post('/api/send-twilio-otp', async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
-  const { username, password }= req.body;
+  const { username, password } = req.body;
   try {
     let user = await User.findOne({ username });
     console.log("new user", user);
-    
+
     if (user && user.verified) {
-      res.status(500).json({ message: 'Phone number already registered. Please login'});
-    } else if(user && !user.verified) {
-      await User.findOneAndUpdate({username}, {password, otp, otpExpiresAt })
+      res.status(500).json({ message: 'Phone number already registered. Please login' });
+    } else if (user && !user.verified) {
+      await User.findOneAndUpdate({ username }, { password, otp, otpExpiresAt })
       res.status(200).json({ message: 'OTP sent successfully: OTP 2:' + otp });
 
-    }else {
+    } else {
       user = new User({ ...req.body, otpExpiresAt, otp });
       await user.save();
       res.status(200).json({ message: 'OTP sent successfully: OTP:' + otp });
@@ -345,69 +331,38 @@ app.post('/api/send-twilio-otp', async (req, res) => {
 
 
 //SOCKET IO 
-io.on('connection', (socket) => {
-    
-    socket.on('join-room', ({ user1, user2 }) => {
-        console.log(`${user1} and ${user2} are now connected`);
-        socket.join(`${user1}-${user2}`);
-      });
-      
-    socket.on('send-message', async ({ sender, receiver, message }) => {
-        console.log("Senging message...");
-        
-      try {
-        // Save message to MongoDB
-        const newChatMessage = new Chat({ sender, receiver, message });
-        await newChatMessage.save();
-  
-        // Emit the message in real-time to the relevant chat room
-        io.to(`${sender}-${receiver}`).emit('receive-message', { sender, message });
-  
-        // Optionally, you can emit to both users
-        io.to(receiver).emit('receive-message', { sender, message });
-        io.to(sender).emit('receive-message', { sender, message });
-      } catch (err) {
-        console.error('Error saving message to database:', err);
-      }
-    });
-  
-    socket.on('disconnect', () => {
-      console.log('A user disconnected');
-    });
+// io.on('connection', (socket) => {
 
-});
+//     socket.on('join-room', ({ user1, user2 }) => {
+//         console.log(`${user1} and ${user2} are now connected`);
+//         socket.join(`${user1}-${user2}`);
+//       });
 
-// Image upload route for multiple images
-app.post('/api/upload-images', upload.array('profileImages', 10), async (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
+//     socket.on('send-message', async ({ sender, receiver, message }) => {
+//         console.log("Senging message...");
 
-  jwt.verify(token, 'secretKey', async (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
+//       try {
+//         // Save message to MongoDB
+//         const newChatMessage = new Chat({ sender, receiver, message });
+//         await newChatMessage.save();
 
-    const userId = decoded.userId;
-    const profileImages = req.files ? req.files.map(file => `/uploads/${userId}/${file.filename}`) : [];
+//         // Emit the message in real-time to the relevant chat room
+//         io.to(`${sender}-${receiver}`).emit('receive-message', { sender, message });
 
-    try {
-      // Store image paths in MongoDB user document
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $push: { profileImages: { $each: profileImages } } },
-        { new: true }
-      );
+//         // Optionally, you can emit to both users
+//         io.to(receiver).emit('receive-message', { sender, message });
+//         io.to(sender).emit('receive-message', { sender, message });
+//       } catch (err) {
+//         console.error('Error saving message to database:', err);
+//       }
+//     });
 
-      res.json({ message: 'Images uploaded successfully', profileImages: updatedUser.profileImages });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error uploading images' });
-    }
-  });
-});
+//     socket.on('disconnect', () => {
+//       console.log('A user disconnected');
+//     });
 
+// });
+ 
 // Start Server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

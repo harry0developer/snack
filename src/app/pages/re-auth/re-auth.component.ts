@@ -7,6 +7,7 @@ import { User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
 import { Router } from '@angular/router';
+import { Geolocation, PositionOptions } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-re-auth',
@@ -20,7 +21,7 @@ import { Router } from '@angular/router';
   ]
 })
 export class ReAuthComponent  implements OnInit {
-username: string = '';
+  username: string = '';
   password: string = '';
   error: string = '';
   dob: string = '';
@@ -66,7 +67,36 @@ constructor(
     return this.passcodeFormGroup.controls['passcode'].value;
   }
 
- 
+  async getCurrentPosition()  {
+    try {
+      const permissionStatus = await Geolocation.checkPermissions();
+      console.log("Perms", permissionStatus.location);
+      if(permissionStatus?.location != 'granted') {
+        const requestStatus = await Geolocation.requestPermissions();
+        if(requestStatus?.location != 'granted') {
+          return;
+        }
+
+      }
+      let options: PositionOptions = {
+        enableHighAccuracy: true,
+        maximumAge: 3000,
+        timeout: 10000
+      }
+       
+      const postions = await Geolocation.getCurrentPosition(options);
+      console.log("Position", postions);
+      
+      return;
+    } catch (error) {
+      console.log(error);
+      return
+    }
+    
+  }
+
+
+
 
   login() {
    

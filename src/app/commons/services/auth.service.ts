@@ -42,40 +42,24 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.getToken() !== null;
   }
-
-  uploadImages(files: any): Observable<any> {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('profileImages', files[i], files[i].name);
-    }
-
-    const token = localStorage.getItem(STORAGE.AUTH_TOKEN); // Get the JWT token
-
-    return this.http.post(`${this.apiUrl}/upload-images`, formData, {
-      headers: {
-        Authorization: token ? token : '',
-      },
-    });
+ 
+  uploadImage( formData: any) {
+    return this.http.post(`${this.apiUrl}/upload`,  formData);
   }
 
-  uploadImage(image: any, uid: any ): Observable<any> {
-    let images: string[] = [];
-    images.push(image);
-    const data = {uid, images};
-    return this.http.post(`${this.apiUrl}/upload`,  data);
-
+  getImages(uid: string) {
+    return this.http.get(`${this.apiUrl}/images/${uid}`);
   }
 
-  updateImages(images: any[], uid: string): Observable<any> {
-    const data = {uid, images};
-    return this.http.put(`${this.apiUrl}/update-images/${uid}`,  data);
+  getImageData(uid: string, filename: string) {
+    return this.http.get(`${this.apiUrl}/image/${uid}/${filename}`, {
+       responseType: 'blob'
+    }); 
   }
 
-  updateProfilePic(profilePic: string, uid: string): Observable<any> {
-    const data = {uid, profilePic};
-    return this.http.put(`${this.apiUrl}/update-profile-picture/${uid}`,  data);
-  }
+  
 
+   
   sendOtp(otpRequest: any) {
     return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);
   }

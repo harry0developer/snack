@@ -1,8 +1,11 @@
 @import '../../../theme/colors.scss';
 
+ion-content{
+    --background: #d9a817;
+}
 .page {
-    background: $primary;
-    height: 100vh;
+
+    height: 100%;
     text-align: center;
     padding: 40px 10px;
     .logo {
@@ -48,6 +51,7 @@
 
 ion-footer {
     color: $white;
+    background-color: $primary ;
     text-align: center; 
 }
  

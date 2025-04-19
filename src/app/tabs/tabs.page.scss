@@ -7,7 +7,7 @@
     } 
 
     ion-tab-button {
-        background-color: $secondary;
+        background-color: $primary;
         color:$white;
     }
 
@@ -17,8 +17,8 @@
 
 
     ion-toolbar {
-        --background: #FFF;
-        color: #d9a817;
+        --background: $white;
+        color: $primary;
         opacity: 1;
     }
 

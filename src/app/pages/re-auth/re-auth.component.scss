@@ -1,7 +1,10 @@
 @import '../../../theme/colors.scss';
 
+ion-content{
+    --background: #d9a817;
+}
+
 .page {
-    background: $primary;
     height: 100vh;
     text-align: center;
     padding: 40px 10px;

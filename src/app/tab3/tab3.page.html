@@ -37,9 +37,9 @@
           </ion-label>
         </ion-item>
         <ion-item >
-          <ion-icon slot="start" class="gender icon" name="man-outline" *ngIf="currentUser.gender == 'Male'  "></ion-icon>
-          <ion-icon slot="start" class="gender icon" name="woman-outline" *ngIf="currentUser.gender == 'Female' "></ion-icon>
-          <ion-icon slot="start" class="gender icon" name="grid-outline" *ngIf="currentUser.gender == 'Gay Couple' || currentUser.gender == 'Lesbian Couple' "></ion-icon>
+          <ion-icon slot="start" class="gender icon" name="man-outline" *ngIf="currentUser?.gender == 'Male'  "></ion-icon>
+          <ion-icon slot="start" class="gender icon" name="woman-outline" *ngIf="currentUser?.gender == 'Female' "></ion-icon>
+          <ion-icon slot="start" class="gender icon" name="grid-outline" *ngIf="currentUser?.gender == 'Gay Couple' || currentUser?.gender == 'Lesbian Couple' "></ion-icon>
           <ion-label>
             <h3>{{currentUser?.gender}}</h3>
           </ion-label>
@@ -56,7 +56,7 @@
       </ion-item-divider>
 
       <ion-grid class="photo-grid" >
-        <ion-row *ngIf="currentUser && currentUser.images && currentUser.images.length > 0">
+        <ion-row *ngIf="currentUser && images.length > 0">
           <ion-col class="user-image" size="4" *ngFor="let u of images; let i=index">
             <img [src]="u" alt="" (click)="openImageActionSheet(i)">
           </ion-col>  
@@ -67,7 +67,7 @@
           </ion-col> 
         </ion-row>
 
-        <ion-row *ngIf="currentUser && currentUser.images && currentUser.images.length < 1">
+        <ion-row *ngIf="currentUser && images.length < 1">
           <ion-col size="4" >
             <div *ngIf="currentUser.images.length < 6" class="img-placeholder" (click)="selectImageActionSheet()">
               <ion-icon name="add-circle-outline"></ion-icon>

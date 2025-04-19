@@ -1,2 +1,2 @@
-# snacky
+# snuggle
 # snack

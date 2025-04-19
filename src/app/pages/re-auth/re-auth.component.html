@@ -42,6 +42,9 @@
 
         <div class="buttons">
           <ion-button expand="block" [disabled]="!passcodeFormGroup.valid" class="solid secondary" (click)="login()">Login</ion-button>
+
+          <ion-button expand="block"  class="solid secondary" (click)="getCurrentPosition()">Allow location</ion-button>
+
         </div>
       </ion-grid>
     </form>

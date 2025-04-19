@@ -12,5 +12,6 @@ export const APP_ROUTES = {
     CHATS: 'tabs/tab2',
     PROFILE: 'tabs/tab3',
     CREATE_ACCOUNT: 'create-account',
-    LOGIN: 'login'
+    LOGIN: 'login',
+    RE_LOGIN: 're-login'
 }

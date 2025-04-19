@@ -198,8 +198,8 @@ export class SignupPhoneModalPage implements OnInit {
       bodyType: f.bodyType,
       sexualOrientation: f.sexualOrientation,
       interests: [],
-      images: [this.profilePic],
-      profilePic: this.profilePic,
+      images: [],
+      profilePic: "",
       verified: false,
       preferences: {
         ethnicity: [],
@@ -238,6 +238,7 @@ export class SignupPhoneModalPage implements OnInit {
     
   }
    
+  
   async stepOne() { 
     const loading = await this.loadingCtrl.create({message: "Checkng email.."});
     await loading.present();

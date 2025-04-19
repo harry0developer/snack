@@ -17,7 +17,7 @@
     <div class="top">
       <div class="user-avatar">
         <img *ngIf="currentUser && !currentUser.profilePic" src="../../../assets/default.jpg" alt="">
-        <img *ngIf="currentUser && currentUser.profilePic" [src]="profilePicture" alt="">
+        <img *ngIf="currentUser && currentUser.profilePic" [src]="currentUser.profilePic" alt="">
       </div>
       <div class="user-info">
         <h1>{{currentUser?.name}}, {{currentUser?.age}}</h1>
@@ -58,7 +58,7 @@
       <ion-grid class="photo-grid" >
         <ion-row *ngIf="currentUser && images.length > 0">
           <ion-col class="user-image" size="4" *ngFor="let u of images; let i=index">
-            <img [src]="u" alt="" (click)="openImageActionSheet(i)">
+            <img [src]="u" alt="" (click)="openImageActionSheet(u)">
           </ion-col>  
           <ion-col size="4" >
             <div *ngIf="currentUser.images.length < 6" class="img-placeholder" (click)="selectImageActionSheet()">

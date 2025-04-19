@@ -15,6 +15,7 @@ const dotenv = require('dotenv');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const util = require('util')
+const { connect } = require('./connect');
 
 mongoose.set("debug", true);
 
@@ -65,19 +66,7 @@ app.use('/api', chatRoutes);
 
 console.log("ENV ", dotenv.config());
 
-// connect();
-
-const conn = mongoose.createConnection(process.env.MONGO_ATLAS);
-
-// Init gfs
- 
-
-let gfs;
-conn.once('open', () => {
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
-    bucketName: 'images', // same as in your GridFsStorage config
-  });
-});
+connect();
 
 
 const storage = new GridFsStorage({
@@ -112,11 +101,34 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  res.json({
-    message: 'File uploaded successfully',
-    file: req.file,
-  });
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  const file = req.file;
+  const uid = req.body.uid;  
+
+  if (!file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  if (!uid) {
+    return res.status(400).json({ error: 'Invalid or missing user ID' });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(uid, {
+      $push: { images: file.filename }  
+    }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      user
+    });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
  
 app.get('/api/images/:uid', async (req, res) => {
@@ -145,10 +157,9 @@ app.get('/api/image/:uid/:filename', async(req, res) => {
     return res.status(404).json({ message: 'No files found for this user' });
   }
 
-   const downloadStream = gfs.openDownloadStreamByName(filename);
+  const downloadStream = gfs.openDownloadStreamByName(filename);
 
   downloadStream.on('error', err => {
-    console.error('Stream error:', err);
     return res.status(500).json({ error: 'Error reading image' });
   });
 
@@ -228,7 +239,6 @@ app.get('/api/protected', (req, res) => {
 
 app.post('/api/send-otp', async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  // const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
   const { phoneNumber, type } = req.body;
 
 

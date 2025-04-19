@@ -4,8 +4,7 @@ import { ChatService } from '../../commons/services/chat.service';
 import { Message, User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { STORAGE } from 'src/app/commons/conts';
-import { UserService } from 'src/app/commons/services/user.service';
-import { SocketService } from 'src/app/commons/services/socket.service';
+ import { SocketService } from 'src/app/commons/services/socket.service';
 
 @Component({
   selector: 'app-chat',
@@ -24,8 +23,7 @@ export class ChatComponent  implements OnInit{
   constructor( 
     private route: ActivatedRoute , 
     private chatService: ChatService,
-    private userService: UserService,
-    private socketService: SocketService,
+     private socketService: SocketService,
     private authService: AuthService
 
   ) { }

@@ -57,8 +57,19 @@ export class AuthService {
     }); 
   }
 
-  
+  updateProfilePic(user: User){
+    return this.http.put(`${this.apiUrl}/users/${user._id}`, user);
+  }
 
+
+  getUsers(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/users`);
+  }
+
+  getUserById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/users/${id}`); 
+  }
+ 
    
   sendOtp(otpRequest: any) {
     return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);

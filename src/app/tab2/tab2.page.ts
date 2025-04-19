@@ -5,8 +5,7 @@ import { AuthService } from '../commons/services/auth.service';
 import { STORAGE } from '../commons/conts';
 import { User } from '../commons/model';
 import { SocketService } from '../commons/services/socket.service';
-import { UserService } from '../commons/services/user.service';
-
+ 
 export interface Chat {
   sender: string;
   receiver: string;
@@ -115,8 +114,7 @@ export class Tab2Page {
     private route: ActivatedRoute , 
     private router: Router,
     private chatService: ChatService,
-    private userService: UserService,
-    private socketService: SocketService,
+     private socketService: SocketService,
     private authService: AuthService
   ) {}
 
@@ -131,7 +129,7 @@ export class Tab2Page {
     console.log("has token", token);
     
     
-    this.userService.getUsers().subscribe((users: any) => {
+    this.authService.getUsers().subscribe((users: any) => {
       
       this.users = users.filter((u: User) => u._id !== me._id);
     })

@@ -26,7 +26,6 @@ export class Tab3Page implements OnInit{
   user: any;
   firebaseUser: any;
   images: any[] = [];
-  profilePicture: string = '';
   currentUser: any;
   isLoading: boolean = true; 
   galleryId = 'myLightbox';
@@ -63,6 +62,7 @@ export class Tab3Page implements OnInit{
     // console.log("Current User", this.currentUser);
     // this.images = this.currentUser.images.map((i: any) =>  'data:image/jpeg;base64, ' + i);
     this.getUserImages();
+ 
     this.cdr.detectChanges();
   }
 
@@ -163,8 +163,6 @@ export class Tab3Page implements OnInit{
 
     const blob = this.dataURLtoBlob(image.dataUrl!);
 
-    console.log("BLOB ", blob);
-    
     const formData = new FormData();
     const mime = image.format || 'jpeg';  
     const extension = mime === 'png' ? 'png' : 'jpg';  
@@ -175,14 +173,17 @@ export class Tab3Page implements OnInit{
 
     console.log("UID FE", this.currentUser._id);
     
-    // Upload to your Node.js GridFS endpoint
     this.authService.uploadImage(formData).subscribe({
-      next: res => console.log('Upload success:', res),
+      next: (res: any) => {
+        console.log(res);
+        this.authService.storageSave(STORAGE.ME, res.user);
+        this.getUserImages();
+        this.cdr.detectChanges();
+      },
       error: err => console.error('Upload failed:', err),
     });
   }
 
-  // Helper to convert Data URL to Blob
   private dataURLtoBlob(dataurl: string): Blob {
     const arr = dataurl.split(',');
     const mime = arr[0].match(/:(.*?);/)![1];
@@ -194,25 +195,17 @@ export class Tab3Page implements OnInit{
   }
 
   getUserImages() {
-    this.authService.getImages(this.currentUser._id).subscribe({
-      next: (res: any) => {
-        res.forEach((img:any) => {
-          // console.log('Images:', img);
-          // this.images.push(img);
-
-          this.authService.getImageData(this.currentUser._id, img.filename).subscribe((blob: any)=>{
-            const objectURL = URL.createObjectURL(blob);
-            this.images.push(this.sanitizer.bypassSecurityTrustUrl(objectURL));
-            
-          })
+    console.log("Images ", this.currentUser);
+    this.images = [];
+    if(this.currentUser.images && this.currentUser.images.length > 0) {
+      this.currentUser.images.forEach((filename: any) => {
+        this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any)=>{
+          const objectURL = URL.createObjectURL(blob);
+          this.images.push(this.sanitizer.bypassSecurityTrustUrl(objectURL));
+           this.cdr.detectChanges();
         })
-        // this.images = res;
-        console.log(this.images);
-        
-        // this.img = 'http://localhost:5001/api/images/'+res[0].metadata.originalName
-      },
-      error: err => console.error('Upload failed:', err),
-    });
+      })
+    }
   }
 
   // async uploadImage(source: CameraSource) {
@@ -235,19 +228,20 @@ export class Tab3Page implements OnInit{
   // }
 
 
-  private async setProfilePicture(index: number) {
-    // const loading = await this.loadingCtrl.create({message: "Updating profile picture..."});
-    // await loading.present();
-
-    // this.authService.updateProfilePic(this.currentUser.images[index], this.currentUser._id).subscribe(res => {
-    //   this.updateCurrentUser(res);
-    //   this.presentToast("Image uploaded successfully", 'bottom');
-    //   loading.dismiss();
-    // }, err => {
-    //   loading.dismiss();
-    //   this.presentToast("An error occured while uploading the image", 'bottom');
-    //   console.log("Images upload error ", err);
-    // })
+  private async setProfilePicture(pic: any) {
+    const loading = await this.loadingCtrl.create({message: "Updating profile picture..."});
+    await loading.present();
+    this.currentUser.profilePic = pic;
+    this.authService.updateProfilePic(this.currentUser).subscribe(res => {
+     console.log(res);
+     
+      this.presentToast("Image uploaded successfully", 'bottom');
+      loading.dismiss();
+    }, err => {
+      loading.dismiss();
+      this.presentToast("An error occured while uploading the image", 'bottom');
+      console.log("Images upload error ", err);
+    })
     
   }
 

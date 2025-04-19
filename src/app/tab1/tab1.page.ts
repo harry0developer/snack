@@ -6,8 +6,7 @@ import { STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
 import { User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
-import { UserService } from '../commons/services/user.service';
- 
+  
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -167,8 +166,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     private modalCtrl: ModalController,
     private authService: AuthService,
     private router: Router,
-    private userService: UserService,
-    private utilService: UtilService,
+     private utilService: UtilService,
     private cdRef: ChangeDetectorRef) {}
 
 
@@ -196,7 +194,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
   }
 
   getUsers() {
-    this.userService.getUsers().subscribe((users: any) => {
+    this.authService.getUsers().subscribe((users: any) => {
       this.users = users.filter((u: User) => u._id !== this.me._id);
       if(this.users && this.users.length > 0) {
         this.users.forEach((u,i) => {

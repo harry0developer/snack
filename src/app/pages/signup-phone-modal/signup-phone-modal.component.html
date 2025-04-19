@@ -2,7 +2,7 @@
 <ion-header> </ion-header>
 
 <ion-content class="modal-container"> 
-  <div class="counter" *ngIf="activeStep <= 6">Step {{activeStep + 1}}/6</div>
+  <div class="counter" *ngIf="activeStep <= 5">Step {{activeStep + 1}}/6</div>
 
   <!-- Step one  -->
   <div class="container" *ngIf="activeStep == 0">
@@ -268,7 +268,7 @@
    <!-- Step 6  -->
    <div class="container" *ngIf="activeStep == 7">
     <div class="title">
-      <h1>Setup a 6 digit Passcode</h1>
+      <h1>Lastly, setup a 6 digit Passcode</h1>
       <p>This is required to login</p>
     </div>
     <form class="modal-form" [formGroup]="userFormGroup">
@@ -295,8 +295,8 @@
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round" (click)="next()">
-         Next
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round" (click)="createAccount()">
+         All Set
         </ion-button>
       </div>
       
@@ -305,7 +305,7 @@
 
 
    <!-- Step 7  -->
-   <div class="container" *ngIf="activeStep == 8">
+   <!-- <div class="container" *ngIf="activeStep == 8">
     <div class="title">
       <h1>Lastly, Upload a profile pic</h1>
       <p>This is what others will see</p>
@@ -333,7 +333,7 @@
       </div>
       
     </div>
-  </div>
+  </div> -->
  
 
 </ion-content> 

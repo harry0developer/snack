@@ -13,7 +13,7 @@
 
 <ion-content [fullscreen]="true"> 
   <div class="center" *ngIf="showNoMoreUsers">
-    <app-no-users [user]="me" (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
+    <app-no-users [user]="currentUser" (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
   </div>
 
   <div class="center" *ngIf="loadingUsers">

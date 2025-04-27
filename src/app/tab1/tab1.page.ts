@@ -4,8 +4,9 @@ import { Preferences, PreferencesComponent } from '../pages/preferences/preferen
 import { AuthService } from '../commons/services/auth.service';
 import { STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
-import { User } from '../commons/model';
+import { ImageBlob, User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
+import { DomSanitizer } from '@angular/platform-browser';
   
 @Component({
   selector: 'app-tab1',
@@ -31,9 +32,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
 
 
   users: User[] = [];
-
-
-  me!: User;
+  currentUser: any
 
   cards = [
     {
@@ -167,6 +166,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
     private authService: AuthService,
     private router: Router,
      private utilService: UtilService,
+    private sanitizer: DomSanitizer,
     private cdRef: ChangeDetectorRef) {}
 
 
@@ -176,13 +176,12 @@ export class Tab1Page implements AfterViewInit, OnInit{
       this.authService.logout();
       this.router.navigateByUrl('login');
     }
-    const u = this.authService.storageGet(STORAGE.ME);
-    u.images = this.utilService.getBase64Images(u.images);
-    u.profilePic = this.utilService.getBase64Image(u.profilePic);
-    this.me = u;
+    this.currentUser = this.authService.storageGet(STORAGE.ME);
+    // const u = this.authService.storageGet(STORAGE.ME);
+    // u.images = this.utilService.getBase64Images(u.images);
+    // u.profilePic = this.utilService.getBase64Image(u.profilePic);
     this.getUsers();
   }
-
 
   ngAfterViewInit() {
     this.loadingUsers = true;
@@ -195,16 +194,26 @@ export class Tab1Page implements AfterViewInit, OnInit{
 
   getUsers() {
     this.authService.getUsers().subscribe((users: any) => {
-      this.users = users.filter((u: User) => u._id !== this.me._id);
+      this.users = users.filter((u: User) => u._id !== this.currentUser._id);
       if(this.users && this.users.length > 0) {
         this.users.forEach((u,i) => {
-          this.users[i].images = this.utilService.getBase64Images(u.images);
+          const userImages = u.images;
+          this.users[i].images = [];
+          userImages.forEach((filename: string) => {
+            this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
+              const objectURL = URL.createObjectURL(blob);
+              const bob: ImageBlob = {
+                img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+                filename
+              }
+              this.users[i].images.push(bob.img.changingThisBreaksApplicationSecurity);
+            }, err => console.log(err))
+          }); 
         });
       }
-      console.log("Base64 ", this.users);
-      
     });
   }
+ 
 
   async openModal() {
     const modal = await this.modalCtrl.create({

@@ -75,6 +75,11 @@ export interface Flags {
     code: string;
 }
 
+export interface ImageBlob {
+  img: any,
+  filename: string;
+} 
+
 export interface OTP {
     phoneNumber: string;
     otp: string;
@@ -84,4 +89,4 @@ export interface OTP {
 export enum ACCOUNT_TYPE {
     PhoneNumber = 'PhoneNumber',
     Email = 'Email',
-  }
+}

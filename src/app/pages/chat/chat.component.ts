@@ -30,7 +30,7 @@ export class ChatComponent  implements OnInit{
   
   ngOnInit() {
     this.me = this.authService.storageGet(STORAGE.ME);
-    this.user = this.authService.storageGet(STORAGE.USER);
+   // this.user = this.authService.storageGet(STORAGE.USER); //TODO: Get user from db
     if(this.me._id &&  this.user._id)  {
       this.socketService.joinRoom(this.me._id, this.user._id);
 

@@ -121,10 +121,10 @@
             formControlName="sexualOrientation"
             interface="action-sheet" 
             placeholder="Select sexual orientation"> 
-            <ion-select-option value="Asia">Straight</ion-select-option>
-            <ion-select-option value="Black">Gay</ion-select-option>
-            <ion-select-option value="Mixed">Lesbian</ion-select-option> 
-            <ion-select-option value="White">Other</ion-select-option> 
+            <ion-select-option value="Straight">Straight</ion-select-option>
+            <ion-select-option value="Gay">Gay</ion-select-option>
+            <ion-select-option value="Lesbian">Lesbian</ion-select-option> 
+            <ion-select-option value="Bi-Sexual">Bi-Sexual</ion-select-option> 
           </ion-select>
         </ion-item>
       </ion-card>
@@ -163,7 +163,7 @@
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Slim/Petite">Slim/Petite</ion-select-option>
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Slim thick">Slim thick</ion-select-option>
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Thick">Thick</ion-select-option>
-              <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="chubby">Chubby</ion-select-option>
+              <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Chubby">Chubby</ion-select-option>
 
             </ion-select>
           </ion-item>

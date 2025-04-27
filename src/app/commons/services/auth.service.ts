@@ -51,6 +51,10 @@ export class AuthService {
     return this.http.get(`${this.apiUrl}/images/${uid}`);
   }
 
+  deleteImage(uid: string, filename: string) {
+    return this.http.delete(`${this.apiUrl}/images/${uid}/${filename}`);
+  }
+  
   getImageData(uid: string, filename: string) {
     return this.http.get(`${this.apiUrl}/image/${uid}/${filename}`, {
        responseType: 'blob'
@@ -93,7 +97,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);
     // localStorage.removeItem(STORAGE.ME);
-    localStorage.removeItem(STORAGE.USER);
   }
 
 

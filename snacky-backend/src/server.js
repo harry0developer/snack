@@ -130,6 +130,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
  
 app.get('/api/images/:uid', async (req, res) => {
   const uid = req.params.uid;
@@ -147,6 +148,34 @@ app.get('/api/images/:uid', async (req, res) => {
   res.json(files);
  
 })
+
+
+ 
+app.delete('/api/images/:uid/:filename', async(req, res) => {
+  const { uid, filename } = req.params; 
+  const files = await gfs.find({ filename, 'metadata.uid': uid }).toArray();
+
+  if (!files.length) {
+    console.log('No files found');
+    res.status(500).json({ message: 'File not found' });
+  }
+
+  for (const file of files) {
+    try {
+      await gfs.delete(file._id);
+      console.log(`Deleted file with id: ${file._id}`);
+      const user = await User.findOneAndUpdate({_id: uid}, {$pull: {images: filename}}, { new: true } );
+      if(user && user._id) {
+        return res.status(200).json(user);
+      }
+      return res.status(200).json({ message: 'Deleted file' });
+    } catch (err) {
+      console.error(`Failed to delete file ${file._id}:`, err);
+      res.status(500).json({ message: 'File not found' });
+    }
+  }
+ 
+});
  
 
 app.get('/api/image/:uid/:filename', async(req, res) => {
@@ -166,6 +195,7 @@ app.get('/api/image/:uid/:filename', async(req, res) => {
   return downloadStream.pipe(res);
  
 });
+
 
 app.post('/api/register', async (req, res) => {
   const { username, password, name, dob } = req.body;

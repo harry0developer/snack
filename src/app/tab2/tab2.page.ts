@@ -137,7 +137,7 @@ export class Tab2Page {
 
   openChats(user: any) {
     console.log(user);
-    this.authService.storageSave(STORAGE.USER, user);
+    // this.authService.storageSave(STORAGE.USER, user); //TODO: Save chats
     this.router.navigate(['chat', user._id]);
   }
 

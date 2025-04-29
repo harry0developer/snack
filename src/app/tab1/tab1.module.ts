@@ -8,6 +8,7 @@ import { Tab1PageRoutingModule } from './tab1-routing.module';
 import { LoadingComponent } from '../components/loading/loading.component';
 import { NoUsersComponent } from '../components/no-users/no-users.component';
 import { PreferencesComponent } from '../pages/preferences/preferences.component';
+import { MatchComponent } from '../pages/match/match.component';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { PreferencesComponent } from '../pages/preferences/preferences.component
     Tab1PageRoutingModule,
     LoadingComponent,
     NoUsersComponent,
+    MatchComponent,
     PreferencesComponent
   ],
   declarations: [Tab1Page]

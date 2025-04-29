@@ -74,7 +74,11 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/users/${id}`); 
   }
  
-   
+  updateSwipeCollection(swiperId: string, swipeeId: string, direction: string): Observable<any> {
+   const req = { swiperId, swipeeId, direction};
+    return this.http.post<any>(`${this.apiUrl}/swipe`, req); 
+  }
+
   sendOtp(otpRequest: any) {
     return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);
   }

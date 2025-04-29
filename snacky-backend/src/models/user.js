@@ -89,7 +89,7 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
     with: {
-      type: [String],
+      type: String,
       required: true,
     },
     distance: {
@@ -97,6 +97,7 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
+  matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   verfied: {
     type: Boolean,
     required: false

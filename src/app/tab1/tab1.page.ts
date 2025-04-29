@@ -2,29 +2,30 @@ import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, ElementRef, OnI
 import { GestureController, Gesture, GestureDetail, ModalController } from '@ionic/angular';
 import { Preferences, PreferencesComponent } from '../pages/preferences/preferences.component';
 import { AuthService } from '../commons/services/auth.service';
-import { STORAGE } from '../commons/conts';
+import { PREFERENCE, SEXUAL_ORIENTATION, STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
 import { ImageBlob, User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
 import { DomSanitizer } from '@angular/platform-browser';
-  
+import { MatchComponent } from '../pages/match/match.component';
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: false,
 })
-export class Tab1Page implements AfterViewInit, OnInit{
-   
+export class Tab1Page implements AfterViewInit, OnInit {
+
   opacityHeart: number = 0;
   opacityClose: number = 0;
 
   @ViewChild('cardContainer', { static: false }) cardContainer!: ElementRef;
 
   opacity: number = 1;
-  currentIndex: number = 0;  
-  swipeDirection: string = '';  
-  rotateAngle: number = 0; 
+  currentIndex: number = 0;
+  swipeDirection: string = '';
+  rotateAngle: number = 0;
   noMoreUsers: boolean = false;
 
   showNoMoreUsers: boolean = false;
@@ -32,123 +33,10 @@ export class Tab1Page implements AfterViewInit, OnInit{
 
 
   users: User[] = [];
-  currentUser: any
-
-  cards = [
-    {
-      _id: '',
-      name: 'Shae Blue',
-      age: 22,
-      gender: 'Female',
-      location: 'Midrand',
-      info: [
-        {
-          img: 'assets/profiles/1a.jpg',
-          title: 'Profile',
-          profile: {
-            name: 'Shae Blue',
-            age: 22,
-            gender: 'Female',
-            location: 'Midrand'
-          }
-        },
-        {
-          img: 'assets/profiles/1b.jpg',
-          title: 'About',
-          about: {
-            ethnicity: 'black',// white, indian, colourd
-            body: 'slim', //thick, slim-thick, bbw,
-            skintone: 'melanin', //light-skin, white 
-            orientation: 'straight' // bi, gay, lesbian, trans
-          }
-        },
-        {
-          img: 'assets/profiles/1c.jpg',
-          title: 'Interests',
-          interests: {
-            into: 'tatoos', //piercings, long-hair, no-hair, beard, 
-          }
-        }
-    
-      ]
-    },
-
-    {
-      _id: '',
-      name: 'Bruce Wale',
-      age: 37,
-      gender: 'Male',
-      location: 'Benoni',
-      info: [
-        {
-          img: 'assets/profiles/2a.jpg',
-          title: 'Profile',
-          profile: {
-            name: 'Bruce Wale',
-            age: 37,
-            gender: 'Male',
-            location: 'Benoni',
-          }
-        },
-        {
-          img: 'assets/profiles/2b.jpg',
-          title: 'About',
-          about: {
-            ethnicity: 'black',// white, indian, colourd
-            body: 'slim', //thick, slim-thick, bbw,
-            skintone: 'melanin', //light-skin, white 
-            orientation: 'straight' // bi, gay, lesbian, trans
-          }
-        },
-        {
-          img: 'assets/profiles/2c.jpg',
-          title: 'Interests',
-          interests: {
-            into: 'tatoos', //piercings, long-hair, no-hair, beard, 
-          }
-        }
-    
-      ]
-    },
-
-    {
-      _id: '',
-      name: 'Nancy Fine-One',
-      age: 19,
-      gender: 'Female',
-      location: 'Durban',
-      info: [
-        {
-          img: 'assets/profiles/3a.jpg',
-          title: 'Profile',
-          profile: {
-            name: 'Nancy Fine-One',
-            age: 19,
-            gender: 'Female',
-            location: 'Durban',
-          }
-        },
-        {
-          img: 'assets/profiles/3b.jpg',
-          title: 'About',
-          about: {
-            ethnicity: 'black',// white, indian, colourd
-            body: 'slim', //thick, slim-thick, bbw,
-            skintone: 'melanin', //light-skin, white 
-            orientation: 'straight' // bi, gay, lesbian, trans
-          }
-        },
-        {
-          img: 'assets/profiles/3c.jpg',
-          title: 'Interests',
-          interests: {
-            into: 'tatoos', //piercings, long-hair, no-hair, beard, 
-          }
-        }
-    
-      ]
-    },
-  ]
+  currentUser!: User
+  currentUserProfilePicture: any;
+  swipeeProfilePicture: any;
+  cards: any;
 
   preferences: Preferences = {
     distance: 60,
@@ -161,25 +49,37 @@ export class Tab1Page implements AfterViewInit, OnInit{
     distanceOutOfBound: false
   }
   constructor(
-    private gestureCtrl: GestureController, 
+    private gestureCtrl: GestureController,
     private modalCtrl: ModalController,
     private authService: AuthService,
     private router: Router,
-     private utilService: UtilService,
+    private utilService: UtilService,
     private sanitizer: DomSanitizer,
-    private cdRef: ChangeDetectorRef) {}
+    private cdRef: ChangeDetectorRef) { }
 
 
   ngOnInit(): void {
     const token = this.authService.getToken();
-    if(!token){
+    if (!token) {
       this.authService.logout();
       this.router.navigateByUrl('login');
     }
     this.currentUser = this.authService.storageGet(STORAGE.ME);
-    // const u = this.authService.storageGet(STORAGE.ME);
-    // u.images = this.utilService.getBase64Images(u.images);
-    // u.profilePic = this.utilService.getBase64Image(u.profilePic);
+    console.log("Current user ", this.currentUser);
+
+    if (!this.currentUserProfilePicture) {
+      this.authService.getImageData(this.currentUser._id!, this.currentUser.profilePic).subscribe((blob: any) => {
+        const objectURL = URL.createObjectURL(blob);
+        const bob: ImageBlob = {
+          img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+          filename: this.currentUser.profilePic
+        }
+        this.currentUserProfilePicture = bob.img.changingThisBreaksApplicationSecurity;
+        console.log("currentUserProfilePicture ", this.currentUserProfilePicture);
+
+      }, err => console.log(err))
+    }
+
     this.getUsers();
   }
 
@@ -189,18 +89,26 @@ export class Tab1Page implements AfterViewInit, OnInit{
       this.initializeGestures();
       this.cdRef.detectChanges();
       this.loadingUsers = false;
-    }, 1300);
+    }, 2000);
   }
 
   getUsers() {
     this.authService.getUsers().subscribe((users: any) => {
-      this.users = users.filter((u: User) => u._id !== this.currentUser._id);
-      if(this.users && this.users.length > 0) {
-        this.users.forEach((u,i) => {
+
+      if (this.currentUser.preferences.with === PREFERENCE.EITHER) {
+        this.users = users.filter((u: User) => u._id !== this.currentUser._id && (u.preferences.with === PREFERENCE.EITHER || u.sexualOrientation === SEXUAL_ORIENTATION.GAY))
+      } else {
+        this.users = users.filter((u: User) => u._id !== this.currentUser._id && this.currentUser.preferences.with === u.gender);
+      }
+
+      console.log("users ", this.users);
+
+      if (this.users && this.users.length > 0) {
+        this.users.forEach((u, i) => {
           const userImages = u.images;
           this.users[i].images = [];
           userImages.forEach((filename: string) => {
-            this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
+            this.authService.getImageData(this.currentUser._id!, filename).subscribe((blob: any) => {
               const objectURL = URL.createObjectURL(blob);
               const bob: ImageBlob = {
                 img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
@@ -208,12 +116,12 @@ export class Tab1Page implements AfterViewInit, OnInit{
               }
               this.users[i].images.push(bob.img.changingThisBreaksApplicationSecurity);
             }, err => console.log(err))
-          }); 
+          });
         });
       }
     });
   }
- 
+
 
   async openModal() {
     const modal = await this.modalCtrl.create({
@@ -232,11 +140,12 @@ export class Tab1Page implements AfterViewInit, OnInit{
       this.preferences = data
     }
   }
-
+ 
   initializeGestures() {
-    const cards = document.querySelectorAll('.swipe-card');
+    this.cards = document.querySelectorAll('.swipe-card');
+    console.log('cards ', this.cards);
 
-    cards.forEach((card, index) => {
+    this.cards.forEach((card: any, index: number) => {
       const gesture: Gesture = this.gestureCtrl.create({
         el: card,
         gestureName: 'swipe',
@@ -249,27 +158,28 @@ export class Tab1Page implements AfterViewInit, OnInit{
   }
 
   onCardMove(detail: GestureDetail, index: number) {
+
     const card = document.querySelectorAll('.swipe-card')[index] as HTMLElement;
     const offsetX = detail.deltaX;
-    const rotation = detail.deltaX > 0 ?  'rotate(30deg)' : 'rotate(-30deg)';
+    const rotation = detail.deltaX > 0 ? 'rotate(30deg)' : 'rotate(-30deg)';
 
     const closeOp = Math.min(Math.max(offsetX / window.innerWidth, 0), 1);
     const heartOp = Math.min(Math.max(-offsetX / window.innerWidth, 0), 1);
 
-    this.opacityClose = closeOp > 0 ? closeOp + 0.5: 0;
-    this.opacityHeart =  heartOp > 0 ? heartOp + 0.5: 0;
- 
+    this.opacityClose = closeOp > 0 ? closeOp + 0.5 : 0;
+    this.opacityHeart = heartOp > 0 ? heartOp + 0.5 : 0;
+
     this.cdRef.detectChanges();
 
     const moveX = Math.min(Math.max(offsetX, -window.innerWidth / 2), window.innerWidth / 2);
     card.style.transform = `translateX(${moveX}px) ${rotation}`;
   }
- 
+
   onCardEnd(detail: GestureDetail, index: number) {
     const card = document.querySelectorAll('.swipe-card')[index] as HTMLElement;
     const offsetX = detail.deltaX;
-   
-    this.opacityClose =  0;
+
+    this.opacityClose = 0;
     this.opacityHeart = 0;
     this.cdRef.detectChanges();
 
@@ -280,7 +190,7 @@ export class Tab1Page implements AfterViewInit, OnInit{
         card.style.transition = 'transform 0.3s ease-out';
         card.style.transform = `translateX(${window.innerWidth}px)`;
         this.onSwipeRight(index);
-      } 
+      }
       // If swiped to the left, move off screen to the left
       else {
         card.style.transition = 'transform 0.3s ease-out';
@@ -290,32 +200,95 @@ export class Tab1Page implements AfterViewInit, OnInit{
     } else {
       // Reset card if not swiped enough
       card.style.transition = 'transform 0.3s ease-out';
-      card.style.transform = 'translateX(0)'; 
+      card.style.transform = 'translateX(0)';
     }
-   
+
   }
 
   onSwipeRight(index: number) {
-    console.log('Card accepted:', this.cards[index]);
-    this.removeCard(index);
+    const swipee = this.getNodeValue(this.cards[index]);
+    this.updateSwipedCollection(index, swipee, 'right');
   }
 
   onSwipeLeft(index: number) {
-    console.log('Card rejected:', this.cards[index]);
-    this.removeCard(index);
+    const swipee = this.getNodeValue(this.cards[index]);
+    this.updateSwipedCollection(index, swipee, 'left');
+  }
+
+  private updateSwipedCollection(index: number,swipee: string, direction: string) {
+    this.authService.updateSwipeCollection(this.currentUser._id!, swipee, direction).subscribe((res: any) => {
+      //do some
+      console.log("SWipe res ", res);
+
+      if(res.match) {
+
+        this.authService.getImageData(res.swipee._id!, res.swipee.profilePic).subscribe((blob: any) => {
+          const objectURL = URL.createObjectURL(blob);
+          const bob: ImageBlob = {
+            img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+            filename: this.currentUser.profilePic
+          }
+          res.swipee.profilePic = bob.img.changingThisBreaksApplicationSecurity;
+          res.swiper.profilePic = this.currentUserProfilePicture;
+
+          this.openMatchModal(res.swiper, res.swipee);
+          this.removeCard(index);
+
+        }, err => console.log(err))
+      }
+      
+
+    }, err => {
+      console.log("Swipe failed ", err);
+    })
+  }
+
+  async openMatchModal(swiper: User, swipee: User) {
+    const modal = await this.modalCtrl.create({
+      component: MatchComponent,
+      componentProps: { 
+        swiper,
+        swipee,
+      }
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      console.log('modal confirm... clicked');
+      console.log("Data model ", data);
+    }
+  }
+
+  getNodeValue(node: any): string {
+    const card = node;
+
+    if (card) {
+      const images = card.querySelectorAll('img');
+      const imageAlts = Array.from(images).map((img: any) => img.getAttribute('alt') || '');
+      console.log(imageAlts[0]);
+      return imageAlts[0];
+    } else {
+      console.warn('Card not found.');
+      return '';
+    }
   }
 
   removeCard(index: number) {
     setTimeout(() => {
-      this.cards.splice(index, 1);
-      this.showNoMoreUsers = this.cards.length < 1;
+      console.log("removeCard ", this.cards);
+      console.log("removeCard index", index);
+
+      // this.cards.splice(index, 1);
+      this.showNoMoreUsers = index < 1;
       this.cdRef.detectChanges();
     }, 300); // Delay removal until the transition completes
   }
 
-  handleNoMoreUsersChange(event: any){
+  handleNoMoreUsersChange(event: any) {
     console.log("No more user ", event);
- 
+
     setTimeout(() => {
       this.initializeGestures();
       this.loadingUsers = false;
@@ -325,5 +298,5 @@ export class Tab1Page implements AfterViewInit, OnInit{
     this.cdRef.detectChanges();
 
   }
-  
+
 }

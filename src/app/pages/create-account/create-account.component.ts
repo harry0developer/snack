@@ -3,12 +3,11 @@ import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
-import { ACCOUNT_TYPE, Country, OTP, TempUser } from 'src/app/commons/model';
+import { Country, OTP } from 'src/app/commons/model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { STORAGE } from 'src/app/commons/conts';
+import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
 import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
 import { OtpComponent } from '../otp/otp.component';
-import moment from 'moment';
 
 @Component({
   selector: 'app-create-account',

@@ -2,11 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { STORAGE } from 'src/app/commons/conts';
+import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
 import moment from 'moment';
-import { ACCOUNT_TYPE } from 'src/app/commons/model';
 
 @Component({
   selector: 'app-otp',

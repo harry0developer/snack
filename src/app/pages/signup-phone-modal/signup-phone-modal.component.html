@@ -90,7 +90,6 @@
             placeholder="Select gender"> 
             <ion-select-option value="Male">Male</ion-select-option>
             <ion-select-option value="Female">Female</ion-select-option>
-            <ion-select-option value="Transgender">Transgender</ion-select-option> 
           </ion-select>
         </ion-item>
       </ion-card>
@@ -160,7 +159,7 @@
               <ion-select-option  *ngIf="gender === 'Male' " value="Built">Built</ion-select-option>
               <ion-select-option  *ngIf="gender === 'Male' " value="Chubby">Chubby</ion-select-option>
 
-              <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Slim/Petite">Slim/Petite</ion-select-option>
+              <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Slim">Slim</ion-select-option>
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Slim thick">Slim thick</ion-select-option>
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Thick">Thick</ion-select-option>
               <ion-select-option *ngIf="gender === 'Female' || gender === 'Transgender'" value="Chubby">Chubby</ion-select-option>
@@ -245,10 +244,10 @@
             formControlName="preferenceWith"
             interface="action-sheet"
             placeholder="With who"
-            [multiple]="true"> 
+            [multiple]="false"> 
               <ion-select-option value="Male">Male</ion-select-option>
               <ion-select-option value="Female">Female</ion-select-option> 
-              <ion-select-option value="Transgender">Transgender</ion-select-option> 
+              <ion-select-option value="Either">Either</ion-select-option> 
           </ion-select>
         </ion-item>
       </ion-card>

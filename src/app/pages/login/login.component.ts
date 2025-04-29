@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { STORAGE } from 'src/app/commons/conts';
+import { APP_ROUTES, STORAGE } from 'src/app/commons/conts';
 import { Country, User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
@@ -57,10 +57,8 @@ export class LoginComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
-    console.log();
-
     this.loginFormGroup = this.formBuilder.group({
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      phone: ['', [Validators.required]],
       code: ['', [Validators.required]],
       passcode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
@@ -79,26 +77,22 @@ export class LoginComponent implements OnInit {
           "Friends With Benefits",
           "One Night Stand"
         ],
-        "with": [
-          "Male"
-        ],
+        "with":  "Male",
         "distance": 100
       },
-      "name": "Micky Mee",
-      "dob": "15-12-2007",
-      "age": 18,
+      "name": "Kinky",
+      "dob": "22-10-2005",
+      "age": 20,
       "gender": "Female",
       "images": [
-        "3b3b9b46211bbe3b0a413ea6a162da3b.jpg",
-        "88245f12245ef34bc7001abe375a467d.jpg"
       ],
       "profilePic": "",
-      "phoneNumber": "+930810002010",
-      "username": "+930810002010",
+      "phoneNumber": "+930810002016",
+      "username": "+9308110002016",
       "password": "123456",
-      "ethnicity": "Asian",
-      "bodyType": "Slim/Thick",
-      "sexualOrientation": "Lesbian",
+      "ethnicity": "Black",
+      "bodyType": "Thick",
+      "sexualOrientation": "Straight",
       "interests": [],
       verified: false
     }
@@ -109,13 +103,6 @@ export class LoginComponent implements OnInit {
     return this.loginFormGroup.controls['passcode'].value;
   }
 
-  // ngOnInit() {
-  //   const token = this.authService.getToken();
-
-  //   if(token) {
-  //     this.router.navigateByUrl('tabs/tab1');
-  //   }
-  // }
 
   login() {
     const p = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;

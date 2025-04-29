@@ -1,0 +1,29 @@
+<ion-header> </ion-header>
+<ion-content>
+  <div class="bg-img background-tint" [style.background-image]="swipee?.profilePic">
+    <div class="content">
+      <!-- <div class="lottie-animation mt-10">
+        <ng-lottie
+          [options]="options" 
+          (animationCreated)="onAnimate()">
+        </ng-lottie>
+      </div> -->
+
+      <h1>It's a Match</h1>
+      
+      <div class="matched-profiles">
+        <div class="swiper">
+          <img [src]="swiper.profilePic" alt="swiper.name">
+        </div>
+        <div class="swipee">
+          <img [src]="swipee.profilePic" alt="swipee.name">
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <ion-button shape="round" expand="block" fill="solid" (click)="startChatting()">Start chatting</ion-button>
+        <ion-button shape="round" expand="block" fill="outline" (click)="continueSwipping()" >Continue swipping</ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

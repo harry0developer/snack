@@ -1,0 +1,83 @@
+@import '../../../theme/colors.scss';
+
+ion-content {
+    --ion-background-color: #d9a817;
+}
+
+.container  {
+    padding: 10vh 20px;
+    height: 80vh;
+    text-align: center;
+ 
+
+    .match-photos {
+        display: inline-flex;
+        img {
+            width: 200px;
+        }
+    }
+
+}
+
+.bg-img {
+    height: 100vh;
+    background-size: cover;
+}
+
+.background-tint {
+    background-color: rgba(0,0,0,.7);
+    background-blend-mode: multiply;
+}
+
+.content{
+    position: absolute;
+    top: 14%;
+    padding: 40px;
+    font-size: 50px;
+    color: white; 
+    h1 {
+        font-size: 70px;
+        font-weight: 900;
+        margin: 40px 0;
+        line-height: 0.8;
+    }
+    h2 {
+        font-size: 30px;
+        font-weight: 100;
+    }
+    
+    .btn-group {
+        margin-top: 60px;
+        ion-button {
+            height: 52px;
+            margin: 20px 0;
+        }
+        .button-outline {
+            color: #FFF !important;
+        }
+    }
+
+    .matched-profiles {
+        text-align: center;
+        .swiper, .swipee {
+            width: 120px;
+            height: 120px;
+            border-radius: 100%;
+            border: 6px solid pink;
+            display: inline-block;
+            overflow: hidden;
+        }
+        .swipee {
+            position: relative;
+            right: 16px;
+
+        }
+    }
+}
+
+.lottie-animation.mt-10 {
+    position: absolute;
+}
+
+ 
+   

@@ -38,7 +38,7 @@ export interface Location {
       upper: number;
     };
     want: string[];
-    with: string[];
+    with: string;
     distance: number;
   }
   
@@ -85,8 +85,4 @@ export interface OTP {
     otp: string;
     otpExpiresAt: string;
     
-}
-export enum ACCOUNT_TYPE {
-    PhoneNumber = 'PhoneNumber',
-    Email = 'Email',
 }

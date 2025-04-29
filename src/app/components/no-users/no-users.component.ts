@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonRange } from '@ionic/angular/standalone';
 import { Range, User } from 'src/app/commons/model';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -10,10 +10,11 @@ import { IonButton, IonIcon } from '@ionic/angular/standalone';
   imports: [IonRange, IonButton, IonIcon],
   standalone: true
 })
-export class NoUsersComponent {
+export class NoUsersComponent implements AfterViewInit {
+
   range: Range = {min: 0, max: 100, value: 30, pin: true};
   @Output() onChange = new EventEmitter<number>();
-  @Input() user!: User;
+  @Input() user!: any;
 
   onIonChange(event: any){
     this.range.value = event.detail.value;
@@ -22,5 +23,11 @@ export class NoUsersComponent {
 
   handelDistanceRangeChange() {
     this.onChange.emit(this.range.value);
+  }
+
+  ngAfterViewInit(): void {
+    console.log(this.user);
+
+     
   }
 }

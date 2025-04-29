@@ -23,10 +23,11 @@ dotenv.config();
 
 const userRoutes = require('./routes/users');
 const chatRoutes = require('./routes/chats');
- 
+const swipeRoutes = require('./routes/swipe');
+
 const Chat = require('./models/chat');
 const User = require('./models/user');
-  
+
  
 const app = express();
 // app.use(express.json({ limit: '50mb' }));  // increase the limit as needed
@@ -59,6 +60,7 @@ app.use(express.urlencoded({ extended: true }));  // To parse form fields (for '
 // Routes
 app.use('/api', userRoutes);
 app.use('/api', chatRoutes);
+app.use('/api', swipeRoutes);
 
 
 // const storage = multer.memoryStorage();

@@ -13,21 +13,23 @@
 
 <ion-content [fullscreen]="true"> 
   <div class="center" *ngIf="showNoMoreUsers">
-    <app-no-users [user]="currentUser" (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
+    <app-no-users [user]="currentUserProfilePicture" (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
   </div>
 
   <div class="center" *ngIf="loadingUsers">
     <app-loading class="loading-spinner"></app-loading>
   </div>
 
+
   <div class="card-container" *ngIf="!showNoMoreUsers && users && users.length > 0">
     <div *ngFor="let card of users; let i = index" class="card" [attr.data-index]="i">
       <ion-card class="swipe-card">
         <div class="scrollable">
           <div class="container">
+            <h1>{{card.name}}</h1>
             <div class="panel" *ngFor="let img of card.images; let i = index">
-              <img [src]="img" alt="">
-
+              <img [src]="img" [alt]="card._id">
+              <pre>{{card._id}}</pre>
               <div class="user-info" *ngIf="card.name && i == 0">
                 <h1>
                   {{card.name}} 

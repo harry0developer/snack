@@ -6,46 +6,58 @@ const Swipe = require('../models/swipe');
 
 // POST /swipe
 router.post('/swipe', async (req, res) => {
-  const { swiperId, swipeeId, direction } = req.body;
+    const { swiperId, swipeeId, direction } = req.body;
 
-  if (!['left', 'right'].includes(direction)) {
-    return res.status(400).json({ error: 'Invalid swipe direction' });
-  }
-
-  try {
-    // Check if swipe already exists
-    const existing = await Swipe.findOne({ swiper: swiperId, swipee: swipeeId });
-    if (existing) {
-      return res.status(400).json({ error: 'Swipe already exists' });
+    if (!['left', 'right'].includes(direction)) {
+        return res.status(400).json({ error: 'Invalid swipe direction' });
     }
 
-    // Save the new swipe
-    await Swipe.create({ swiper: swiperId, swipee: swipeeId, direction });
+    try {
+        // Check if swipe already exists
+        const existing = await Swipe.findOne({ swiper: swiperId, swipee: swipeeId });
+        if (existing) {
+            return res.status(400).json({ error: 'Swipe already exists' });
+        }
 
-    // Check for mutual right swipe
-    if (direction === 'right') {
-      const reverse = await Swipe.findOne({
-        swiper: swipeeId,
-        swipee: swiperId,
-        direction: 'right'
-      });
+        // Save the new swipe
+        await Swipe.create({ swiper: swiperId, swipee: swipeeId, direction });
 
-      if (reverse) {
-        // It's a match!
-        await User.updateOne({ _id: swiperId }, { $addToSet: { matches: swipeeId } });
-        await User.updateOne({ _id: swipeeId }, { $addToSet: { matches: swiperId } });
-        const swiper = await User.findById(swiperId).select("-password");
-        const swipee = await User.findById(swipeeId).select("-password");
+        // Check for mutual right swipe
+        if (direction === 'right') {
+            const reverse = await Swipe.findOne({
+                swiper: swipeeId,
+                swipee: swiperId,
+                direction: 'right'
+            });
 
-        return res.status(200).json({ message: 'Matched!', match: true, swiper, swipee  });
-      }
+            if (reverse) {
+                // It's a match!
+                await User.updateOne({ _id: swiperId }, { $addToSet: { matches: swipeeId } });
+                await User.updateOne({ _id: swipeeId }, { $addToSet: { matches: swiperId } });
+                const swiper = await User.findById(swiperId).select("-password");
+                const swipee = await User.findById(swipeeId).select("-password");
+
+                return res.status(200).json({ message: 'Matched!', match: true, swiper, swipee });
+            }
+        }
+
+        res.status(200).json({ message: 'Swipe recorded' });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
+});
 
-    res.status(200).json({ message: 'Swipe recorded' });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+router.get('/swipe/:_id', async (req, res) => {
+    try {
+        const swipe = await Swipe.findById(req.params._id);
+        console.log("swipe ", swipe);
+        
+        res.send(swipe);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
 });
 
 module.exports = router;

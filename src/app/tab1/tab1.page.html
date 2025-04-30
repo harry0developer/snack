@@ -12,77 +12,77 @@
 </ion-header>
 
 <ion-content [fullscreen]="true"> 
-  <div class="center" *ngIf="showNoMoreUsers">
+  <div class="center" *ngIf="!loadingUsers && (showNoMoreUsers || users.length < 1)">
     <app-no-users [user]="currentUserProfilePicture" (onChange)="handleNoMoreUsersChange($event)"></app-no-users>
   </div>
 
-  <div class="center" *ngIf="loadingUsers">
+  <div class="center" *ngIf="loadingUsers; else content">
     <app-loading class="loading-spinner"></app-loading>
   </div>
 
+  <ng-template #content>
+    <div class="card-container" *ngIf="!showNoMoreUsers && users && users.length > 0">
+      <div *ngFor="let card of users; let i = index" class="card" [attr.data-index]="i">
+        <ion-card class="swipe-card">
+          <div class="scrollable">
+            <div class="container">
+              <h1>{{card.name}}</h1>
+              <div class="panel" *ngFor="let img of card.images; let i = index">
+                <img [src]="img" [alt]="card._id">
+                <div class="user-info" *ngIf="card.name && i == 0">
+                  <h1>
+                    {{card.name}} 
+                    <span class="status">.</span>
+                    <span class="age">{{card.age}} </span>
+                  </h1>
+                
+                  <p>
+                    <ion-icon name="male-female-outline"></ion-icon>
+                    {{card.gender}} 
+                  </p>
+                  <p >
+                    <ion-icon name="location-outline"></ion-icon>
+                  22km away
+                  </p>
+                </div>
 
-  <div class="card-container" *ngIf="!showNoMoreUsers && users && users.length > 0">
-    <div *ngFor="let card of users; let i = index" class="card" [attr.data-index]="i">
-      <ion-card class="swipe-card">
-        <div class="scrollable">
-          <div class="container">
-            <h1>{{card.name}}</h1>
-            <div class="panel" *ngFor="let img of card.images; let i = index">
-              <img [src]="img" [alt]="card._id">
-              <pre>{{card._id}}</pre>
-              <div class="user-info" *ngIf="card.name && i == 0">
-                <h1>
-                  {{card.name}} 
-                  <span class="status">.</span>
-                  <span class="age">{{card.age}} </span>
-                </h1>
-               
-                <p>
-                  <ion-icon name="male-female-outline"></ion-icon>
-                  {{card.gender}} 
-                </p>
-                <p >
-                  <ion-icon name="location-outline"></ion-icon>
-                 22km away
-                </p>
-              </div>
+                <div class="user-info" *ngIf="i == 1">
+                  <h1>{{card.name}}</h1>
+                  <p class="title">
+                    <ion-icon name="person-outline"></ion-icon>
+                    About
+                  </p>
+                  <ion-chip [outline]="true"> {{card.ethnicity}} </ion-chip>
+                  <ion-chip [outline]="true"> {{card.bodyType}} </ion-chip>
+                  <ion-chip [outline]="true"> {{card.sexualOrientation}} </ion-chip>
+                </div>
 
-              <div class="user-info" *ngIf="i == 1">
-                <h1>{{card.name}}</h1>
-                <p class="title">
-                  <ion-icon name="person-outline"></ion-icon>
-                  About
-                </p>
-                <ion-chip [outline]="true"> {{card.ethnicity}} </ion-chip>
-                <ion-chip [outline]="true"> {{card.bodyType}} </ion-chip>
-                <ion-chip [outline]="true"> {{card.sexualOrientation}} </ion-chip>
+                <div class="user-info" *ngIf="card.preferences && card.preferences.want && card.preferences.want.length > 0 && i == 2">
+                  <h1>{{card.name}}</h1>
+                  <p class="title">
+                    <ion-icon name="beer-outline"></ion-icon>
+                    Preferences
+                  </p>
+                  <ion-chip [outline]="true" *ngFor="let in of card.preferences.want"> {{in}} </ion-chip> 
+                </div>
+  
               </div>
-
-              <div class="user-info" *ngIf="card.preferences && card.preferences.want && card.preferences.want.length > 0 && i == 2">
-                <h1>{{card.name}}</h1>
-                <p class="title">
-                  <ion-icon name="beer-outline"></ion-icon>
-                  Preferences
-                </p>
-                <ion-chip [outline]="true" *ngFor="let in of card.preferences.want"> {{in}} </ion-chip> 
-              </div>
- 
             </div>
           </div>
-        </div>
-      </ion-card>
+        </ion-card>
+      </div>
     </div>
-  </div>
 
-  <div class="no-users" *ngIf=" users.length < 1">
-      <h1>No more users</h1>
-      <p>Please update your preferences to see more users</p>
-  </div>
+    <div class="actions">
+      <ion-icon *ngIf="opacityHeart" [style.opacity]="opacityHeart" class="left" name="close-circle-outline"></ion-icon>
+      <ion-icon *ngIf="opacityClose" [style.opacity]="opacityClose" class="right" name="heart-outline"></ion-icon>
+    </div>
+  </ng-template>
 
-  <div class="actions">
-    <ion-icon *ngIf="opacityHeart" [style.opacity]="opacityHeart" class="left" name="close-circle-outline"></ion-icon>
-    <ion-icon *ngIf="opacityClose" [style.opacity]="opacityClose" class="right" name="heart-outline"></ion-icon>
-  </div>
+ 
+
+
+
 </ion-content>
 
  

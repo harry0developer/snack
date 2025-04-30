@@ -1,5 +1,9 @@
 
 @import url('../../theme/colors.scss');
+.title {
+  font-weight: bold;
+  font-size: 28px;
+}
 
 .tab2 {
   ion-item {
@@ -9,4 +13,5 @@
   ion-card {
     margin: 4px 10px;
   }
+  
 }

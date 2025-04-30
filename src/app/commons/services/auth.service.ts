@@ -65,7 +65,6 @@ export class AuthService {
     return this.http.put(`${this.apiUrl}/users/${user._id}`, user);
   }
 
-
   getUsers(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/users`);
   }
@@ -74,6 +73,10 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/users/${id}`); 
   }
  
+  getSwipes(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/swipe/${id}`); 
+  }
+
   updateSwipeCollection(swiperId: string, swipeeId: string, direction: string): Observable<any> {
    const req = { swiperId, swipeeId, direction};
     return this.http.post<any>(`${this.apiUrl}/swipe`, req); 

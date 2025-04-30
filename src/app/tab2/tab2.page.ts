@@ -3,7 +3,7 @@ import { ChatService } from '../commons/services/chat.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../commons/services/auth.service';
 import { STORAGE } from '../commons/conts';
-import { User } from '../commons/model';
+import { NotFound, User } from '../commons/model';
 import { SocketService } from '../commons/services/socket.service';
  
 export interface Chat {
@@ -108,6 +108,11 @@ export class Tab2Page {
       "__v": 0
   }
 
+  notFound: NotFound = {
+    icon: 'assets/icons/chats.svg',
+    title: 'Keep swipping',
+    body: 'Your matches will appear here where you can send them a message'
+  }
 
   users: any[] = [];
   constructor(
@@ -124,14 +129,12 @@ export class Tab2Page {
     if(!token){
       this.authService.logout();
       this.router.navigateByUrl('login');
-    }
-
-    console.log("has token", token);
+    }    
     
-    
-    this.authService.getUsers().subscribe((users: any) => {
-      
-      this.users = users.filter((u: User) => u._id !== me._id);
+    this.authService.getSwipes(me._id).subscribe((swipes: any) => {
+      console.log("Swipes ", swipes);
+      this.messages = swipes
+      // this.users = users.filter((u: User) => u._id !== me._id);
     })
   }
 
@@ -139,6 +142,9 @@ export class Tab2Page {
     console.log(user);
     // this.authService.storageSave(STORAGE.USER, user); //TODO: Save chats
     this.router.navigate(['chat', user._id]);
+
+    this.router.navigate(['chat', user.uid, {user: JSON.stringify(user)}])
+
   }
 
   getSender(msg: Chat) {

@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonRange } from '@ionic/angular/standalone';
 import { Range, User } from 'src/app/commons/model';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-no-users',
   templateUrl: './no-users.component.html',
   styleUrls: ['./no-users.component.scss'],
-  imports: [IonRange, IonButton, IonIcon],
+  imports: [IonRange, IonButton, IonIcon, IonItem, IonLabel, IonNote],
   standalone: true
 })
 export class NoUsersComponent implements AfterViewInit {
@@ -18,7 +18,7 @@ export class NoUsersComponent implements AfterViewInit {
 
   onIonChange(event: any){
     this.range.value = event.detail.value;
-    this.onChange.emit(event.detail.value);
+    // this.onChange.emit(event.detail.value);
   }
 
   handelDistanceRangeChange() {

@@ -5,12 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { Tab2Page } from './tab2.page';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
+import { NotFoundComponent } from '../components/not-found/not-found.component';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
+    NotFoundComponent,
     Tab2PageRoutingModule
   ],
   declarations: [Tab2Page]

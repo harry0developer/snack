@@ -151,8 +151,6 @@ app.get('/api/images/:uid', async (req, res) => {
  
 })
 
-
- 
 app.delete('/api/images/:uid/:filename', async(req, res) => {
   const { uid, filename } = req.params; 
   const files = await gfs.find({ filename, 'metadata.uid': uid }).toArray();
@@ -179,7 +177,6 @@ app.delete('/api/images/:uid/:filename', async(req, res) => {
  
 });
  
-
 app.get('/api/image/:uid/:filename', async(req, res) => {
   const { uid, filename } = req.params;
   const file = await gfs.find({ filename, 'metadata.uid': uid }).toArray();
@@ -343,7 +340,6 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
-
  
 //TWILLIO CODE 
 app.post('/api/send-twilio-otp', async (req, res) => {
@@ -373,37 +369,37 @@ app.post('/api/send-twilio-otp', async (req, res) => {
 
 
 //SOCKET IO 
-// io.on('connection', (socket) => {
+io.on('connection', (socket) => {
 
-//     socket.on('join-room', ({ user1, user2 }) => {
-//         console.log(`${user1} and ${user2} are now connected`);
-//         socket.join(`${user1}-${user2}`);
-//       });
+    socket.on('join-room', ({ user1, user2 }) => {
+      console.log(`${user1} and ${user2} are now connected`);
+      socket.join(`${user1}-${user2}`);
+    });
 
-//     socket.on('send-message', async ({ sender, receiver, message }) => {
-//         console.log("Senging message...");
+    socket.on('send-message', async ({ sender, receiver, message }) => {
+      console.log("Senging message...");
 
-//       try {
-//         // Save message to MongoDB
-//         const newChatMessage = new Chat({ sender, receiver, message });
-//         await newChatMessage.save();
+      try {
+        // Save message to MongoDB
+        const newChatMessage = new Chat({ sender, receiver, message });
+        await newChatMessage.save();
 
-//         // Emit the message in real-time to the relevant chat room
-//         io.to(`${sender}-${receiver}`).emit('receive-message', { sender, message });
+        // Emit the message in real-time to the relevant chat room
+        io.to(`${sender}-${receiver}`).emit('receive-message', { sender, message });
 
-//         // Optionally, you can emit to both users
-//         io.to(receiver).emit('receive-message', { sender, message });
-//         io.to(sender).emit('receive-message', { sender, message });
-//       } catch (err) {
-//         console.error('Error saving message to database:', err);
-//       }
-//     });
+        // Optionally, you can emit to both users
+        io.to(receiver).emit('receive-message', { sender, message });
+        io.to(sender).emit('receive-message', { sender, message });
+      } catch (err) {
+        console.error('Error saving message to database:', err);
+      }
+    });
 
-//     socket.on('disconnect', () => {
-//       console.log('A user disconnected');
-//     });
+    socket.on('disconnect', () => {
+      console.log('A user disconnected');
+    });
 
-// });
+});
  
 // Start Server
 server.listen(port, () => {

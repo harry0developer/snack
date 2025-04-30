@@ -1,10 +1,10 @@
 import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, ElementRef, OnInit } from '@angular/core';
-import { GestureController, Gesture, GestureDetail, ModalController } from '@ionic/angular';
+import { GestureController, Gesture, GestureDetail, ModalController, LoadingController } from '@ionic/angular';
 import { Preferences, PreferencesComponent } from '../pages/preferences/preferences.component';
 import { AuthService } from '../commons/services/auth.service';
 import { PREFERENCE, SEXUAL_ORIENTATION, STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
-import { ImageBlob, User } from '../commons/model';
+import { ImageBlob, NotFound, User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatchComponent } from '../pages/match/match.component';
@@ -48,6 +48,13 @@ export class Tab1Page implements AfterViewInit, OnInit {
     ageOutOfBound: false,
     distanceOutOfBound: false
   }
+
+  notFound: NotFound = {
+    icon: 'assets/icons/chats.svg',
+    title: 'Keep swipping',
+    body: 'Your matches will appear here where you can send them a message'
+  }
+
   constructor(
     private gestureCtrl: GestureController,
     private modalCtrl: ModalController,
@@ -55,6 +62,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
     private router: Router,
     private utilService: UtilService,
     private sanitizer: DomSanitizer,
+    private loadingCtrl: LoadingController,
     private cdRef: ChangeDetectorRef) { }
 
 
@@ -80,7 +88,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
       }, err => console.log(err))
     }
 
-    this.getUsers();
+    // this.getUsers();
   }
 
   ngAfterViewInit() {
@@ -92,9 +100,11 @@ export class Tab1Page implements AfterViewInit, OnInit {
     }, 2000);
   }
 
-  getUsers() {
+  async getUsers() {
+     
+    this.loadingUsers = true;
     this.authService.getUsers().subscribe((users: any) => {
-
+     
       if (this.currentUser.preferences.with === PREFERENCE.EITHER) {
         this.users = users.filter((u: User) => u._id !== this.currentUser._id && (u.preferences.with === PREFERENCE.EITHER || u.sexualOrientation === SEXUAL_ORIENTATION.GAY))
       } else {
@@ -115,11 +125,17 @@ export class Tab1Page implements AfterViewInit, OnInit {
                 filename
               }
               this.users[i].images.push(bob.img.changingThisBreaksApplicationSecurity);
-            }, err => console.log(err))
+              this.loadingUsers = false;
+
+            }, err => {
+              console.log(err);
+              this.loadingUsers = false;
+            });
           });
         });
       }
-    });
+      
+    }, err => this.loadingUsers = false  );
   }
 
 
@@ -140,7 +156,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
       this.preferences = data
     }
   }
- 
+
   initializeGestures() {
     this.cards = document.querySelectorAll('.swipe-card');
     console.log('cards ', this.cards);
@@ -215,12 +231,12 @@ export class Tab1Page implements AfterViewInit, OnInit {
     this.updateSwipedCollection(index, swipee, 'left');
   }
 
-  private updateSwipedCollection(index: number,swipee: string, direction: string) {
+  private updateSwipedCollection(index: number, swipee: string, direction: string) {
     this.authService.updateSwipeCollection(this.currentUser._id!, swipee, direction).subscribe((res: any) => {
       //do some
       console.log("SWipe res ", res);
 
-      if(res.match) {
+      if (res.match) {
 
         this.authService.getImageData(res.swipee._id!, res.swipee.profilePic).subscribe((blob: any) => {
           const objectURL = URL.createObjectURL(blob);
@@ -236,7 +252,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
         }, err => console.log(err))
       }
-      
+
 
     }, err => {
       console.log("Swipe failed ", err);
@@ -246,7 +262,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
   async openMatchModal(swiper: User, swipee: User) {
     const modal = await this.modalCtrl.create({
       component: MatchComponent,
-      componentProps: { 
+      componentProps: {
         swiper,
         swipee,
       }
@@ -288,13 +304,14 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   handleNoMoreUsersChange(event: any) {
     console.log("No more user ", event);
-
+    this.loadingUsers = true;
+    this.users = [];
     setTimeout(() => {
       this.initializeGestures();
       this.loadingUsers = false;
       this.showNoMoreUsers = false;
       this.getUsers();
-    }, 1300);
+    }, 1000);
     this.cdRef.detectChanges();
 
   }

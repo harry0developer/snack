@@ -86,3 +86,9 @@ export interface OTP {
     otpExpiresAt: string;
     
 }
+
+export interface NotFound {
+  icon: string;
+  title: string;
+  body: string;
+}

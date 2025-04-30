@@ -1,12 +1,15 @@
-<div class="no-users">
-  <div class="profile">
-    <img [src]="user" alt="">
-  </div>
+<div class="no-users"> 
+  <img src="assets/icons/location.svg" alt="distance">
 
   <h1>You ran out of people</h1>
   <p>Expand your distance settings to see more people in your area</p>
 
-  <!-- <ion-range aria-label="distance" 
+  <ion-item lines="none"> 
+    <ion-label slot="start"><b>Distance</b></ion-label>
+    <ion-note slot="end"><b>{{range.value}} km</b></ion-note>
+  </ion-item>
+  
+  <ion-range aria-label="distance" 
     [min]="range.min" 
     [max]="range.max"
     [pin]="range.pin"
@@ -16,6 +19,6 @@
       <span slot="end">{{range.max}}</span>
   </ion-range>
 
-  <ion-button (click)="handelDistanceRangeChange()" [disabled]="range.value < 1" shape="round">Apply</ion-button> -->
+  <ion-button class="solid secondary" (click)="handelDistanceRangeChange()" [disabled]="range.value < 1"  >Apply</ion-button>
 
 </div>

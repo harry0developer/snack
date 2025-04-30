@@ -1,0 +1,19 @@
+@import '../../../theme/colors.scss';
+.not-found {
+    text-align: center;
+    margin-top: 14vh;
+    padding: 20px;
+    
+    img {
+      width: 160px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: bold;
+      line-height: 0.8;
+    }
+    p {
+      font-size: 18px;
+      padding-top: 20px;
+    }
+  }

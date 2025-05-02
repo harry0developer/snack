@@ -57,8 +57,9 @@ export interface Location {
     password: string;
     ethnicity: string;
     bodyType: string;
-    sexualOrientation: string;
+    height: string;
     interests: string[];
+    description: string;
     preferences: Preferences;
   }
   

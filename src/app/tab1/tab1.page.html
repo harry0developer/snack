@@ -26,7 +26,6 @@
         <ion-card class="swipe-card">
           <div class="scrollable">
             <div class="container">
-              <h1>{{card.name}}</h1>
               <div class="panel" *ngFor="let img of card.images; let i = index">
                 <img [src]="img" [alt]="card._id">
                 <div class="user-info" *ngIf="card.name && i == 0">
@@ -54,7 +53,6 @@
                   </p>
                   <ion-chip [outline]="true"> {{card.ethnicity}} </ion-chip>
                   <ion-chip [outline]="true"> {{card.bodyType}} </ion-chip>
-                  <ion-chip [outline]="true"> {{card.sexualOrientation}} </ion-chip>
                 </div>
 
                 <div class="user-info" *ngIf="card.preferences && card.preferences.want && card.preferences.want.length > 0 && i == 2">
@@ -77,11 +75,7 @@
       <ion-icon *ngIf="opacityHeart" [style.opacity]="opacityHeart" class="left" name="close-circle-outline"></ion-icon>
       <ion-icon *ngIf="opacityClose" [style.opacity]="opacityClose" class="right" name="heart-outline"></ion-icon>
     </div>
-  </ng-template>
-
- 
-
-
+  </ng-template> 
 
 </ion-content>
 

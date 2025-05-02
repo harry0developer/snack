@@ -267,25 +267,25 @@ app.get('/api/protected', (req, res) => {
 
 
 app.post('/api/send-otp', async (req, res) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const { phoneNumber, type } = req.body;
-
-
-  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toLocaleString('en-US', {
-    timeZone: 'Europe/London'
-  });
 
   try {
-    const userExists = await User.findOne({ phoneNumber, type });
+    const userExists = await User.findOne({ phoneNumber });
     if (userExists) {
       return res.status(500).json({ message: 'User already exists' });
     }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const { phoneNumber } = req.body;
+
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toLocaleString('en-US', {
+      timeZone: 'Europe/London'
+    });
+
     console.log({ phoneNumber, otp, otpExpiresAt });
 
     return res.status(200).json({ phoneNumber, otp, otpExpiresAt });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error', error });
   }
 
 });

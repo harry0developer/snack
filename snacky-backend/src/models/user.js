@@ -61,10 +61,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  sexualOrientation: {
-    type: String,
-    required: true,
-  },
   interests: {
     type: [String],
     required: true,
@@ -96,6 +92,10 @@ const userSchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
+  },
+  description: {
+    type: String,
+    required: false
   },
   matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   verfied: {

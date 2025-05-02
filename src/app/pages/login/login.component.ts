@@ -90,9 +90,10 @@ export class LoginComponent implements OnInit {
       "phoneNumber": "+930810002016",
       "username": "+9308110002016",
       "password": "123456",
+      height: '160',
+      description: '',
       "ethnicity": "Black",
       "bodyType": "Thick",
-      "sexualOrientation": "Straight",
       "interests": [],
       verified: false
     }

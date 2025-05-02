@@ -9,16 +9,16 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5001/api';  
+  private apiUrl = 'http://localhost:5001/api';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   register(username: string, password: string, name: string, dob: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, { username, password, name, dob });
   }
 
   login(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { username: data.phoneNumber,  phoneNumber: data.phoneNumber, password: data.passcode  });
+    return this.http.post(`${this.apiUrl}/login`, { username: data.phoneNumber, phoneNumber: data.phoneNumber, password: data.passcode });
   }
 
   saveToken(token: string): void {
@@ -29,7 +29,7 @@ export class AuthService {
     return localStorage.getItem(STORAGE.AUTH_TOKEN);
   }
 
- 
+
   storageSave(key: string, data: any): void {
     const saveData = JSON.stringify(data);
     localStorage.setItem(key, saveData)
@@ -42,9 +42,9 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.getToken() !== null;
   }
- 
-  uploadImage( formData: any) {
-    return this.http.post(`${this.apiUrl}/upload`,  formData);
+
+  uploadImage(formData: any) {
+    return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 
   getImages(uid: string) {
@@ -54,40 +54,40 @@ export class AuthService {
   deleteImage(uid: string, filename: string) {
     return this.http.delete(`${this.apiUrl}/images/${uid}/${filename}`);
   }
-  
+
   getImageData(uid: string, filename: string) {
     return this.http.get(`${this.apiUrl}/image/${uid}/${filename}`, {
-       responseType: 'blob'
-    }); 
+      responseType: 'blob'
+    });
   }
 
-  updateProfilePic(user: User){
+  updateProfilePic(user: User) {
     return this.http.put(`${this.apiUrl}/users/${user._id}`, user);
   }
 
-  getUsers(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users`);
+  getUsers(user: User): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/users-search`, user);
   }
 
   getUserById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users/${id}`); 
+    return this.http.get<any>(`${this.apiUrl}/users/${id}`);
   }
- 
+
   getSwipes(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/swipe/${id}`); 
+    return this.http.get<any>(`${this.apiUrl}/swipe/${id}`);
   }
 
   updateSwipeCollection(swiperId: string, swipeeId: string, direction: string): Observable<any> {
-   const req = { swiperId, swipeeId, direction};
-    return this.http.post<any>(`${this.apiUrl}/swipe`, req); 
+    const req = { swiperId, swipeeId, direction };
+    return this.http.post<any>(`${this.apiUrl}/swipe`, req);
   }
 
   sendOtp(otpRequest: any) {
-    return this.http.post(`${this.apiUrl}/send-otp`,  otpRequest);
+    return this.http.post(`${this.apiUrl}/send-otp`, otpRequest);
   }
 
   createAccount(user: User) {
-    return this.http.post(`${this.apiUrl}/create-account`,  user);
+    return this.http.post(`${this.apiUrl}/create-account`, user);
   }
 
 
@@ -99,7 +99,7 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/verify-otp`, otpReq);
   }
 
- 
+
 
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);

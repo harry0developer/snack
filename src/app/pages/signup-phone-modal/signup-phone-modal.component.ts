@@ -4,7 +4,9 @@ import { Validators, FormBuilder, FormGroup, FormControl, ReactiveFormsModule } 
 import { Router } from '@angular/router';
 import { ActionSheetController, AlertController, LoadingController, ModalController, ToastController} from '@ionic/angular';
 
-import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter, IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem, IonLabel, IonSelect, IonSelectModal, IonSelectOption,  } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter,
+  IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem, 
+  IonLabel, IonSelect, IonSelectModal, IonSelectOption, IonRange} from '@ionic/angular/standalone';
  
 import moment from 'moment';
 import { User } from '../../commons/model';
@@ -33,6 +35,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     IonIcon,
     IonCol,
     IonFooter,
+    IonRange,
     CommonModule,
     ReactiveFormsModule
 
@@ -103,7 +106,6 @@ export class SignupPhoneModalPage implements OnInit {
     private presentToast: ToastController,
     private loadingCtrl:LoadingController
   ) { } 
-
   
   get name() {
     return this.userFormGroup.get('name')?.value;
@@ -116,7 +118,12 @@ export class SignupPhoneModalPage implements OnInit {
   get gender() {
     return this.userFormGroup.get('gender')?.value;
   }
-
+  get description() {
+    return this.userFormGroup.get('description')?.value;
+  }
+  get height() {
+    return this.userFormGroup.get('height')?.value;
+  }
   get ethnicity() {
     return this.userFormGroup.get('ethnicity')?.value;
   }
@@ -143,10 +150,13 @@ export class SignupPhoneModalPage implements OnInit {
       ethnicity: new FormControl('', Validators.compose([
         Validators.required
       ])),
-      sexualOrientation: new FormControl('', Validators.compose([
+      bodyType: new FormControl('', Validators.compose([
         Validators.required
       ])),
-      bodyType: new FormControl('', Validators.compose([
+      description: new FormControl('', Validators.compose([
+        Validators.required
+      ])),
+      height: new FormControl('', Validators.compose([
         Validators.required
       ])),
       preferenceFor: new FormControl('', Validators.compose([
@@ -196,7 +206,8 @@ export class SignupPhoneModalPage implements OnInit {
       password: f.passcode,
       ethnicity: f.ethnicity,
       bodyType: f.bodyType,
-      sexualOrientation: f.sexualOrientation,
+      height: f.height,
+      description: f.description,
       interests: [],
       images: [],
       profilePic: "",
@@ -221,14 +232,12 @@ export class SignupPhoneModalPage implements OnInit {
         const data = {
           phoneNumber: user.username, passcode: user.password
         };
-    
         this.authService.login(data).subscribe((auth) => {
           this.router.navigateByUrl(APP_ROUTES.HOME);
           this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
           this.authService.storageSave(STORAGE.ME, auth.user);
         }, err => {
           console.log(err);
-          
         })
       })
     }, err => {

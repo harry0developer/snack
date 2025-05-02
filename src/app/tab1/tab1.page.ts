@@ -16,7 +16,6 @@ import { MatchComponent } from '../pages/match/match.component';
   standalone: false,
 })
 export class Tab1Page implements AfterViewInit, OnInit {
-
   opacityHeart: number = 0;
   opacityClose: number = 0;
 
@@ -30,8 +29,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
 
   showNoMoreUsers: boolean = false;
   loadingUsers: boolean = false;
-
-
   users: User[] = [];
   currentUser!: User
   currentUserProfilePicture: any;
@@ -65,7 +62,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
     private loadingCtrl: LoadingController,
     private cdRef: ChangeDetectorRef) { }
 
-
   ngOnInit(): void {
     const token = this.authService.getToken();
     if (!token) {
@@ -88,7 +84,12 @@ export class Tab1Page implements AfterViewInit, OnInit {
       }, err => console.log(err))
     }
 
-    // this.getUsers();
+    const req = {
+      withWho: this.currentUser.preferences.with,
+      age: this.currentUser.age,
+      distance: this.currentUser.preferences.distance
+    }
+    this.getUsers();
   }
 
   ngAfterViewInit() {
@@ -101,18 +102,11 @@ export class Tab1Page implements AfterViewInit, OnInit {
   }
 
   async getUsers() {
-     
     this.loadingUsers = true;
-    this.authService.getUsers().subscribe((users: any) => {
-     
-      if (this.currentUser.preferences.with === PREFERENCE.EITHER) {
-        this.users = users.filter((u: User) => u._id !== this.currentUser._id && (u.preferences.with === PREFERENCE.EITHER || u.sexualOrientation === SEXUAL_ORIENTATION.GAY))
-      } else {
-        this.users = users.filter((u: User) => u._id !== this.currentUser._id && this.currentUser.preferences.with === u.gender);
-      }
-
-      console.log("users ", this.users);
-
+   
+    this.authService.getUsers(this.currentUser).subscribe((users: any) => {
+      this.users = users;
+      console.log("users ", users);
       if (this.users && this.users.length > 0) {
         this.users.forEach((u, i) => {
           const userImages = u.images;
@@ -126,7 +120,6 @@ export class Tab1Page implements AfterViewInit, OnInit {
               }
               this.users[i].images.push(bob.img.changingThisBreaksApplicationSecurity);
               this.loadingUsers = false;
-
             }, err => {
               console.log(err);
               this.loadingUsers = false;
@@ -134,10 +127,8 @@ export class Tab1Page implements AfterViewInit, OnInit {
           });
         });
       }
-      
     }, err => this.loadingUsers = false  );
   }
-
 
   async openModal() {
     const modal = await this.modalCtrl.create({
@@ -308,9 +299,9 @@ export class Tab1Page implements AfterViewInit, OnInit {
     this.users = [];
     setTimeout(() => {
       this.initializeGestures();
-      this.loadingUsers = false;
       this.showNoMoreUsers = false;
       this.getUsers();
+      this.loadingUsers = false;
     }, 1000);
     this.cdRef.detectChanges();
 

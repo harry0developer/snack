@@ -6,6 +6,7 @@ import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
 import moment from 'moment';
+import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
   selector: 'app-otp',
@@ -104,22 +105,6 @@ export class OtpComponent  implements OnInit {
         this.error = err.error.message
       })
    }
-
-
-   async openCreateAccountModal() {
-    const modal = await this.modalCtrl.create({
-      component: SignupPhoneModalPage,
-      initialBreakpoint: 0.8,
-      breakpoints: [0, 0.8],
-      backdropBreakpoint: 0,
-      backdropDismiss: false
-    });
-    modal.present();
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      console.log("confirmed");
-    }
-  }
 
 
   ngOnDestroy(): void {

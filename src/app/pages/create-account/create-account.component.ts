@@ -58,8 +58,6 @@ export class CreateAccountComponent  implements OnInit {
     private router: Router) {}
   
   ngOnInit() {
-    console.log();
-
     this.phoneNumberFormGroup = this.formBuilder.group({
       phone: new FormControl('', Validators.compose([
         Validators.required,
@@ -68,14 +66,18 @@ export class CreateAccountComponent  implements OnInit {
       code: new FormControl('', Validators.compose([
         Validators.required
       ])),
-      // passcode: new FormControl('', Validators.compose([
-      //   Validators.required,
-      //   Validators.minLength(6),
-      //   Validators.maxLength(6),
-      // ]))
+      passcode: new FormControl('', Validators.compose([
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(6),
+      ]))
     });
   }
 
+  get passcode() {
+    return this.phoneNumberFormGroup.get('passcode')?.value;
+  }
+  
   async openCountryCodeModal() {
     const modal = await this.modalCtrl.create({
       component: CountryCodeComponent,
@@ -89,21 +91,7 @@ export class CreateAccountComponent  implements OnInit {
       console.log("applied", data);
       this.selectedCountryCode = data.dial_code;
     }
-  }
-
-
-  createAccount() { 
-    const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
-    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber}
-    this.authService.sendOtp(req).subscribe((res: any) => {
-      this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
-      this.openOTPModal(res);
-    }, err => {
-      console.log(err.error);
-      
-    })
-  }
-   
+  } 
 
   async openOTPModal(phoneAndOtp: OTP) {
     const modal = await this.modalCtrl.create({
@@ -130,10 +118,9 @@ export class CreateAccountComponent  implements OnInit {
   async openCreateAccountModal() {
     const modal = await this.modalCtrl.create({
       component: SignupPhoneModalPage,
-      initialBreakpoint: 0.8,
-      breakpoints: [0, 0.8],
-      backdropBreakpoint: 0,
-      backdropDismiss: false
+      componentProps: {
+        "passcode": this.passcode
+      }
     });
     modal.present();
     const { data, role } = await modal.onWillDismiss();
@@ -141,6 +128,19 @@ export class CreateAccountComponent  implements OnInit {
       console.log("confirmed", data);
       // this.sendOtp(this.authService.storageGet(STORAGE.PHONE_NUMBER))
     }
+  }
+
+
+  createAccount() { 
+    const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
+    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber}
+    this.authService.sendOtp(req).subscribe((res: any) => {
+      this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
+      this.openOTPModal(res);
+    }, err => {
+      console.log(err.error);
+      this.error = err.error.message
+    })
   }
 
   goToSignIn(){

@@ -1,8 +1,8 @@
 import { Component, ViewChild, AfterViewInit, ChangeDetectorRef, ElementRef, OnInit } from '@angular/core';
-import { GestureController, Gesture, GestureDetail, ModalController, LoadingController } from '@ionic/angular';
+import { GestureController, Gesture, GestureDetail, ModalController, LoadingController, AlertController } from '@ionic/angular';
 import { Preferences, PreferencesComponent } from '../pages/preferences/preferences.component';
 import { AuthService } from '../commons/services/auth.service';
-import { PREFERENCE, SEXUAL_ORIENTATION, STORAGE } from '../commons/conts';
+import { APP_ROUTES, PREFERENCE, SEXUAL_ORIENTATION, STORAGE } from '../commons/conts';
 import { Router } from '@angular/router';
 import { ImageBlob, NotFound, User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
@@ -60,15 +60,28 @@ export class Tab1Page implements AfterViewInit, OnInit {
     private utilService: UtilService,
     private sanitizer: DomSanitizer,
     private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController,
     private cdRef: ChangeDetectorRef) { }
 
+
+  ionViewWillEnter() {
+    this.currentUser = this.authService.storageGet(STORAGE.ME);
+
+    if (this.currentUser.images.length < 1) {
+      this.showAlert('Upload images', "Please upload at least 3 photos before you can start swipping")
+    }
+
+  }
   ngOnInit(): void {
+
     const token = this.authService.getToken();
     if (!token) {
       this.authService.logout();
       this.router.navigateByUrl('login');
     }
+
     this.currentUser = this.authService.storageGet(STORAGE.ME);
+ 
     console.log("Current user ", this.currentUser);
 
     if (!this.currentUserProfilePicture) {
@@ -101,9 +114,21 @@ export class Tab1Page implements AfterViewInit, OnInit {
     }, 2000);
   }
 
+
+  async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header, message, buttons: ['Dismiss']
+    })
+
+    await alert.present();
+    alert.onDidDismiss().then(res => {
+      this.router.navigateByUrl(APP_ROUTES.PROFILE)
+    })
+  }
+
   async getUsers() {
     this.loadingUsers = true;
-   
+
     this.authService.getUsers(this.currentUser).subscribe((users: any) => {
       this.users = users;
       console.log("users ", users);
@@ -127,7 +152,7 @@ export class Tab1Page implements AfterViewInit, OnInit {
           });
         });
       }
-    }, err => this.loadingUsers = false  );
+    }, err => this.loadingUsers = false);
   }
 
   async openModal() {

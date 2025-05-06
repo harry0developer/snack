@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { Validators, FormBuilder, FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ActionSheetController, AlertController, LoadingController, ModalController, ToastController} from '@ionic/angular';
+import { ActionSheetController, AlertController, LoadingController, ModalController, ToastController } from '@ionic/angular';
 
-import { IonButton, IonButtons, IonCard, IonDatetime, IonFooter,
-  IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem, 
-  IonLabel, IonSelect, IonSelectModal, IonSelectOption, IonRange} from '@ionic/angular/standalone';
- 
+import {
+  IonButton, IonButtons, IonCard, IonDatetime, IonFooter,
+  IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem,
+  IonLabel, IonSelect, IonSelectModal, IonSelectOption, IonRange, IonRow, IonGrid, IonImg
+} from '@ionic/angular/standalone';
+
 import moment from 'moment';
 import { User } from '../../commons/model';
 import { AuthService } from '../../commons/services/auth.service';
@@ -36,7 +38,11 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     IonCol,
     IonFooter,
     IonRange,
+    IonGrid,
+    IonRow,
+    IonImg,
     CommonModule,
+    FormsModule,
     ReactiveFormsModule
 
   ]
@@ -65,9 +71,12 @@ export class SignupPhoneModalPage implements OnInit {
       { type: 'required', message: 'Preference is required.' }
     ],
     'email': [
-     { type: 'required', message: 'Email is required.' },
-     { type: 'pattern', message: 'Please enter a valid email.' }
-   ],
+      { type: 'required', message: 'Email is required.' },
+      { type: 'pattern', message: 'Please enter a valid email.' }
+    ],
+    'bio': [
+      { type: 'required', message: 'Bio is required.' },
+    ],
     'password': [
       { type: 'required', message: 'Password is required.' },
       { type: 'minlength', message: 'Password must be at least 6 characters long.' }
@@ -83,7 +92,7 @@ export class SignupPhoneModalPage implements OnInit {
       { type: 'maxlength', message: 'Passcode code must be 6 characters long.' }
     ]
   };
- 
+
   profilePic: string = '';
   profilePicture: string = '';
   user: any;
@@ -96,6 +105,11 @@ export class SignupPhoneModalPage implements OnInit {
   maxDate: any;
 
   verificationCode: string = '';
+  formDataForImages = new FormData();
+  blobImages: any[] = [];
+
+  @Input() passcode: string = '';
+
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
@@ -104,9 +118,9 @@ export class SignupPhoneModalPage implements OnInit {
     private modalCtrl: ModalController,
     public actionSheetController: ActionSheetController,
     private presentToast: ToastController,
-    private loadingCtrl:LoadingController
-  ) { } 
-  
+    private loadingCtrl: LoadingController
+  ) { }
+
   get name() {
     return this.userFormGroup.get('name')?.value;
   }
@@ -118,8 +132,8 @@ export class SignupPhoneModalPage implements OnInit {
   get gender() {
     return this.userFormGroup.get('gender')?.value;
   }
-  get description() {
-    return this.userFormGroup.get('description')?.value;
+  get bio() {
+    return this.userFormGroup.get('bio')?.value;
   }
   get height() {
     return this.userFormGroup.get('height')?.value;
@@ -134,7 +148,7 @@ export class SignupPhoneModalPage implements OnInit {
     return this.userFormGroup.get('preferenceWith')?.value;
   }
 
-  ngOnInit() {    
+  ngOnInit() {
     this.setMaxDate();
     this.userFormGroup = this.formBuilder.group({
       name: new FormControl('', Validators.compose([
@@ -153,8 +167,8 @@ export class SignupPhoneModalPage implements OnInit {
       bodyType: new FormControl('', Validators.compose([
         Validators.required
       ])),
-      description: new FormControl('', Validators.compose([
-        Validators.required
+      bio: new FormControl('', Validators.compose([
+        Validators.required,
       ])),
       height: new FormControl('', Validators.compose([
         Validators.required
@@ -164,32 +178,29 @@ export class SignupPhoneModalPage implements OnInit {
       ])),
       preferenceWith: new FormControl('', Validators.compose([
         Validators.required
-      ])), 
-      passcode: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(6),
-        Validators.maxLength(6),
-      ])),
+      ]))
     });
-  
   }
 
+
   back() {
-    if(this.activeStep > 0) {
+    if (this.activeStep > 0) {
       --this.activeStep;
     }
   }
 
-	next() {
-		++this.activeStep;
-	}
- 
+  next() {
+    console.log("Messge ", this.bio);
+    ++this.activeStep;
+
+  }
+
   setMaxDate() {
     const m = moment().subtract(18, 'years');
     const mm = moment().subtract(100, 'years');
     this.minDate = mm.format();
     this.maxDate = m.format();
-    this.selectedDate = m.format();    
+    this.selectedDate = m.format();
   }
 
   async createAccount() {
@@ -203,11 +214,11 @@ export class SignupPhoneModalPage implements OnInit {
       gender: f.gender,
       phoneNumber: phone,
       username: phone,
-      password: f.passcode,
+      password: this.passcode,
       ethnicity: f.ethnicity,
       bodyType: f.bodyType,
       height: f.height,
-      description: f.description,
+      bio: f.bio,
       interests: [],
       images: [],
       profilePic: "",
@@ -227,29 +238,37 @@ export class SignupPhoneModalPage implements OnInit {
     console.log("API READY DATA ", user);
 
     this.authService.createAccount(user).subscribe((res: any) => {
-      console.log("Response ", user);
+      console.log("CreateAccount Response ", res);
       this.modalCtrl.dismiss().then(() => {
         const data = {
           phoneNumber: user.username, passcode: user.password
         };
-        this.authService.login(data).subscribe((auth) => {
-          this.router.navigateByUrl(APP_ROUTES.HOME);
-          this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
-          this.authService.storageSave(STORAGE.ME, auth.user);
-        }, err => {
-          console.log(err);
+        
+        this.formDataForImages.append('uid', res._id);  
+        console.log(" this.formDataForImages", this.formDataForImages);
+        
+        this.authService.uploadImages(this.formDataForImages, res._id).subscribe((img: any)=>{
+          console.log(img);
+          this.authService.login(data).subscribe((auth) => {
+            this.router.navigateByUrl(APP_ROUTES.HOME);
+            this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
+            this.authService.storageSave(STORAGE.ME, auth.user);
+          }, err => {
+            console.log(err);
+          })
         })
+       
       })
     }, err => {
       console.log(err.error);
-      
+
     })
-    
+
   }
-   
-  
-  async stepOne() { 
-    const loading = await this.loadingCtrl.create({message: "Checkng email.."});
+ 
+
+  async stepOne() {
+    const loading = await this.loadingCtrl.create({ message: "Checkng email.." });
     await loading.present();
   }
 
@@ -263,20 +282,20 @@ export class SignupPhoneModalPage implements OnInit {
 
   cancel() {
     this.modalCtrl.dismiss();
-  }   
+  }
 
   resedCode() {
-    this.code = ""+Math.floor(Math.random()*100000+1);
+    this.code = "" + Math.floor(Math.random() * 100000 + 1);
     console.log("Cocde: ", this.code);
 
   }
 
   cancelCreateAccount() {
-    this.router.navigateByUrl('ROUTES.SIGNUP', {replaceUrl: true})
-  } 
+    this.router.navigateByUrl('ROUTES.SIGNUP', { replaceUrl: true })
+  }
 
   otpController(event: any, next: any, prev: any) {
-    if(isNaN(event.target.value)) {
+    if (isNaN(event.target.value)) {
       event.target.value = "";
       return 0;
     } else {
@@ -299,35 +318,48 @@ export class SignupPhoneModalPage implements OnInit {
       resultType: CameraResultType.Base64,
       source: source
     });
-    
-    if(image && image.base64String) { 
+
+    if (image && image.base64String) {
       this.profilePic = image.base64String;
       this.profilePicture = 'data:image/jpeg;base64, ' + image.base64String;
     }
   }
 
-  async selectImageActionSheet() {
-    const actionSheet = await this.actionSheetController.create({
-      header: "Select Image",
-      buttons: [{
-        text: 'Load from Library',
-        handler: () => {
-          this.uploadImage(CameraSource.Photos)
-        }
-      },
-      {
-        text: 'Use Camera',
-        handler: () => {
-          this.uploadImage(CameraSource.Camera)
-        }
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel'
-      }
-      ]
+  // Upload multiple images
+  async uploadImages() {
+    const photos = await Camera.pickImages({
+      quality: 90,
+      limit: 6 - this.blobImages.length
     });
-    await actionSheet.present();
+
+    // const formData = new FormData();
+    // this.formDataForImages.append('uid', uid); //We do not have
+
+    photos.photos.forEach((photo: any, index: number) => {
+      this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
+        const extension = this.getExtensionFromMime(blob.type);
+        const fileName = `photo_${Date.now()}_${index}.${extension}`;
+        this.formDataForImages.append('files', blob, fileName);
+        console.log(blob);
+
+        this.blobImages.push(photo.webPath)
+      });
+    });
   }
-  
+  // Fetch Blob from webPath
+  private async fetchBlobFromWebPath(webPath: string): Promise<Blob> {
+    const response = await fetch(webPath);
+    return await response.blob();
+  }
+
+  // Helper to extract file extension
+  private getExtensionFromMime(mime: string): string {
+    const map: any = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+    };
+    return map[mime] || 'jpg';
+  }
+
 }

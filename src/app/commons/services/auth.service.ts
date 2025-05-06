@@ -43,13 +43,13 @@ export class AuthService {
     return this.getToken() !== null;
   }
 
-  uploadImage(formData: any) {
-    return this.http.post(`${this.apiUrl}/upload`, formData);
+  uploadImages(formData: any, uid: string) {
+    return this.http.post(`${this.apiUrl}/upload-multiple?uid=${uid}`, formData);
   }
 
-  getImages(uid: string) {
-    return this.http.get(`${this.apiUrl}/images/${uid}`);
-  }
+  // getImages(uid: string) {
+  //   return this.http.get(`${this.apiUrl}/images/${uid}`);
+  // }
 
   deleteImage(uid: string, filename: string) {
     return this.http.delete(`${this.apiUrl}/images/${uid}/${filename}`);

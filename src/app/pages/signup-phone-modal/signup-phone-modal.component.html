@@ -1,12 +1,11 @@
-
 <ion-header> </ion-header>
 
-<ion-content class="modal-container"> 
-  <div class="counter" *ngIf="activeStep <= 7">Step {{activeStep + 1}}/8</div>
+<ion-content class="modal-container">
+  <div class="counter" *ngIf="activeStep <= 8">Step {{activeStep + 1}}/9</div>
 
   <!-- Step Name  -->
   <div class="container" *ngIf="activeStep == 0">
-    <div class="title">
+    <div class="title mb">
       <h1>What is your name?</h1>
       <p>Other users will see this</p>
     </div>
@@ -26,7 +25,7 @@
         </ng-container>
       </div>
 
- 
+
       <div class="validation-errors">
         <label class="error-message">{{errorMessage}}</label>
       </div>
@@ -39,55 +38,44 @@
           Next
         </ion-button>
       </div>
-      
+
     </form>
   </div>
 
-
-   <!-- Step dob  -->
-   <div class="container" *ngIf="activeStep == 1">
+  <!-- Step dob  -->
+  <div class="container" *ngIf="activeStep == 1">
     <div class="title">
       <h1>What's your date of birth</h1>
       <p>Others will only see your age.</p>
       <p class="note">You must be 18 years or older to use this app</p>
-    </div> 
+    </div>
 
     <form class="modal-form" [formGroup]="userFormGroup">
-      <ion-datetime
-        preferWheel = "true"
-        [value]="selectedDate"
-        [max]="maxDate"
-        [min]="minDate"
-        presentation="date" 
-        formControlName="dob"
-        size="cover"
-        placeholder="Select date of birth"></ion-datetime>
-        <div class="buttons">
-          <ion-button class="clear primary" shape="round" (click)="back()">
-            Back
-          </ion-button>
-  
-          <ion-button class="solid primary" [disabled]="!userFormGroup.get('dob')?.valid"  shape="round" (click)="next()">
-            Next
-          </ion-button>
-        </div>
+      <ion-datetime preferWheel="true" [value]="selectedDate" [max]="maxDate" [min]="minDate" presentation="date"
+        formControlName="dob" size="cover" placeholder="Select date of birth"></ion-datetime>
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="back()">
+          Back
+        </ion-button>
+
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('dob')?.valid" shape="round" (click)="next()">
+          Next
+        </ion-button>
+      </div>
     </form>
   </div>
- 
+
   <!-- Step Gender -->
   <div class="container" *ngIf="activeStep == 2">
-    <div class="title">
+    <div class="title mb">
       <h1>What's your gender?</h1>
       <p>This help us find the right match for you</p>
     </div>
 
     <form class="modal-form" [formGroup]="userFormGroup">
       <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select 
-            formControlName="gender"
-            interface="action-sheet" 
-            placeholder="Select gender"> 
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="gender" interface="action-sheet" placeholder="Select gender">
             <ion-select-option value="Male">Male</ion-select-option>
             <ion-select-option value="Female">Female</ion-select-option>
           </ion-select>
@@ -98,68 +86,64 @@
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('gender')?.valid" shape="round" (click)="next()">
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('gender')?.valid" shape="round"
+          (click)="next()">
           Next
         </ion-button>
       </div>
     </form>
-  </div> 
+  </div>
 
-    <!-- Step height -->
+  <!-- Step height -->
   <div class="container" *ngIf="activeStep == 3">
-    <div class="title">
-      <h1>What's your body height</h1>
+    <div class="title mb">
+      <h1>What's your height</h1>
       <p>This help us find the right match for you</p>
     </div>
 
     <form class="modal-form" [formGroup]="userFormGroup">
       <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select 
-            formControlName="height"
-            interface="action-sheet" 
-            placeholder="Select body type"> 
-            <ion-select-option value="120 - 140">120cm - 140cm</ion-select-option> 
-            <ion-select-option value="141 - 150">141cm - 150cm</ion-select-option> 
-            <ion-select-option value="151 - 160">151cm - 160cm</ion-select-option> 
-            <ion-select-option value="161 - 170">161cm - 170cm</ion-select-option> 
-            <ion-select-option value="171 - 180">171cm - 180cm</ion-select-option> 
-            <ion-select-option value="181 - 190">181cm - 190cm</ion-select-option> 
-            <ion-select-option value="191 - 200">191cm - 200cm</ion-select-option> 
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="height" interface="action-sheet" placeholder="Select body type">
+            <ion-select-option value="120 - 140">120cm - 140cm</ion-select-option>
+            <ion-select-option value="141 - 150">141cm - 150cm</ion-select-option>
+            <ion-select-option value="151 - 160">151cm - 160cm</ion-select-option>
+            <ion-select-option value="161 - 170">161cm - 170cm</ion-select-option>
+            <ion-select-option value="171 - 180">171cm - 180cm</ion-select-option>
+            <ion-select-option value="181 - 190">181cm - 190cm</ion-select-option>
+            <ion-select-option value="191 - 200">191cm - 200cm</ion-select-option>
           </ion-select>
         </ion-item>
       </ion-card>
-        
+
       <div class="buttons">
         <ion-button class="clear primary" shape="round" (click)="back()">
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('height')?.valid" shape="round" (click)="next()">
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('height')?.valid" shape="round"
+          (click)="next()">
           Next
         </ion-button>
       </div>
     </form>
-  </div> 
+  </div>
 
-    <!-- Step bodyType -->
+  <!-- Step bodyType -->
   <div class="container" *ngIf="activeStep == 4">
-    <div class="title">
+    <div class="title mb">
       <h1>What's your body type</h1>
       <p>This help us find the right match for you</p>
     </div>
 
     <form class="modal-form" [formGroup]="userFormGroup">
       <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select 
-            formControlName="bodyType"
-            interface="action-sheet" 
-            placeholder="Select body type"> 
-            <ion-select-option  *ngIf="gender === 'Male'" value="Skinny">Skinny</ion-select-option>
-            <ion-select-option  *ngIf="gender === 'Male'" value="Average">Average</ion-select-option>
-            <ion-select-option  *ngIf="gender === 'Male'" value="Built">Built</ion-select-option>
-            <ion-select-option  *ngIf="gender === 'Male'" value="Chubby">Chubby</ion-select-option>
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="bodyType" interface="action-sheet" placeholder="Select body type">
+            <ion-select-option *ngIf="gender === 'Male'" value="Skinny">Skinny</ion-select-option>
+            <ion-select-option *ngIf="gender === 'Male'" value="Average">Average</ion-select-option>
+            <ion-select-option *ngIf="gender === 'Male'" value="Built">Built</ion-select-option>
+            <ion-select-option *ngIf="gender === 'Male'" value="Chubby">Chubby</ion-select-option>
 
             <ion-select-option *ngIf="gender === 'Female'" value="Slim">Slim</ion-select-option>
             <ion-select-option *ngIf="gender === 'Female'" value="Slim thick">Slim thick</ion-select-option>
@@ -169,106 +153,128 @@
           </ion-select>
         </ion-item>
       </ion-card>
-        
+
       <div class="buttons">
         <ion-button class="clear primary" shape="round" (click)="back()">
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('bodyType')?.valid" shape="round" (click)="next()">
-          Next
-        </ion-button>
-      </div>
-    </form>
-  </div> 
-
-  <!-- Step Ethnicity -->
-  <div class="container" *ngIf="activeStep == 5">
-    <div class="title">
-      <h1>What's your ethnicity?</h1>
-      <p>This help us find the right match for you</p>
-    </div>
-
-    <form class="modal-form" [formGroup]="userFormGroup">
-      <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select 
-            formControlName="ethnicity"
-            interface="action-sheet" 
-            placeholder="Select ethnicity"> 
-            <ion-select-option value="Asia">Asian</ion-select-option>
-            <ion-select-option value="Black">Black</ion-select-option>
-            <ion-select-option value="Mixed">Mixed</ion-select-option> 
-            <ion-select-option value="White">White</ion-select-option> 
-          </ion-select>
-        </ion-item>
-      </ion-card>
-        
-      <div class="buttons">
-        <ion-button class="clear primary" shape="round" (click)="back()">
-          Back
-        </ion-button>
-
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('ethnicity')?.valid" shape="round" (click)="next()">
-          Next
-        </ion-button>
-      </div>
-    </form>
-  </div> 
- 
-  <!-- Step preferences -->
-  <div class="container" *ngIf="activeStep == 6">
-    <div class="title">
-      <h1>What are you looking for?</h1>
-      <p>These preferences can be changed once logged in</p>
-    </div>
-
-    <form class="modal-form" [formGroup]="userFormGroup">
-      <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select
-            formControlName="preferenceFor"
-            interface="action-sheet"
-            placeholder="I am looking for"
-            [multiple]="true">
-              <ion-select-option value="No Strings Attached">No Strings Attached</ion-select-option>
-              <ion-select-option value="Friends With Benefits">Friends With Benefits</ion-select-option>
-              <ion-select-option value="One Night Stand">One Night Stand</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card>
- 
-      <div class="text-divider">With</div>
-
-      <ion-card>
-        <ion-item class="item-choose" lines="none"> 
-          <ion-select
-            formControlName="preferenceWith"
-            interface="action-sheet"
-            placeholder="With who"
-            [multiple]="false"> 
-              <ion-select-option value="Male">Male</ion-select-option>
-              <ion-select-option value="Female">Female</ion-select-option> 
-              <ion-select-option value="Either">Either</ion-select-option> 
-          </ion-select>
-        </ion-item>
-      </ion-card>
-      
-      <div class="buttons">
-        <ion-button class="clear primary" shape="round" (click)="back()">
-          Back
-        </ion-button>
-
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('preferenceFor')?.valid || !userFormGroup.get('preferenceWith')?.valid"  shape="round" (click)="next()">
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('bodyType')?.valid" shape="round"
+          (click)="next()">
           Next
         </ion-button>
       </div>
     </form>
   </div>
 
-   <!-- Step 6  -->
-   <div class="container" *ngIf="activeStep == 7">
-    <div class="title">
+  <!-- Step Ethnicity -->
+  <div class="container" *ngIf="activeStep == 5">
+    <div class="title mb">
+      <h1>What's your ethnicity?</h1>
+      <p>This help us find the right match for you</p>
+    </div>
+
+    <form class="modal-form" [formGroup]="userFormGroup">
+      <ion-card>
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="ethnicity" interface="action-sheet" placeholder="Select ethnicity">
+            <ion-select-option value="Asia">Asian</ion-select-option>
+            <ion-select-option value="Black">Black</ion-select-option>
+            <ion-select-option value="Mixed">Mixed</ion-select-option>
+            <ion-select-option value="White">White</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card>
+
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="back()">
+          Back
+        </ion-button>
+
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('ethnicity')?.valid" shape="round"
+          (click)="next()">
+          Next
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Step preferences -->
+  <div class="container" *ngIf="activeStep == 6">
+    <div class="title mb">
+      <h1>What are you looking for?</h1>
+      <p>These preferences can be changed once logged in</p>
+    </div>
+
+    <form class="modal-form" [formGroup]="userFormGroup">
+      <ion-card>
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="preferenceFor" interface="action-sheet" placeholder="I am looking for"
+            [multiple]="true">
+            <ion-select-option value="No Strings Attached">No Strings Attached</ion-select-option>
+            <ion-select-option value="Friends With Benefits">Friends With Benefits</ion-select-option>
+            <ion-select-option value="One Night Stand">One Night Stand</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card>
+
+      <div class="text-divider">With</div>
+
+      <ion-card>
+        <ion-item class="item-choose" lines="none">
+          <ion-select formControlName="preferenceWith" interface="action-sheet" placeholder="With who"
+            [multiple]="false">
+            <ion-select-option value="Male">Male</ion-select-option>
+            <ion-select-option value="Female">Female</ion-select-option>
+            <ion-select-option value="Either">Either</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card>
+
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="back()">
+          Back
+        </ion-button>
+
+        <ion-button class="solid primary"
+          [disabled]="!userFormGroup.get('preferenceFor')?.valid || !userFormGroup.get('preferenceWith')?.valid"
+          shape="round" (click)="next()">
+          Next
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Step bio -->
+  <div class="container" *ngIf="activeStep == 7">
+    <div class="title mb">
+      <h1>Tell us a bit about you</h1>
+      <p>Some things are better said in words</p>
+    </div>
+
+    <form class="modal-form" [formGroup]="userFormGroup">
+      <p class="bio">Bio</p>
+      <ion-card>
+        <ion-item class="item-choose" lines="none">
+          <ion-textarea placeholder="Type something here" rows="3" formControlName="bio"  [maxlength]="100"></ion-textarea>
+        </ion-item>
+      </ion-card>
+
+      <div class="buttons">
+        <ion-button class="clear primary" shape="round" (click)="back()">
+          Back
+        </ion-button>
+
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('bio')?.valid" shape="round" (click)="next()">
+          Next
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Step 6  -->
+  <!-- <div class="container" *ngIf="activeStep == 8">
+    <div class="title mb">
       <h1>Lastly, setup a 6 digit Passcode</h1>
       <p>This is required to login</p>
     </div>
@@ -287,7 +293,7 @@
         </ng-container>
       </div>
 
- 
+
       <div class="validation-errors">
         <label class="error-message">{{errorMessage}}</label>
       </div>
@@ -296,45 +302,54 @@
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round" (click)="createAccount()">
-         All Set
+        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round"
+          (click)="createAccount()">
+          All Set
         </ion-button>
       </div>
-      
+
     </form>
-  </div>
+  </div> -->
 
-
-   <!-- Step 7  -->
-   <!-- <div class="container" *ngIf="activeStep == 8">
+ 
+  <!-- Step photos -->
+  <div class="container" *ngIf="activeStep == 8">
     <div class="title">
-      <h1>Lastly, Upload a profile pic</h1>
-      <p>This is what others will see</p>
+      <h1>Lastly, upload your photos</h1>
+      <p>Show them what you got</p>
     </div>
 
-    <div class="profile-pic" *ngIf="profilePicture">
-      <img  [src]="profilePicture" alt="">
-    </div>
+    <div class="modal-form">
+      <p class="bio">Photos</p>
+      
+      <ion-grid class="photo-grid" >
+        <ion-row>
+          <ion-col size="4" *ngFor="let path of blobImages; let i = index">
+            <ion-img *ngIf="i < 6" [src]="path"></ion-img>
+          </ion-col>
+          <ion-col size="4" *ngIf="blobImages.length < 6">
+            <div class="img-placeholder" (click)="uploadImages()">
+              <ion-icon name="add-circle-outline"></ion-icon>
+            </div>
+          </ion-col> 
+          
+        </ion-row>
 
-    <div class="modal-form" >
-      <ion-col size="4" >
-        <div class="img-placeholder" (click)="selectImageActionSheet()">
-          <ion-icon name="camera-outline"></ion-icon>
-        </div>
-      </ion-col> 
-        
+       
+      </ion-grid>
+
       <div class="buttons">
         <ion-button class="clear primary" shape="round" (click)="back()">
           Back
         </ion-button>
 
-        <ion-button class="solid primary" [disabled]="!profilePicture" shape="round" (click)="createAccount()">
-          All set
+        <ion-button class="solid primary" [disabled]="blobImages.length < 1" shape="round" (click)="createAccount()">
+          Next
         </ion-button>
       </div>
-      
     </div>
-  </div> -->
+  </div>
  
 
-</ion-content> 
+
+</ion-content>

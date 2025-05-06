@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
       "username": "+9308110002016",
       "password": "123456",
       height: '160',
-      description: '',
+      bio: '',
       "ethnicity": "Black",
       "bodyType": "Thick",
       "interests": [],

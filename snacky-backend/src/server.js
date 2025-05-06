@@ -76,7 +76,9 @@ const storage = new GridFsStorage({
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       try {
-        const { uid } = req.body;  
+        // const { uid } = req.body;  
+        const uid = req.query?.uid || req.headers['x-uid'];
+
         if (!uid) {
           return reject(new Error('No UID provided'));
         }
@@ -133,7 +135,36 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 });
 
- 
+app.post('/api/upload-multiple', upload.array('files'), async (req, res) => {
+  const files = req.files;
+  const uid = req.body.uid;
+
+  if (!files || files.length === 0) {
+    return res.status(400).json({ error: 'No files uploaded' });
+  }
+
+  if (!uid) {
+    return res.status(400).json({ error: 'Invalid or missing user ID' });
+  }
+
+  try {
+    const filenames = files.map(file => file.filename);
+
+    const user = await User.findByIdAndUpdate(uid, {
+      $push: { images: { $each: filenames } }
+    }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ user });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 app.get('/api/images/:uid', async (req, res) => {
   const uid = req.params.uid;
 
@@ -269,23 +300,25 @@ app.get('/api/protected', (req, res) => {
 app.post('/api/send-otp', async (req, res) => {
 
   try {
+    const { phoneNumber } = req.body;
+
     const userExists = await User.findOne({ phoneNumber });
     if (userExists) {
       return res.status(500).json({ message: 'User already exists' });
     }
+   
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const { phoneNumber } = req.body;
-
     const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000).toLocaleString('en-US', {
       timeZone: 'Europe/London'
     });
+
 
     console.log({ phoneNumber, otp, otpExpiresAt });
 
     return res.status(200).json({ phoneNumber, otp, otpExpiresAt });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: 'Internal server error' });
   }
 
 });

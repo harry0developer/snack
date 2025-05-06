@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
-  description: {
+  bio: {
     type: String,
     required: false
   },

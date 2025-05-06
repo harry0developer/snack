@@ -7,7 +7,6 @@ import { GalleryModule, GalleryItem, ImageItem, GalleryComponent, Gallery } from
 
 import { Lightbox } from 'ng-gallery/lightbox';
 
-import moment from 'moment';
 import { AuthService } from '../commons/services/auth.service';
 import { APP_ROUTES, STORAGE } from '../commons/conts';
 import { ImageBlob, User } from '../commons/model';
@@ -31,7 +30,7 @@ export class Tab3Page implements OnInit {
   galleryId = 'myLightbox';
 
   galImages: GalleryItem[] = [];
-  profilePicture: string = 'assets/user.png';
+  profilePicture: string = 'assets/icons/user.png';
 
   img: string = '';
   constructor(
@@ -165,7 +164,7 @@ export class Tab3Page implements OnInit {
     formData.append('uid', this.currentUser._id);
     formData.append('file', blob, fileName);
 
-    this.authService.uploadImage(formData).subscribe({
+    this.authService.uploadImages(formData, this.currentUser._id).subscribe({
       next: (res: any) => {
         console.log("res.user", res.user);
         
@@ -190,6 +189,8 @@ export class Tab3Page implements OnInit {
   getUserImages(images: string[]) {
     this.images = [];
     if (this.currentUser.images && this.currentUser.images.length > 0) {
+      console.log("images ", images);
+      
       images.forEach((filename: any) => {
         this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
           const objectURL = URL.createObjectURL(blob);
@@ -207,20 +208,75 @@ export class Tab3Page implements OnInit {
   }
 
 
+  //multi
+  async uploadImages() {
+    const photos = await Camera.pickImages({
+      quality: 90,
+      limit: 5
+    });
+  
+    const formData = new FormData();
+    formData.append('uid', this.currentUser._id);
+  
+    photos.photos.forEach((photo, index) => {
+      // pickImages returns webPath or path, not dataUrl, so we fetch the Blob
+      this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
+        const extension = this.getExtensionFromMime(blob.type);
+        const fileName = `photo_${Date.now()}_${index}.${extension}`;
+        formData.append('files', blob, fileName);
+  
+        // Upload only after all files are added
+        if (index === photos.photos.length - 1) {
+          console.log("formData", formData);
+          
+          this.authService.uploadImages(formData, this.currentUser._id).subscribe({
+            next: (res: any) => {
+              console.log("res.user", res.user);
+              this.authService.storageSave(STORAGE.ME, res.user);
+              this.currentUser = res.user;
+              this.getUserImages(res.user.images);
+            },
+            error: err => console.error('Upload failed:', err),
+          });
+        }
+      });
+    });
+  }
+  
+  // Fetch Blob from webPath
+  private async fetchBlobFromWebPath(webPath: string): Promise<Blob> {
+    const response = await fetch(webPath);
+    return await response.blob();
+  }
+  
+  // Helper to extract file extension
+  private getExtensionFromMime(mime: string): string {
+    const map: any = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+    };
+    return map[mime] || 'jpg';
+  }
+  
+  //end multi
+
   private getProfilePic(filename: string) {
     console.log("getProfilePic", filename);
+    if(filename) {
+      this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
+        const objectURL = URL.createObjectURL(blob);
+        const bob: ImageBlob = {
+          img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+          filename
+        }
+        this.profilePicture = bob.img.changingThisBreaksApplicationSecurity;
+        console.log("Profile pic", bob);
+        
+        this.cdr.detectChanges();
+      }, err => console.log(err))
+    }
     
-    this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
-      const objectURL = URL.createObjectURL(blob);
-      const bob: ImageBlob = {
-        img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
-        filename
-      }
-      this.profilePicture = bob.img.changingThisBreaksApplicationSecurity;
-      console.log("Profile pic", bob);
-      
-      this.cdr.detectChanges();
-    }, err => console.log(err))
   }
 
   private async setProfilePicture(pic: any) {
@@ -299,13 +355,13 @@ export class Tab3Page implements OnInit {
       buttons: [{
         text: 'Load from Library',
         handler: () => {
-          this.uploadImage(CameraSource.Photos)
+          this.uploadImages()
         }
       },
       {
         text: 'Use Camera',
         handler: () => {
-          this.uploadImage(CameraSource.Camera)
+          this.uploadImages()
         }
       },
       {

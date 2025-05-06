@@ -59,7 +59,7 @@ export interface Location {
     bodyType: string;
     height: string;
     interests: string[];
-    description: string;
+    bio: string;
     preferences: Preferences;
   }
   

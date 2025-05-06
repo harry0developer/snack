@@ -39,8 +39,9 @@
             </div>
           </ng-container>
         </div> 
-        
-<!-- 
+
+
+
         <ion-row>
           <ion-col size="12">
             <ion-item class="phone-number">
@@ -50,18 +51,18 @@
                   placeholder="Passcode"></ion-input>
               </ion-item>
             </ion-col>
-        </ion-row> -->
+        </ion-row>
 
-        <!-- <div class="validation-errors">
+        <div class="validation-errors">
           <ng-container *ngFor="let validation of phoneFormValidationMessages.passcode">
             <div class="error-message"
               *ngIf="phoneNumberFormGroup.get('passcode')?.hasError(validation.type) && (phoneNumberFormGroup.get('passcode')?.dirty || phoneNumberFormGroup.get('passcode')?.touched)">
               {{ validation.message }}
             </div>
           </ng-container>
-        </div>  -->
-
-        <div class="error-message">
+        </div> 
+ 
+        <div class="error-message" *ngIf="error">
           <p>{{error}}</p>
         </div>
 

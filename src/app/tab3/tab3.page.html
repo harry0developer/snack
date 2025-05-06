@@ -32,24 +32,30 @@
         <ion-item >
           <ion-icon slot="start"  class="icon" name="calendar-clear-outline"></ion-icon>
           <ion-label>
-            <h3> {{currentUser?.dob}}</h3>
+            <p> {{currentUser?.dob}}</p>
           </ion-label>
         </ion-item>
         <ion-item >
           <ion-icon slot="start" class="gender icon" name="man-outline" *ngIf="currentUser?.gender == 'Male'  "></ion-icon>
           <ion-icon slot="start" class="gender icon" name="woman-outline" *ngIf="currentUser?.gender == 'Female' "></ion-icon>
-          <ion-icon slot="start" class="gender icon" name="grid-outline" *ngIf="currentUser?.gender == 'Gay Couple' || currentUser?.gender == 'Lesbian Couple' "></ion-icon>
-          <ion-label>
-            <h3>{{currentUser?.gender}}</h3>
+           <ion-label>
+            <p>{{currentUser?.gender}}</p>
           </ion-label>
         </ion-item> 
+
+        <p class="bio">Bio</p>
+        <ion-item> 
+          <ion-textarea placeholder="Type something here" rows="3" [value]="currentUser?.bio" [maxlength]="100"></ion-textarea>
+        </ion-item>
+        
       </ion-list>
       
 
       <ion-item-divider class="divider">
         <ion-label>
           Your Photos ({{images.length}})
-          <p>You can click on each photo to manage it</p>
+          <p *ngIf="images.length > 0">You can click on each photo to manage it</p>
+          <p *ngIf="images.length < 1">Click on the <ion-icon name="add-circle-outline"></ion-icon> below to add a photo </p>
 
         </ion-label>
       </ion-item-divider>

@@ -27,6 +27,18 @@ const routes: Routes = [
     path: 'otp',
     loadChildren: () => import('./pages/otp/otp.module').then(m => m.OtpComponentModule)
   },
+  {
+    path: 'allow-notifications',
+    loadComponent: () => import('./pages/allow-notifications/allow-notifications.component').then(m => m.AllowNotificationsComponent)
+  },
+  {
+    path: 'allow-location',
+    loadComponent: () => import('./pages/allow-location/allow-location.component').then(m => m.AllowLocationComponent)
+  },
+  {
+    path: 'allow-tracking',
+    loadComponent: () => import('./pages/allow-tracking/allow-tracking.component').then(m => m.AllowTrackingComponent)
+  },
   { path: 'protected', component: ProtectedComponent },
   {
     path: 'chat/:uid',

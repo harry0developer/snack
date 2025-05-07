@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ActionSheetController, AlertController, LoadingController, ModalController, ToastController } from '@ionic/angular';
-
 import {
   IonButton, IonButtons, IonCard, IonDatetime, IonFooter,
   IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem,
@@ -44,7 +43,6 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     CommonModule,
     FormsModule,
     ReactiveFormsModule
-
   ]
 })
 export class SignupPhoneModalPage implements OnInit {

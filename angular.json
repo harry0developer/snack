@@ -32,7 +32,6 @@
               }
             ],
             "styles": ["src/global.scss", 
-              "node_modules/flag-icon-css/sass/flag-icon.scss",
               "src/theme/variables.scss"
             ],
             "scripts": []
@@ -47,8 +46,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 }
               ],
               "fileReplacements": [

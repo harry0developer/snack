@@ -32,8 +32,8 @@ const routes: Routes = [
     loadComponent: () => import('./pages/allow-notifications/allow-notifications.component').then(m => m.AllowNotificationsComponent)
   },
   {
-    path: 'allow-location',
-    loadComponent: () => import('./pages/allow-location/allow-location.component').then(m => m.AllowLocationComponent)
+    path: 'system-preferences',
+    loadComponent: () => import('./pages/system-preferences/system-preferences.component').then(m => m.SystemPreferencesComponent)
   },
   {
     path: 'allow-tracking',

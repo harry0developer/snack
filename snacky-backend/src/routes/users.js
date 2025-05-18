@@ -6,11 +6,18 @@ server.post('/users-search', async (req, res) => {
   try {
     const { preferences } = req.body;
     const { lower, upper } = preferences.age;
-    const users = await User.find({
-      age: { $gte: lower, $lte: upper },
-      gender: preferences.with
-    });
-
+    let users;
+    if(preferences.with === 'Either') {
+      users = await User.find({
+        age: { $gte: lower, $lte: upper }
+      });
+    } else {
+      users = await User.find({
+        age: { $gte: lower, $lte: upper },
+        gender: preferences.with
+      });
+    }
+  
     res.json(users);
   } catch (err) {
     console.error(err);

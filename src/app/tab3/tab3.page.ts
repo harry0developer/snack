@@ -3,10 +3,6 @@ import { AlertController, LoadingController, ModalController, Platform, ToastCon
 import { ActionSheetController } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
-import { GalleryModule, GalleryItem, ImageItem, GalleryComponent, Gallery } from 'ng-gallery';
-
-import { Lightbox } from 'ng-gallery/lightbox';
-
 import { AuthService } from '../commons/services/auth.service';
 import { APP_ROUTES, STORAGE } from '../commons/conts';
 import { ImageBlob, User } from '../commons/model';
@@ -29,7 +25,6 @@ export class Tab3Page implements OnInit {
   isLoading: boolean = true;
   galleryId = 'myLightbox';
 
-  galImages: GalleryItem[] = [];
   profilePicture: string = 'assets/icons/user.png';
 
   img: string = '';
@@ -40,7 +35,6 @@ export class Tab3Page implements OnInit {
     private alertCtrl: AlertController,
     private authService: AuthService,
     private utilService: UtilService,
-    public gallery: Gallery, private lightbox: Lightbox,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController,
@@ -58,23 +52,7 @@ export class Tab3Page implements OnInit {
     
     this.getUserImages(this.currentUser.images);
   }
-
-  initialiseGallery(user: User) {
-    this.galImages = [];
-
-    user.images?.forEach((img: string) => {
-      this.galImages.push(
-        new ImageItem({ src: img, thumb: '' }),
-      );
-    })
-
-    const galleryRef = this.gallery.ref(this.galleryId);
-    galleryRef.setConfig({
-      nav: false
-    })
-    galleryRef.load(this.galImages);
-
-  }
+ 
 
   async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
     const toast = await this.toastController.create({

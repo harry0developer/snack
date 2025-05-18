@@ -35,7 +35,7 @@ import { TermsComponent } from 'src/app/terms/terms.component';
     IonLabel,
     IonList,
     IonAvatar, IonIcon, IonToggle,
-    IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle,
+    IonCard, IonCardContent, IonCardHeader,
     IonItemDivider
   ],
   standalone: true

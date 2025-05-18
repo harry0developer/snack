@@ -8,6 +8,8 @@ import { ImageBlob, NotFound, User } from '../commons/model';
 import { UtilService } from '../commons/services/util.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatchComponent } from '../pages/match/match.component';
+import { Device } from '@capacitor/device';
+import { SystemPreferencesComponent } from '../pages/system-preferences/system-preferences.component';
 
 @Component({
   selector: 'app-tab1',
@@ -52,6 +54,8 @@ export class Tab1Page implements AfterViewInit, OnInit {
     body: 'Your matches will appear here where you can send them a message'
   }
 
+  deviceId: string = '';
+
   constructor(
     private gestureCtrl: GestureController,
     private modalCtrl: ModalController,
@@ -61,17 +65,24 @@ export class Tab1Page implements AfterViewInit, OnInit {
     private sanitizer: DomSanitizer,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
-    private cdRef: ChangeDetectorRef) { }
+    private cdRef: ChangeDetectorRef) {
+     
+     }
 
 
   ionViewWillEnter() {
     this.currentUser = this.authService.storageGet(STORAGE.ME);
-
+    // this.getDeviceId();
+    // if(this.currentUser.settings.deviceId !== this.deviceId) {
+    //   this.openSystemPreferences();
+    // }
     if (this.currentUser.images.length < 1) {
       this.showAlert('Upload images', "Please upload at least 3 photos before you can start swipping")
     }
 
   }
+
+  
   ngOnInit(): void {
 
     const token = this.authService.getToken();
@@ -114,7 +125,14 @@ export class Tab1Page implements AfterViewInit, OnInit {
     }, 2000);
   }
 
-
+  private getDeviceId() {
+    Device.getId().then(info => {
+      console.log('Device ID:', info);
+      this.deviceId = info.identifier;
+    }).catch(err => {
+      console.log("Cannot get device id", err);
+    })
+  }
   async showAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({
       header, message, buttons: ['Dismiss']
@@ -172,6 +190,25 @@ export class Tab1Page implements AfterViewInit, OnInit {
       this.preferences = data
     }
   }
+
+  async openSystemPreferences() {
+    const modal = await this.modalCtrl.create({
+      component: SystemPreferencesComponent,
+      componentProps: {
+        user: this.currentUser
+      }
+    });
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      console.log('modal confirm... clicked');
+      console.log("Data model ", data);
+      this.preferences = data
+    }
+  }
+
 
   initializeGestures() {
     this.cards = document.querySelectorAll('.swipe-card');

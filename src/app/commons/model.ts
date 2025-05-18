@@ -50,7 +50,6 @@ export interface Location {
     gender: string;
     location?: Location;
     profilePic: string;
-    verified: boolean;
     images: string[];
     phoneNumber: string;
     username: string;
@@ -60,6 +59,11 @@ export interface Location {
     height: string;
     interests: string[];
     bio: string;
+    settings: {
+      deviceId: string,
+      banned: boolean,
+      verified: boolean
+    },
     preferences: Preferences;
   }
   

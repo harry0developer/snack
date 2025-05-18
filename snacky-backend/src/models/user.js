@@ -97,11 +97,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  settings: {
+    deviceId: {
+      type: String,
+      required: false
+    },
+    banned: {
+      type: Boolean,
+      required: true
+    },
+    verified: {
+      type: Boolean,
+      required: true
+    }
+  },
   matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  verfied: {
-    type: Boolean,
-    required: false
-  }
 });
 
 const User = mongoose.model('User', userSchema);

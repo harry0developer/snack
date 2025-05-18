@@ -6,15 +6,13 @@
   <div class="page">
 
     <div class="logo" >
-      <img src="assets/brand/logo.svg" alt="">
+      <img src="assets/brand/dark.svg" alt="">
     </div>
   
     <div class="text">
       <h1>Welcome</h1>
       <p>Match, meet, mingle </p>
     </div>
-    <ion-button expand="block" class="solid secondary" (click)="createUsers()">createUsers</ion-button>
-
     <form class="modal-form" [formGroup]="loginFormGroup">
       <ion-grid>
         <ion-row>
@@ -67,6 +65,7 @@
 
         <div class="buttons">
           <ion-button expand="block" [disabled]="!loginFormGroup.valid" class="solid secondary" (click)="login()">Login</ion-button>
+          <ion-button expand="block"  class="clear white forgot-password" (click)="login()">Forgot Password</ion-button>
         </div>
       </ion-grid>
     </form>

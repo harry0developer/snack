@@ -95,8 +95,12 @@ export class LoginComponent implements OnInit {
       "ethnicity": "Black",
       "bodyType": "Thick",
       "interests": [],
-      verified: false
-    }
+      settings: {
+        banned: false,
+        verified: false,
+        deviceId: ''
+      }
+     }
     this.authService.createAccount(user).subscribe(res => console.log(res), err => console.log(err))
   }
 

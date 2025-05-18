@@ -1,0 +1,32 @@
+<ion-header></ion-header>
+
+<ion-content>
+
+  <!-- ALLOW LOCATION -->
+  <div class="allow-page" *ngIf="step === 0">
+    <img src="assets/icons/allow-location.svg" alt="Share your location">
+    <h1>Share your location</h1>
+    <p>We use this to show people in your area. We never share your exact location</p>
+
+    <ion-button expand="block" class="solid secondary" (click)="allow()">Share location</ion-button>
+  </div>
+
+
+  <!-- ALLOW NOTIFICATION -->
+  <div class="allow-page" *ngIf="step === 1">
+    <img src="assets/icons/allow-notifications.svg" alt="Allow notifications">
+    <h1>Allow notifications</h1>
+    <p>So we can tell you when you get new matches and messages</p>
+
+    <ion-button expand="block" class="solid secondary" (click)="allow()">Share notifications</ion-button>
+  </div>
+
+  <!-- ALLOW TRACKING  -->
+  <div class="allow-page" *ngIf="step === 2">
+    <img src="assets/icons/allow-ads.svg" alt="Personalise your experience">
+    <h1>Personalise your experience</h1>
+    <p>We want to improve your experience, so we use tracking to show you relevant ads</p>
+    
+    <ion-button expand="block"  class="solid secondary" (click)="allow()">Allow tracking</ion-button>
+  </div>
+</ion-content>

@@ -24,18 +24,15 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     IonHeader,
     IonContent,
     IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     IonButtons,
     IonSelect,
-    IonSelectModal,
     IonSelectOption,
     IonDatetime,
     IonCard,
     IonIcon,
     IonCol,
-    IonFooter,
     IonRange,
     IonGrid,
     IonRow,
@@ -105,7 +102,7 @@ export class SignupPhoneModalPage implements OnInit {
   verificationCode: string = '';
   formDataForImages = new FormData();
   blobImages: any[] = [];
-
+  deviceId: string = '';
   @Input() passcode: string = '';
 
   constructor(
@@ -117,7 +114,8 @@ export class SignupPhoneModalPage implements OnInit {
     public actionSheetController: ActionSheetController,
     private presentToast: ToastController,
     private loadingCtrl: LoadingController
-  ) { }
+  ) { 
+  }
 
   get name() {
     return this.userFormGroup.get('name')?.value;
@@ -179,7 +177,7 @@ export class SignupPhoneModalPage implements OnInit {
       ]))
     });
   }
-
+ 
 
   back() {
     if (this.activeStep > 0) {
@@ -220,8 +218,7 @@ export class SignupPhoneModalPage implements OnInit {
       interests: [],
       images: [],
       profilePic: "",
-      verified: false,
-      preferences: {
+       preferences: {
         ethnicity: [],
         age: {
           lower: 18,
@@ -230,6 +227,11 @@ export class SignupPhoneModalPage implements OnInit {
         want: f.preferenceFor,
         with: f.preferenceWith,
         distance: 100
+      },
+      settings: {
+        deviceId: this.deviceId,
+        banned: false,
+        verified: false
       }
     }
 
@@ -243,7 +245,7 @@ export class SignupPhoneModalPage implements OnInit {
         };
         
         this.formDataForImages.append('uid', res._id);  
-        console.log(" this.formDataForImages", this.formDataForImages);
+        console.log("Uploaded images", this.formDataForImages);
         
         this.authService.uploadImages(this.formDataForImages, res._id).subscribe((img: any)=>{
           console.log(img);
@@ -333,6 +335,8 @@ export class SignupPhoneModalPage implements OnInit {
     // const formData = new FormData();
     // this.formDataForImages.append('uid', uid); //We do not have
 
+    console.log();
+    
     photos.photos.forEach((photo: any, index: number) => {
       this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
         const extension = this.getExtensionFromMime(blob.type);

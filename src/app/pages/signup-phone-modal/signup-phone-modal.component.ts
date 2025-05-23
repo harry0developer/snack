@@ -199,76 +199,10 @@ export class SignupPhoneModalPage implements OnInit {
     this.selectedDate = m.format();
   }
 
-  async createAccount() {
-    console.log(this.userFormGroup.value);
-    const f = this.userFormGroup.value;
-    const phone = this.authService.storageGet(STORAGE.PHONE_NUMBER);
-    const user: User = {
-      name: f.name,
-      dob: moment(f.dob).format("DD-MM-YYYY"),
-      age: moment().diff(f.dob, 'years'),
-      gender: f.gender,
-      phoneNumber: phone,
-      username: phone,
-      password: this.passcode,
-      ethnicity: f.ethnicity,
-      bodyType: f.bodyType,
-      height: f.height,
-      bio: f.bio,
-      interests: [],
-      images: [],
-      profilePic: "",
-       preferences: {
-        ethnicity: [],
-        age: {
-          lower: 18,
-          upper: 55
-        },
-        want: f.preferenceFor,
-        with: f.preferenceWith,
-        distance: 100
-      },
-      settings: {
-        deviceId: this.deviceId,
-        banned: false,
-        verified: false
-      }
-    }
 
-    console.log("API READY DATA ", user);
-
-    this.authService.createAccount(user).subscribe((res: any) => {
-      console.log("CreateAccount Response ", res);
-      this.modalCtrl.dismiss().then(() => {
-        const data = {
-          phoneNumber: user.username, passcode: user.password
-        };
-        
-        this.formDataForImages.append('uid', res._id);  
-        console.log("Uploaded images", this.formDataForImages);
-        
-        this.authService.uploadImages(this.formDataForImages, res._id).subscribe((img: any)=>{
-          console.log(img);
-          this.authService.login(data).subscribe((auth) => {
-            this.router.navigateByUrl(APP_ROUTES.HOME);
-            this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
-            this.authService.storageSave(STORAGE.ME, auth.user);
-          }, err => {
-            console.log(err);
-          })
-        })
-       
-      })
-    }, err => {
-      console.log(err.error);
-
-    })
-
-  }
- 
 
   async stepOne() {
-    const loading = await this.loadingCtrl.create({ message: "Checkng email.." });
+    const loading = await this.loadingCtrl.create({ message: "Checking phone number..." });
     await loading.present();
   }
 
@@ -325,29 +259,119 @@ export class SignupPhoneModalPage implements OnInit {
     }
   }
 
-  // Upload multiple images
-  async uploadImages() {
-    const photos = await Camera.pickImages({
-      quality: 90,
-      limit: 6 - this.blobImages.length
-    });
 
-    // const formData = new FormData();
-    // this.formDataForImages.append('uid', uid); //We do not have
+    async createAccount() {
+    const loadingCreateAccount = await this.loadingCtrl.create({ message: "Creating your account..." });
+    await loadingCreateAccount.present();
 
-    console.log();
-    
-    photos.photos.forEach((photo: any, index: number) => {
-      this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
-        const extension = this.getExtensionFromMime(blob.type);
-        const fileName = `photo_${Date.now()}_${index}.${extension}`;
-        this.formDataForImages.append('files', blob, fileName);
-        console.log(blob);
+    console.log(this.userFormGroup.value);
+    const f = this.userFormGroup.value;
+    const phone = this.authService.storageGet(STORAGE.PHONE_NUMBER);
+    const user: User = {
+      name: f.name,
+      dob: moment(f.dob).format("DD-MM-YYYY"),
+      age: moment().diff(f.dob, 'years'),
+      gender: f.gender,
+      phoneNumber: phone,
+      username: phone,
+      password: this.passcode,
+      ethnicity: f.ethnicity,
+      bodyType: f.bodyType,
+      height: f.height,
+      bio: f.bio,
+      interests: [],
+      images: [],
+      profilePic: "",
+       preferences: {
+        ethnicity: [],
+        age: {
+          lower: 18,
+          upper: 55
+        },
+        want: f.preferenceFor,
+        with: f.preferenceWith,
+        distance: 100
+      },
+      settings: {
+        deviceId: this.deviceId,
+        banned: false,
+        verified: false
+      }
+    }
 
-        this.blobImages.push(photo.webPath)
-      });
-    });
+    console.log("API READY DATA ", user);
+
+    this.authService.createAccount(user).subscribe(async (res: any) => {
+      loadingCreateAccount.dismiss();
+      
+      console.log("CreateAccount Response ", res);
+
+      this.modalCtrl.dismiss().then(async () => {
+        const loadingProfile = await this.loadingCtrl.create({ message: "Setting up your profile..." });
+        await loadingProfile.present();
+
+        const data = {
+          phoneNumber: user.username, passcode: user.password
+        };
+        
+        this.formDataForImages.append('uid', res._id);  
+        console.log("Uploaded images", this.authService.showBlob(this.formDataForImages));
+        
+        this.authService.uploadImages(this.formDataForImages, res._id).subscribe((img: any)=>{
+          console.log(img);
+          this.authService.login(data).subscribe((auth) => {
+            
+            loadingProfile.dismiss();
+
+            this.router.navigateByUrl(APP_ROUTES.HOME);
+            this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
+            this.authService.storageSave(STORAGE.ME, auth.user);
+          }, err => {
+            loadingProfile.dismiss();
+            console.log("ERR: this.authService.login(");
+            console.log(err);
+          })
+        }, err => {
+          loadingProfile.dismiss();
+           console.log("Err:  this.authService.uploadImage");
+           console.log(err);
+           
+        })
+       
+      })
+    }, err => {
+      loadingCreateAccount.dismiss();
+      console.log(err.error);
+    })
+
   }
+ 
+
+  // Upload multiple images
+ async uploadImages() {
+  const photos = await Camera.pickImages({
+    quality: 90,
+    limit: 6 - this.blobImages.length
+  });
+
+  for (let index = 0; index < photos.photos.length; index++) {
+    const photo = photos.photos[index];
+
+    try {
+      const blob = await this.fetchBlobFromWebPath(photo.webPath!);
+      const extension = this.getExtensionFromMime(blob.type);
+      const fileName = `photo_${Date.now()}_${index}.${extension}`;
+
+      this.formDataForImages.append('files', blob, fileName);
+      console.log("Appended blob:", blob);
+
+      this.blobImages.push(photo.webPath);
+    } catch (error) {
+      console.error("Failed to fetch blob from webPath", error);
+    }
+  }
+}
+
   // Fetch Blob from webPath
   private async fetchBlobFromWebPath(webPath: string): Promise<Blob> {
     const response = await fetch(webPath);

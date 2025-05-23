@@ -7,8 +7,8 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:5001/api/chats'; 
- 
+  // private apiUrl = 'http://localhost:5001/api/chats'; 
+  private apiUrl = 'https://snuggle.onrender.com/api';
   constructor(private http: HttpClient) {}
  
 

@@ -9,8 +9,9 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5001/api';
+  // private apiUrl = 'http://localhost:5001/api';
 
+  private apiUrl = 'https://snuggle.onrender.com/api';
   constructor(private http: HttpClient, private router: Router) { }
 
   register(username: string, password: string, name: string, dob: string): Observable<any> {
@@ -43,6 +44,18 @@ export class AuthService {
     return this.getToken() !== null;
   }
 
+ showBlob(blob: any) {
+    const entries = blob.getAll('files');
+    console.log('BLOB UID', blob.getAll('uid'));
+    entries.forEach((entry: any, idx: number) => {
+      console.log(`BLOB File ${idx}:`, {
+        name: entry.name || '(no name)',
+        type: entry.type,
+        size: entry.size,
+      });
+    });
+
+  }
   uploadImages(formData: any, uid: string) {
     return this.http.post(`${this.apiUrl}/upload-multiple?uid=${uid}`, formData);
   }

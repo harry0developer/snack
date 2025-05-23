@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { APP_ROUTES, STORAGE } from 'src/app/commons/conts';
 import { Country, User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private formBuilder: FormBuilder,
-
+    private loadingCtrl: LoadingController,
     private modalCtrl: ModalController,
     private router: Router) { }
 
@@ -109,7 +109,10 @@ export class LoginComponent implements OnInit {
   }
 
 
-  login() {
+  async login() {
+    const loading = await this.loadingCtrl.create({ message: "Signing you in..." });
+    await loading.present();
+
     const p = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
 
     console.log("phone", p)
@@ -121,12 +124,15 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(data).subscribe(
       (response: any) => {
+        loading.dismiss();
         console.log('User logged in successfully', response);
         this.authService.saveToken(response.token);
         this.authService.storageSave(STORAGE.ME, response.user);
         this.router.navigate(['/protected']);
       },
       (error) => {
+        loading.dismiss();
+
         console.error('Error logging in', error);
         this.error = error.error.message;
       }

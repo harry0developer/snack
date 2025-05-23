@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
@@ -31,7 +31,8 @@ export class OtpComponent  implements OnInit {
   constructor(
     private authService: AuthService, 
     private router: Router,
-        private formBuilder: FormBuilder,
+    private loadingCtrl: LoadingController,
+    private formBuilder: FormBuilder,
     private modalCtrl: ModalController) {}
   
   ngOnInit() {
@@ -87,12 +88,16 @@ export class OtpComponent  implements OnInit {
     this.error = '';
    }
 
-   resendOTP(){
+   async resendOTP(){
+      const loading = await this.loadingCtrl.create({ message: "Validating the OTP.." });
+      await loading.present();
+      
       this.error = '';
        this.authService.storageSave(STORAGE.PHONE_NUMBER, this.phoneNumber);
       const req = {phoneNumber: this.phoneNumber, type:  ACCOUNT_TYPE.PhoneNumber}
   
       this.authService.sendOtp(req).subscribe((res: any) => {
+        loading.dismiss();
         console.log("OTP SENT", res.otp);
         this.otp = res.otp;
         this.otpExpiresAt = res.otpExpiresAt;
@@ -101,6 +106,7 @@ export class OtpComponent  implements OnInit {
         this.otpFG.reset();
       },
       err => {
+        loading.dismiss();
         console.log(err);
         this.error = err.error.message
       })

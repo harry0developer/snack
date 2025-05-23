@@ -138,6 +138,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 app.post('/api/upload-multiple', upload.array('files'), async (req, res) => {
   const files = req.files;
   const uid = req.body.uid;
+  console.error('FILES UPLOADED:', files.length);
 
   if (!files || files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded' });
@@ -149,7 +150,7 @@ app.post('/api/upload-multiple', upload.array('files'), async (req, res) => {
 
   try {
     const filenames = files.map(file => file.filename);
-
+    
     const user = await User.findByIdAndUpdate(uid, {
       $push: { images: { $each: filenames } }
     }, { new: true });

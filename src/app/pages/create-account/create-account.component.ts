@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
 import { Country, OTP } from 'src/app/commons/model';
@@ -53,7 +53,7 @@ export class CreateAccountComponent  implements OnInit {
   constructor(
     private authService: AuthService, 
     private formBuilder: FormBuilder,
-
+    private loadingCtrl: LoadingController,
     private modalCtrl: ModalController,
     private router: Router) {}
   
@@ -131,13 +131,18 @@ export class CreateAccountComponent  implements OnInit {
   }
 
 
-  createAccount() { 
+  async createAccount() { 
+    const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
+    await loading.present();
+
     const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
     const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber}
     this.authService.sendOtp(req).subscribe((res: any) => {
       this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
+      loading.dismiss();
       this.openOTPModal(res);
     }, err => {
+      loading.dismiss();
       console.log(err.error);
       this.error = err.error.message
     })

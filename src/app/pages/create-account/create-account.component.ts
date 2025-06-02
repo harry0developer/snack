@@ -130,22 +130,40 @@ export class CreateAccountComponent  implements OnInit {
     }
   }
 
+ async openCreateAcc() {
+  const user = { name: 'Big Macc', dob: '24-05-2004', age: 21, gender: 'Male', images: [], profilePic: '', phoneNumber: '+930829990188', username: '+930829990188', password: '123456', ethnicity: 'Black', bodyType: 'Built', interests: [], preferences: { ethnicity: [], age: { lower: 18, upper: 55 }, want: [ 'Friends With Benefits', 'One Night Stand' ], with: 'Female', distance: 100 }, bio: 'I am tester guy', settings: { deviceId: '', banned: false, verified: false }, matches: [], }
+  
+  const modal = await this.modalCtrl.create({
+      component: SignupPhoneModalPage,
+      componentProps: {
+        "user": user
+      }
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'save') {
+      console.log("confirmed", data);
+      // this.sendOtp(this.authService.storageGet(STORAGE.PHONE_NUMBER))
+    }
+}
 
   async createAccount() { 
-    const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
-    await loading.present();
+    // const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
+    // await loading.present();
 
     const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
-    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber}
-    this.authService.sendOtp(req).subscribe((res: any) => {
-      this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
-      loading.dismiss();
-      this.openOTPModal(res);
-    }, err => {
-      loading.dismiss();
-      console.log(err.error);
-      this.error = err.error.message
-    })
+    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber};
+
+    this.openCreateAcc();
+    // this.authService.sendOtp(req).subscribe((res: any) => {
+    //   this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
+    //   loading.dismiss();
+    //   this.openOTPModal(res);
+    // }, err => {
+    //   loading.dismiss();
+    //   console.log(err.error);
+    //   this.error = err.error.message
+    // })
   }
 
   goToSignIn(){

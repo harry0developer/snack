@@ -233,7 +233,34 @@ p.signin {
       border-radius: 8px;
     }
   }
+
+  .close-icon {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 30px;
+    color: red;
+    z-index: 10;
+    background: white;
+    border-radius: 50%;
+  }
+   .image-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 140px; // Set the desired fixed height
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 }
+
 
 ::ng-deep ion-datetime::part(active) {
   color: $primary;

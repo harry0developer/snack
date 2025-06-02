@@ -2,16 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Always allow location access to find nearby people</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allow location access to find nearby people</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Allow camera access </string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow camera access </string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow camera access </string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -36,6 +26,41 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
+ 
+	<key>UIFileSharingEnabled</key>
+	<string>Application supports iTunes file sharing</string>
+
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<string>Supports opening documents in place</string>
+
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to upload images.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs access to save images to your photo library.</string>
+
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
+	<key>NSPrivacyAccessedAPITypes</key>
+    <array>
+      <!-- Add this dict entry to the array if the PrivacyInfo file already exists -->
+      <dict>
+        <key>NSPrivacyAccessedAPIType</key>
+        <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+        <key>NSPrivacyAccessedAPITypeReasons</key>
+        <array>
+          <string>C617.1</string>
+        </array>
+      </dict>
+    </array>
+
+
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

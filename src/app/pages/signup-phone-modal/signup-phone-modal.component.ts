@@ -8,12 +8,14 @@ import {
   IonIcon, IonContent, IonCol, IonHeader, IonInput, IonItem,
   IonLabel, IonSelect, IonSelectModal, IonSelectOption, IonRange, IonRow, IonGrid, IonImg
 } from '@ionic/angular/standalone';
+import { Filesystem } from '@capacitor/filesystem';
 
 import moment from 'moment';
 import { User } from '../../commons/model';
 import { AuthService } from '../../commons/services/auth.service';
 import { APP_ROUTES, STORAGE } from '../../commons/conts';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource, GalleryPhotos } from '@capacitor/camera';
+import { PhotoService } from 'src/app/commons/services/photo.service';
 
 @Component({
   selector: 'app-signup-phone-modal',
@@ -103,6 +105,8 @@ export class SignupPhoneModalPage implements OnInit {
   formDataForImages = new FormData();
   blobImages: any[] = [];
   deviceId: string = '';
+
+  galleryPhotos!: GalleryPhotos
   @Input() passcode: string = '';
 
   constructor(
@@ -113,8 +117,9 @@ export class SignupPhoneModalPage implements OnInit {
     private modalCtrl: ModalController,
     public actionSheetController: ActionSheetController,
     private presentToast: ToastController,
-    private loadingCtrl: LoadingController
-  ) { 
+    private loadingCtrl: LoadingController,
+    private photoService: PhotoService
+  ) {
   }
 
   get name() {
@@ -177,7 +182,7 @@ export class SignupPhoneModalPage implements OnInit {
       ]))
     });
   }
- 
+
 
   back() {
     if (this.activeStep > 0) {
@@ -198,8 +203,6 @@ export class SignupPhoneModalPage implements OnInit {
     this.maxDate = m.format();
     this.selectedDate = m.format();
   }
-
-
 
   async stepOne() {
     const loading = await this.loadingCtrl.create({ message: "Checking phone number..." });
@@ -245,147 +248,121 @@ export class SignupPhoneModalPage implements OnInit {
     }
   }
 
-  async uploadImage(source: CameraSource) {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.Base64,
-      source: source
-    });
-
-    if (image && image.base64String) {
-      this.profilePic = image.base64String;
-      this.profilePicture = 'data:image/jpeg;base64, ' + image.base64String;
-    }
-  }
-
-
-    async createAccount() {
+  async createAccount() {
     const loadingCreateAccount = await this.loadingCtrl.create({ message: "Creating your account..." });
     await loadingCreateAccount.present();
 
-    console.log(this.userFormGroup.value);
+    // console.log(this.userFormGroup.value);
     const f = this.userFormGroup.value;
     const phone = this.authService.storageGet(STORAGE.PHONE_NUMBER);
-    const user: User = {
-      name: f.name,
-      dob: moment(f.dob).format("DD-MM-YYYY"),
-      age: moment().diff(f.dob, 'years'),
-      gender: f.gender,
-      phoneNumber: phone,
-      username: phone,
-      password: this.passcode,
-      ethnicity: f.ethnicity,
-      bodyType: f.bodyType,
-      height: f.height,
-      bio: f.bio,
-      interests: [],
-      images: [],
-      profilePic: "",
-       preferences: {
-        ethnicity: [],
-        age: {
-          lower: 18,
-          upper: 55
-        },
-        want: f.preferenceFor,
-        with: f.preferenceWith,
-        distance: 100
-      },
-      settings: {
-        deviceId: this.deviceId,
-        banned: false,
-        verified: false
-      }
-    }
+    // const user: User = {
+    //   name: f.name,
+    //   dob: moment(f.dob).format("DD-MM-YYYY"),
+    //   age: moment().diff(f.dob, 'years'),
+    //   gender: f.gender,
+    //   phoneNumber: phone,
+    //   username: phone,
+    //   password: this.passcode,
+    //   ethnicity: f.ethnicity,
+    //   bodyType: f.bodyType,
+    //   height: f.height,
+    //   bio: f.bio,
+    //   interests: [],
+    //   images: [],
+    //   profilePic: "",
+    //    preferences: {
+    //     ethnicity: [],
+    //     age: {
+    //       lower: 18,
+    //       upper: 55
+    //     },
+    //     want: f.preferenceFor,
+    //     with: f.preferenceWith,
+    //     distance: 100
+    //   },
+    //   settings: {
+    //     deviceId: this.deviceId,
+    //     banned: false,
+    //     verified: false
+    //   }
+    // }
 
-    console.log("API READY DATA ", user);
 
-    this.authService.createAccount(user).subscribe(async (res: any) => {
+    this.authService.createAccount(this.user).subscribe(async (res: any) => {
       loadingCreateAccount.dismiss();
-      
-      console.log("CreateAccount Response ", res);
+      const loadingProfile = await this.loadingCtrl.create({ message: "Setting up your profile..." });
+      await loadingProfile.present();
 
-      this.modalCtrl.dismiss().then(async () => {
-        const loadingProfile = await this.loadingCtrl.create({ message: "Setting up your profile..." });
-        await loadingProfile.present();
+      const data = {
+        phoneNumber: this.user.username, passcode: this.user.password
+      }; 
+      this.photoService.uploadPhotos(this.galleryPhotos, res._id).then((user: any) => {
+        console.log("Photos uploaded successfully");
+        console.log(user);
+        this.authService.login(data).subscribe((auth) => {
+          loadingProfile.dismiss();
+          this.modalCtrl.dismiss();
 
-        const data = {
-          phoneNumber: user.username, passcode: user.password
-        };
-        
-        this.formDataForImages.append('uid', res._id);  
-        console.log("Uploaded images", this.authService.showBlob(this.formDataForImages));
-        
-        this.authService.uploadImages(this.formDataForImages, res._id).subscribe((img: any)=>{
-          console.log(img);
-          this.authService.login(data).subscribe((auth) => {
-            
-            loadingProfile.dismiss();
-
-            this.router.navigateByUrl(APP_ROUTES.HOME);
-            this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
-            this.authService.storageSave(STORAGE.ME, auth.user);
-          }, err => {
-            loadingProfile.dismiss();
-            console.log("ERR: this.authService.login(");
-            console.log(err);
-          })
+          this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
+          this.authService.storageSave(STORAGE.ME, auth.user)
+          this.router.navigateByUrl(APP_ROUTES.HOME);
         }, err => {
           loadingProfile.dismiss();
-           console.log("Err:  this.authService.uploadImage");
-           console.log(err);
-           
+          console.log("ERR: this.authService.login(");
+          console.log(err);
         })
-       
       })
     }, err => {
       loadingCreateAccount.dismiss();
-      console.log(err.error);
+      console.log("Upload failed:", err);
+      console.log("Error message:", err.message);
+      console.log("Status:", err.status);
+
     })
 
+
   }
- 
+
+  removeImage(index: number) {
+    this.blobImages.splice(index, 1);
+  }
+
+  
 
   // Upload multiple images
- async uploadImages() {
-  const photos = await Camera.pickImages({
-    quality: 90,
-    limit: 6 - this.blobImages.length
-  });
+  async uploadImages() {
+    const result = await Camera.pickImages({
+      quality: 50,
+      limit: 5
+    });
 
-  for (let index = 0; index < photos.photos.length; index++) {
-    const photo = photos.photos[index];
-
-    try {
-      const blob = await this.fetchBlobFromWebPath(photo.webPath!);
-      const extension = this.getExtensionFromMime(blob.type);
-      const fileName = `photo_${Date.now()}_${index}.${extension}`;
-
-      this.formDataForImages.append('files', blob, fileName);
-      console.log("Appended blob:", blob);
-
-      this.blobImages.push(photo.webPath);
-    } catch (error) {
-      console.error("Failed to fetch blob from webPath", error);
+    if (!result.photos.length) {
+      console.log('No images selected');
+      return;
     }
+   
+    this.galleryPhotos = result;
+    result.photos.forEach(p => this.blobImages.push(p.webPath))
+    console.log("IMAGES...", result.photos.length);
+      
   }
-}
+  // for (let index = 0; index < photos.photos.length; index++) {
+  //   const photo = photos.photos[index];
 
-  // Fetch Blob from webPath
-  private async fetchBlobFromWebPath(webPath: string): Promise<Blob> {
-    const response = await fetch(webPath);
-    return await response.blob();
-  }
 
-  // Helper to extract file extension
-  private getExtensionFromMime(mime: string): string {
-    const map: any = {
-      'image/jpeg': 'jpg',
-      'image/png': 'png',
-      'image/webp': 'webp',
-    };
-    return map[mime] || 'jpg';
-  }
+  //   try {
+  //     const blob = await this.fetchBlobFromWebPath(photo.webPath!);
+  //     const extension = this.getExtensionFromMime(blob.type);
+  //     const fileName = `photo_${Date.now()}_${index}.${extension}`;
+
+  //     this.formDataForImages.append('files', blob, fileName);
+  //     console.log("Appended blob:", this.authService.showBlob(blob));
+
+  //     this.blobImages.push(photo.webPath);
+  //   } catch (error) {
+  //     console.error("Failed to fetch blob from webPath", error);
+  //   }
+  // }
+  // }
 
 }

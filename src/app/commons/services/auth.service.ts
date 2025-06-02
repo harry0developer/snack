@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { STORAGE } from '../conts';
 import { TempUser, User } from '../model';
@@ -9,9 +9,9 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  // private apiUrl = 'http://localhost:5001/api';
+  private apiUrl = 'http://localhost:5001/api';
 
-  private apiUrl = 'https://snuggle.onrender.com/api';
+  // private apiUrl = 'https://snuggle.onrender.com/api';
   constructor(private http: HttpClient, private router: Router) { }
 
   register(username: string, password: string, name: string, dob: string): Observable<any> {
@@ -56,10 +56,20 @@ export class AuthService {
     });
 
   }
+  
   uploadImages(formData: any, uid: string) {
-    return this.http.post(`${this.apiUrl}/upload-multiple?uid=${uid}`, formData);
+    this.showBlob(formData);
+    const headers = new HttpHeaders({
+      'x-uid': uid,
+    });
+    return this.http.post(`${this.apiUrl}/upload-multiple/uid=${uid}`, formData, { headers });
+
   }
 
+  uploadImage(formData: any, uid: string) {
+    this.showBlob(formData);
+    return this.http.post(`${this.apiUrl}/upload/uid=${uid}`, formData);
+  }
   // getImages(uid: string) {
   //   return this.http.get(`${this.apiUrl}/images/${uid}`);
   // }

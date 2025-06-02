@@ -7,10 +7,12 @@ import { io } from 'socket.io-client';
   providedIn: 'root',
 })
 export class SocketService {
-  
-  private apiUrl = 'https://snuggle.onrender.com/api'; 
-    socket = io('https://snuggle.onrender.com/api', {
+  private apiUrl = 'http://localhost:5001/api';
+ socket = io('http://localhost:5001/api', {
   });
+  // private apiUrl = 'https://snuggle.onrender.com/api'; 
+  // socket = io('https://snuggle.onrender.com/api', {
+  // });
   constructor(private http: HttpClient) {
     this.socket.connect();
 

@@ -26,7 +26,7 @@ export class ProtectedComponent implements OnInit {
 
     // Get protected data
     this.http
-      .get('https://snuggle.onrender.com/api/protected', {
+      .get('http://localhost:5001/api/protected', {
         headers: { Authorization: token },
       })
       .subscribe(

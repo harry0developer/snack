@@ -4,7 +4,7 @@
   <div class="counter" *ngIf="activeStep <= 8">Step {{activeStep + 1}}/9</div>
 
   <!-- Step Name  -->
-  <div class="container" *ngIf="activeStep == 0">
+  <div class="container" *ngIf="activeStep == 9990">
     <div class="title mb">
       <h1>What is your name?</h1>
       <p>Other users will see this</p>
@@ -314,21 +314,29 @@
 
  
   <!-- Step photos -->
-  <div class="container" *ngIf="activeStep == 8">
+  <div class="container" *ngIf="activeStep == 0">
     <div class="title">
       <h1>Lastly, upload your photos</h1>
       <p>Show them what you got</p>
     </div>
 
     <div class="modal-form">
-      <p class="bio">Photos</p>
+      <p class="bio">Photos (Max of 5)</p>
       
       <ion-grid class="photo-grid" >
         <ion-row>
-          <ion-col size="4" *ngFor="let path of blobImages; let i = index">
+          <!-- <ion-col size="4" *ngFor="let path of blobImages; let i = index">
             <ion-img *ngIf="i < 6" [src]="path"></ion-img>
+          </ion-col> -->
+
+           <ion-col class="user-image" size="4" *ngFor="let path of blobImages; let i = index">
+            <ion-icon *ngIf="i < 5" name="close-circle" class="close-icon" (click)="removeImage(i)"></ion-icon>
+            <div *ngIf="i < 5" class="image-container">
+              <img [src]="path" />
+            </div>
           </ion-col>
-          <ion-col size="4" *ngIf="blobImages.length < 6">
+
+          <ion-col size="4" *ngIf="blobImages.length < 5">
             <div class="img-placeholder" (click)="uploadImages()">
               <ion-icon name="add-circle-outline"></ion-icon>
             </div>

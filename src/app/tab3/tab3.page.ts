@@ -10,6 +10,7 @@ import { SettingsComponent } from '../pages/settings/settings.component';
 import { UtilService } from '../commons/services/util.service';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Directory, Filesystem } from '@capacitor/filesystem';
 
 @Component({
   selector: 'app-tab3',
@@ -68,6 +69,8 @@ export class Tab3Page implements OnInit {
     // this.showImage(index);
   }
 
+
+
   getAge(dob: string) {
   }
 
@@ -122,38 +125,7 @@ export class Tab3Page implements OnInit {
     };
     // this.gallery.load(prop);
   }
-
-
-  async uploadImage(uploadImage: CameraSource) {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.DataUrl,
-      source: CameraSource.Camera,
-    });
-
-    const blob = this.dataURLtoBlob(image.dataUrl!);
-
-    const formData = new FormData();
-    const mime = image.format || 'jpeg';
-    const extension = mime === 'png' ? 'png' : 'jpg';
-    const fileName = `photo_${Date.now()}.${extension}`;
-
-    formData.append('uid', this.currentUser._id);
-    formData.append('file', blob, fileName);
-
-    this.authService.uploadImages(formData, this.currentUser._id).subscribe({
-      next: (res: any) => {
-        console.log("res.user", res.user);
-        
-        this.authService.storageSave(STORAGE.ME, res.user);
-        this.currentUser = res.user;
-        this.getUserImages(res.user.images);
-      },
-      error: err => console.error('Upload failed:', err),
-    });
-  }
-
+ 
   private dataURLtoBlob(dataurl: string): Blob {
     const arr = dataurl.split(',');
     const mime = arr[0].match(/:(.*?);/)![1];
@@ -186,8 +158,24 @@ export class Tab3Page implements OnInit {
   }
 
 
-  //multi
   async uploadImages() {
+
+    const image = await Camera.getPhoto({
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera,
+      quality: 80,
+    });
+    await Filesystem.writeFile({
+      path: `image-${Date.now()}.jpeg`,
+      data: image.base64String!,
+      directory: Directory.Data,
+    });
+
+    console.log("IMG ", image);
+  }
+
+  //multi
+  async XuploadImages() {
     const photos = await Camera.pickImages({
       quality: 90,
       limit: 5
@@ -196,9 +184,13 @@ export class Tab3Page implements OnInit {
     const formData = new FormData();
     formData.append('uid', this.currentUser._id);
   
+    console.log("UPLOADING IMAGeS....");
+    
     photos.photos.forEach((photo, index) => {
       // pickImages returns webPath or path, not dataUrl, so we fetch the Blob
       this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
+        console.log("BLOB FETCHED ...", blob);
+        
         const extension = this.getExtensionFromMime(blob.type);
         const fileName = `photo_${Date.now()}_${index}.${extension}`;
         formData.append('files', blob, fileName);

@@ -1,37 +1,42 @@
-$primary: #d9a817;
-$secondary: #374750;
+$primary: #7d0270;
+$secondary: #ffcdfa;
 $light: #f5f5f5;
 $white: #fff;
 $dark: #292929;
-
+$error: #be1e34;
 
 ion-button.solid.primary {
     background-color: $primary;
     color: $white;
     border-radius: 100px;
+    text-transform: uppercase;
 }
 
 ion-button.solid.secondary {
     background-color: $secondary;
     color: $white;
     border-radius: 100px;
+    text-transform: uppercase;
 }
 
 ion-button.clear.primary {
     background-color: inherit;
     color: $primary;
     border-radius: 100px;
+    text-transform: uppercase;
 }
 ion-button.clear.white {
     background-color: inherit;
     color: white;
     border-radius: 100px;
+    text-transform: uppercase;
 }
 
 ion-button.clear.secondary {
     background-color: inherit;
     color: $secondary;
     border-radius: 100px;
+    text-transform: uppercase;
 }
 
 .error-message {

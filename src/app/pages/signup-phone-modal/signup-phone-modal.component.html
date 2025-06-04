@@ -4,7 +4,7 @@
   <div class="counter" *ngIf="activeStep <= 8">Step {{activeStep + 1}}/9</div>
 
   <!-- Step Name  -->
-  <div class="container" *ngIf="activeStep == 9990">
+  <div class="container" *ngIf="activeStep == 0">
     <div class="title mb">
       <h1>What is your name?</h1>
       <p>Other users will see this</p>
@@ -314,7 +314,7 @@
 
  
   <!-- Step photos -->
-  <div class="container" *ngIf="activeStep == 0">
+  <div class="container" *ngIf="activeStep == 8">
     <div class="title">
       <h1>Lastly, upload your photos</h1>
       <p>Show them what you got</p>

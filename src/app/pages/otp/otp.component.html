@@ -10,9 +10,11 @@
   
     <div class="text">
       <h1>Verify OTP</h1>
-      <p>Please enter the OTP code sent to <b>{{phoneNumber}}</b></p>
+      <p>Please enter the OTP code sent to <b>{{otpData.phoneNumber}}</b></p>
       <br>
-      <p>Your OTP will expire in <b>{{remainingSeconds}}</b> sec</p>
+      <p *ngIf="!otpExpired">Your OTP will expire in <b>{{remainingSeconds}}</b> sec</p>
+      <p *ngIf="otpExpired">Your OTP has expired. Please request a new one</p>
+
     </div>
   
     <form [formGroup]="otpFG">
@@ -40,10 +42,10 @@
   </div>
 </ion-content>
 
-
+<!-- 
 <ion-footer>
   <ion-button fill="clear" (click)="goToSignIn()">Go to login</ion-button>
-</ion-footer>
+</ion-footer> -->
 
 
 

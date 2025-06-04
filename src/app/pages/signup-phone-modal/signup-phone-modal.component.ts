@@ -92,7 +92,6 @@ export class SignupPhoneModalPage implements OnInit {
 
   profilePic: string = '';
   profilePicture: string = '';
-  user: any;
   currentUser: any;
   uploadedImages: any;
   code: string = '';
@@ -107,7 +106,7 @@ export class SignupPhoneModalPage implements OnInit {
   deviceId: string = '';
 
   galleryPhotos!: GalleryPhotos
-  @Input() passcode: string = '';
+  @Input() phoneNumber: string = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -150,6 +149,9 @@ export class SignupPhoneModalPage implements OnInit {
   }
 
   ngOnInit() {
+
+    console.log("phoneNumber ", this.phoneNumber);
+
     this.setMaxDate();
     this.userFormGroup = this.formBuilder.group({
       name: new FormControl('', Validators.compose([
@@ -193,7 +195,6 @@ export class SignupPhoneModalPage implements OnInit {
   next() {
     console.log("Messge ", this.bio);
     ++this.activeStep;
-
   }
 
   setMaxDate() {
@@ -224,93 +225,74 @@ export class SignupPhoneModalPage implements OnInit {
   resedCode() {
     this.code = "" + Math.floor(Math.random() * 100000 + 1);
     console.log("Cocde: ", this.code);
-
-  }
-
-  cancelCreateAccount() {
-    this.router.navigateByUrl('ROUTES.SIGNUP', { replaceUrl: true })
-  }
-
-  otpController(event: any, next: any, prev: any) {
-    if (isNaN(event.target.value)) {
-      event.target.value = "";
-      return 0;
-    } else {
-      if (event.target.value.length < 1 && prev) {
-        prev.setFocus();
-        return 0;
-      } else if (next && event.target.value.length > 0) {
-        next.setFocus();
-        return 0;
-      } else {
-        return 0;
-      }
-    }
   }
 
   async createAccount() {
     const loadingCreateAccount = await this.loadingCtrl.create({ message: "Creating your account..." });
     await loadingCreateAccount.present();
 
-    // console.log(this.userFormGroup.value);
     const f = this.userFormGroup.value;
-    const phone = this.authService.storageGet(STORAGE.PHONE_NUMBER);
-    // const user: User = {
-    //   name: f.name,
-    //   dob: moment(f.dob).format("DD-MM-YYYY"),
-    //   age: moment().diff(f.dob, 'years'),
-    //   gender: f.gender,
-    //   phoneNumber: phone,
-    //   username: phone,
-    //   password: this.passcode,
-    //   ethnicity: f.ethnicity,
-    //   bodyType: f.bodyType,
-    //   height: f.height,
-    //   bio: f.bio,
-    //   interests: [],
-    //   images: [],
-    //   profilePic: "",
-    //    preferences: {
-    //     ethnicity: [],
-    //     age: {
-    //       lower: 18,
-    //       upper: 55
-    //     },
-    //     want: f.preferenceFor,
-    //     with: f.preferenceWith,
-    //     distance: 100
-    //   },
-    //   settings: {
-    //     deviceId: this.deviceId,
-    //     banned: false,
-    //     verified: false
-    //   }
-    // }
 
 
-    this.authService.createAccount(this.user).subscribe(async (res: any) => {
+    const user: User = {
+      name: f.name,
+      dob: moment(f.dob).format("DD-MM-YYYY"),
+      age: moment().diff(f.dob, 'years'),
+      gender: f.gender,
+      phoneNumber: this.phoneNumber,
+      username: this.phoneNumber,
+      ethnicity: f.ethnicity,
+      bodyType: f.bodyType,
+      height: f.height,
+      bio: f.bio,
+      interests: [],
+      images: [],
+      profilePic: "",
+      preferences: {
+        ethnicity: [],
+        age: {
+          lower: 18,
+          upper: 55
+        },
+        want: f.preferenceFor,
+        with: f.preferenceWith,
+        distance: 100
+      },
+      settings: {
+        deviceId: this.deviceId,
+        banned: false,
+        verified: false
+      }
+    }
+
+    console.log("CREATE ACCOUNT", user);
+
+    this.authService.createAccount(user).subscribe(async (res: any) => {
       loadingCreateAccount.dismiss();
+
       const loadingProfile = await this.loadingCtrl.create({ message: "Setting up your profile..." });
       await loadingProfile.present();
 
-      const data = {
-        phoneNumber: this.user.username, passcode: this.user.password
-      }; 
-      this.photoService.uploadPhotos(this.galleryPhotos, res._id).then((user: any) => {
+      this.photoService.uploadPhotos(this.galleryPhotos, res._id).then(async (user: any) => {
+        loadingProfile.dismiss();
         console.log("Photos uploaded successfully");
         console.log(user);
-        this.authService.login(data).subscribe((auth) => {
-          loadingProfile.dismiss();
-          this.modalCtrl.dismiss();
 
+        const loadingSignin = await this.loadingCtrl.create({ message: "Signing you in..." });
+        await loadingSignin.present();
+        this.authService.login(res.phoneNumber).subscribe(async (auth: any) => {
+          loadingSignin.dismiss();
+          this.modalCtrl.dismiss();
           this.authService.storageSave(STORAGE.AUTH_TOKEN, auth.token);
           this.authService.storageSave(STORAGE.ME, auth.user)
           this.router.navigateByUrl(APP_ROUTES.HOME);
         }, err => {
-          loadingProfile.dismiss();
+          loadingSignin.dismiss();
           console.log("ERR: this.authService.login(");
           console.log(err);
         })
+      }).catch(err => {
+        loadingProfile.dismiss();
       })
     }, err => {
       loadingCreateAccount.dismiss();
@@ -327,7 +309,7 @@ export class SignupPhoneModalPage implements OnInit {
     this.blobImages.splice(index, 1);
   }
 
-  
+
 
   // Upload multiple images
   async uploadImages() {
@@ -340,11 +322,11 @@ export class SignupPhoneModalPage implements OnInit {
       console.log('No images selected');
       return;
     }
-   
+
     this.galleryPhotos = result;
     result.photos.forEach(p => this.blobImages.push(p.webPath))
     console.log("IMAGES...", result.photos.length);
-      
+
   }
   // for (let index = 0; index < photos.photos.length; index++) {
   //   const photo = photos.photos[index];

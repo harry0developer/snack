@@ -16,7 +16,6 @@ import { OtpComponent } from '../otp/otp.component';
   standalone: false
 })
 export class CreateAccountComponent  implements OnInit {
-  username: string = '';
   dob: string = '';
   name: string = '';
   password: string = '';
@@ -26,7 +25,7 @@ export class CreateAccountComponent  implements OnInit {
 
 
   validations_form!: FormGroup;
-  phoneNumberFormGroup!: FormGroup;
+  createAccountFormGroup!: FormGroup;
 
  
 
@@ -58,25 +57,17 @@ export class CreateAccountComponent  implements OnInit {
     private router: Router) {}
   
   ngOnInit() {
-    this.phoneNumberFormGroup = this.formBuilder.group({
+    this.createAccountFormGroup = this.formBuilder.group({
       phone: new FormControl('', Validators.compose([
         Validators.required,
         Validators.minLength(9),
       ])),
       code: new FormControl('', Validators.compose([
         Validators.required
-      ])),
-      passcode: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(6),
-        Validators.maxLength(6),
       ]))
     });
   }
-
-  get passcode() {
-    return this.phoneNumberFormGroup.get('passcode')?.value;
-  }
+ 
   
   async openCountryCodeModal() {
     const modal = await this.modalCtrl.create({
@@ -92,78 +83,74 @@ export class CreateAccountComponent  implements OnInit {
       this.selectedCountryCode = data.dial_code;
     }
   } 
+ 
 
-  async openOTPModal(phoneAndOtp: OTP) {
+  async openCreateAccountModal(phoneNumber: string) {
+    const modal = await this.modalCtrl.create({
+      component: SignupPhoneModalPage,
+      componentProps: {
+        "phoneNumber": phoneNumber
+      }
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'save') {
+      console.log("confirmed", data);
+    }
+  }
+
+  async sendOTP(phoneNumber: string) {
+    const loading = await this.loadingCtrl.create({ message: "Sending OTP..." });
+    await loading.present();
+     this.authService.sendOtp(phoneNumber).subscribe((res: any) => {
+      loading.dismiss();
+      console.log("OTP SENT", res.otp);
+    
+      this.presentOTPModal(res);
+      
+    }, err => {
+        loading.dismiss();
+        console.log(err);
+        this.error = err.error.message
+      })
+  }
+  
+  async presentOTPModal(otpData: OTP) {
     const modal = await this.modalCtrl.create({
       component: OtpComponent,
+      backdropDismiss: false,
+      breakpoints: [0, 0.7],
+      initialBreakpoint: 0.7,
       componentProps: {
-        phoneNumber: phoneAndOtp.phoneNumber,
-        otp: phoneAndOtp.otp,
-        otpExpiresAt: phoneAndOtp.otpExpiresAt
-      },
-      initialBreakpoint: 0.8,
-      breakpoints: [0, 0.8],
-      backdropBreakpoint: 0,
-      backdropDismiss: false
+        otpData
+      }
     });
-    modal.present();
+    await modal.present();
+
     const { data, role } = await modal.onWillDismiss();
     if (role === 'verified') {
-      this.openCreateAccountModal();
-      console.log("All good, create account and, go to profile");
-      
+      const phoneNumber = this.createAccountFormGroup.controls['code'].value + this.createAccountFormGroup.controls['phone'].value;
+      this.openCreateAccountModal(phoneNumber);
     }
   }
-
-  async openCreateAccountModal() {
-    const modal = await this.modalCtrl.create({
-      component: SignupPhoneModalPage,
-      componentProps: {
-        "passcode": this.passcode
-      }
-    });
-    modal.present();
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'save') {
-      console.log("confirmed", data);
-      // this.sendOtp(this.authService.storageGet(STORAGE.PHONE_NUMBER))
-    }
-  }
-
- async openCreateAcc() {
-  const user = { name: 'Big Macc', dob: '24-05-2004', age: 21, gender: 'Male', images: [], profilePic: '', phoneNumber: '+930829990188', username: '+930829990188', password: '123456', ethnicity: 'Black', bodyType: 'Built', interests: [], preferences: { ethnicity: [], age: { lower: 18, upper: 55 }, want: [ 'Friends With Benefits', 'One Night Stand' ], with: 'Female', distance: 100 }, bio: 'I am tester guy', settings: { deviceId: '', banned: false, verified: false }, matches: [], }
-  
-  const modal = await this.modalCtrl.create({
-      component: SignupPhoneModalPage,
-      componentProps: {
-        "user": user
-      }
-    });
-    modal.present();
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'save') {
-      console.log("confirmed", data);
-      // this.sendOtp(this.authService.storageGet(STORAGE.PHONE_NUMBER))
-    }
-}
 
   async createAccount() { 
-    // const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
-    // await loading.present();
+    const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
+    await loading.present();
 
-    const phone = this.phoneNumberFormGroup.controls['code'].value +  this.phoneNumberFormGroup.controls['phone'].value
-    const req = {phoneNumber: phone, type:  ACCOUNT_TYPE.PhoneNumber};
+    const phoneNumber = this.createAccountFormGroup.controls['code'].value + this.createAccountFormGroup.controls['phone'].value;
 
-    this.openCreateAcc();
-    // this.authService.sendOtp(req).subscribe((res: any) => {
-    //   this.authService.storageSave(STORAGE.PHONE_NUMBER, phone);
-    //   loading.dismiss();
-    //   this.openOTPModal(res);
-    // }, err => {
-    //   loading.dismiss();
-    //   console.log(err.error);
-    //   this.error = err.error.message
-    // })
+    this.authService.userExists(phoneNumber).subscribe((res: any) => {
+      console.log(res);
+      loading.dismiss();
+      this.error = "Provided phone number has an active account";
+    }, err => {
+      console.log(err);
+      loading.dismiss();
+      this.sendOTP(phoneNumber);
+
+    });
+ 
   }
 
   goToSignIn(){

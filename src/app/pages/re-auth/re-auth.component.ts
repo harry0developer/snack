@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
- import { STORAGE } from 'src/app/commons/conts';
+import { STORAGE } from 'src/app/commons/conts';
 import { User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
@@ -16,12 +16,11 @@ import { Geolocation, PositionOptions } from '@capacitor/geolocation';
   imports: [
     IonicModule,
     CommonModule,
-    FormsModule, 
+    FormsModule,
     ReactiveFormsModule,
   ]
 })
-export class ReAuthComponent  implements OnInit {
-  username: string = '';
+export class ReAuthComponent implements OnInit {
   password: string = '';
   error: string = '';
   dob: string = '';
@@ -36,44 +35,44 @@ export class ReAuthComponent  implements OnInit {
 
   phoneFormValidationMessages = {
     'passcode': [
-     { type: 'required', message: 'Passcode is required.' },
-     { type: 'minlength', message: 'Passcode must be 6 characters long.' },
-     { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
+      { type: 'required', message: 'Passcode is required.' },
+      { type: 'minlength', message: 'Passcode must be 6 characters long.' },
+      { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
 
     ]
   };
- 
 
 
-constructor(
-    private authService: AuthService, 
+
+  constructor(
+    private authService: AuthService,
     private formBuilder: FormBuilder,
 
     private modalCtrl: ModalController,
-    private router: Router) {}
+    private router: Router) { }
 
   ngOnInit() {
     this.user = this.authService.storageGet(STORAGE.ME);
     this.error
     console.log("User ", this.user);
-    this.passcodeFormGroup = this.formBuilder.group({ 
+    this.passcodeFormGroup = this.formBuilder.group({
       passcode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
   }
 
- 
+
 
   get passcode() {
     return this.passcodeFormGroup.controls['passcode'].value;
   }
 
-  async getCurrentPosition()  {
+  async getCurrentPosition() {
     try {
       const permissionStatus = await Geolocation.checkPermissions();
       console.log("Perms", permissionStatus.location);
-      if(permissionStatus?.location != 'granted') {
+      if (permissionStatus?.location != 'granted') {
         const requestStatus = await Geolocation.requestPermissions();
-        if(requestStatus?.location != 'granted') {
+        if (requestStatus?.location != 'granted') {
           return;
         }
 
@@ -83,34 +82,28 @@ constructor(
         maximumAge: 3000,
         timeout: 10000
       }
-       
+
       const postions = await Geolocation.getCurrentPosition(options);
       console.log("Position", postions);
-      
+
       return;
     } catch (error) {
       console.log(error);
       return
     }
-    
+
   }
 
 
 
 
   login() {
-   
-    const data = {
-      phoneNumber:  this.user.phoneNumber,
-      passcode: this.passcode
-    };
 
-
-    this.authService.login(data).subscribe(
+    this.authService.login(this.user.phoneNumber).subscribe(
       (response: any) => {
         console.log('User logged in successfully', response);
-        this.authService.saveToken(response.token); 
-        this.authService.storageSave(STORAGE.ME, response.user); 
+        this.authService.saveToken(response.token);
+        this.authService.storageSave(STORAGE.ME, response.user);
         this.router.navigate(['/protected']);
       },
       (error) => {
@@ -120,7 +113,7 @@ constructor(
     );
   }
 
-  resetLogin(){
+  resetLogin() {
     this.router.navigateByUrl('login')
   }
 
@@ -138,9 +131,9 @@ constructor(
       this.selectedCountryCode = data.dial_code;
     }
   }
-    
+
   goToCreateAccount() {
     this.router.navigateByUrl('create-account');
   }
- 
+
 }

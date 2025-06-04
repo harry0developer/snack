@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login.component';
 import { LoginComponentRoutingModule } from './login-routing.module';
+import { NgOtpInputModule } from 'ng-otp-input';
 
 @NgModule({
   imports: [
@@ -11,6 +12,7 @@ import { LoginComponentRoutingModule } from './login-routing.module';
     CommonModule,
     FormsModule, 
     ReactiveFormsModule,
+    NgOtpInputModule,
     LoginComponentRoutingModule
   ],
   declarations: [LoginComponent]

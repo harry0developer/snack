@@ -14,6 +14,7 @@ import { User } from 'src/app/commons/model';
 import { SafetyTipsComponent } from 'src/app/safety-tips/safety-tips.component';
 import { SupportComponent } from 'src/app/support/support.component';
 import { TermsComponent } from 'src/app/terms/terms.component';
+import { APP_ROUTES } from 'src/app/commons/conts';
 
 @Component({
   selector: 'app-settings',
@@ -136,7 +137,7 @@ export class SettingsComponent  implements OnInit {
   async logout() {
     this.modalCtrl.dismiss().then(() => {
       this.authService.logout();
-      this.router.navigateByUrl('re-login')
+      this.router.navigateByUrl(APP_ROUTES.LOGIN)
     })
   }
 }

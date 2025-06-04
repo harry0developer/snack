@@ -18,7 +18,6 @@ export interface Message {
 
 
 export interface TempUser {
-    username: string;
     password: string;
     phoneNumber?: string;
     verified: boolean;
@@ -53,7 +52,6 @@ export interface Location {
     images: string[];
     phoneNumber: string;
     username: string;
-    password: string;
     ethnicity: string;
     bodyType: string;
     height: string;

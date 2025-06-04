@@ -14,12 +14,9 @@ export class AuthService {
   // private apiUrl = 'https://snuggle.onrender.com/api';
   constructor(private http: HttpClient, private router: Router) { }
 
-  register(username: string, password: string, name: string, dob: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, { username, password, name, dob });
-  }
-
-  login(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { username: data.phoneNumber, phoneNumber: data.phoneNumber, password: data.passcode });
+ 
+  login(phoneNumber: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { phoneNumber });
   }
 
   saveToken(token: string): void {
@@ -105,8 +102,12 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/swipe`, req);
   }
 
-  sendOtp(otpRequest: any) {
-    return this.http.post(`${this.apiUrl}/send-otp`, otpRequest);
+  sendOtp(phoneNumber: string) {
+    return this.http.post(`${this.apiUrl}/send-otp`, {phoneNumber});
+  }
+
+  userExists(phoneNumber: string) {
+    return this.http.post(`${this.apiUrl}/user-exists`, {phoneNumber});
   }
 
   createAccount(user: User) {

@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController } from '@ionic/angular';
 import { APP_ROUTES, STORAGE } from 'src/app/commons/conts';
-import { Country, User } from 'src/app/commons/model';
+import { Country, OTP, User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
+import { OtpComponent } from '../otp/otp.component';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,6 @@ import { CountryCodeComponent } from '../country-code/country-code.component';
 })
 export class LoginComponent implements OnInit {
 
-  username: string = '';
   password: string = '';
   error: string = '';
   dob: string = '';
@@ -26,8 +26,6 @@ export class LoginComponent implements OnInit {
   selectedCountryCode: string = '';
   validations_form!: FormGroup;
   loginFormGroup!: FormGroup;
-
-
 
   phoneFormValidationMessages = {
     'phone': [
@@ -54,90 +52,86 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private loadingCtrl: LoadingController,
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
     private router: Router) { }
 
   ngOnInit() {
     this.loginFormGroup = this.formBuilder.group({
       phone: ['', [Validators.required]],
       code: ['', [Validators.required]],
-      passcode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
+      // passcode: new FormControl('', Validators.compose([
+      //     Validators.required,
+      //     Validators.minLength(6),
+      //     Validators.maxLength(6),
+      //   ]))
     });
   }
+ 
+ 
 
-  createUsers() {
-    const user: User = {
-      "preferences": {
-        "age": {
-          "lower": 18,
-          "upper": 55
-        },
-        "ethnicity": [],
-        "want": [
-          "No Strings Attached",
-          "Friends With Benefits",
-          "One Night Stand"
-        ],
-        "with":  "Male",
-        "distance": 100
-      },
-      "name": "Kinky",
-      "dob": "22-10-2005",
-      "age": 20,
-      "gender": "Female",
-      "images": [
-      ],
-      "profilePic": "",
-      "phoneNumber": "+930810002016",
-      "username": "+9308110002016",
-      "password": "123456",
-      height: '160',
-      bio: '',
-      "ethnicity": "Black",
-      "bodyType": "Thick",
-      "interests": [],
-      settings: {
-        banned: false,
-        verified: false,
-        deviceId: ''
+  async presentOTPModal(otpData: OTP) {
+    const modal = await this.modalCtrl.create({
+      component: OtpComponent,
+      backdropDismiss: false,
+      breakpoints: [0, 0.7],
+      initialBreakpoint: 0.7,
+      componentProps: {
+        otpData
       }
-     }
-    this.authService.createAccount(user).subscribe(res => console.log(res), err => console.log(err))
-  }
+    });
+    await modal.present();
 
-  get passcode() {
-    return this.loginFormGroup.controls['passcode'].value;
-  }
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'verified') {
+      const phoneNumber = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
 
+      this.authService.login(phoneNumber).subscribe((res: any) => {
+        console.log(res);
+        this.authService.saveToken(res.token); 
+        this.authService.storageSave(STORAGE.ME, res.user); 
+        this.router.navigate(['/protected']);
+      }, err => {
+        console.log("LOGIN error ", err);
+        
+      })
+     
+    }
+  }
 
   async login() {
     const loading = await this.loadingCtrl.create({ message: "Signing you in..." });
     await loading.present();
 
-    const p = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
+    const phoneNumber = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
 
-    console.log("phone", p)
-    const data = {
-      phoneNumber: p,
-      passcode: this.passcode
-    };
-
-
-    this.authService.login(data).subscribe(
-      (response: any) => {
-        loading.dismiss();
-        console.log('User logged in successfully', response);
-        this.authService.saveToken(response.token);
-        this.authService.storageSave(STORAGE.ME, response.user);
-        this.router.navigate(['/protected']);
-      },
-      (error) => {
-        loading.dismiss();
-
-        console.error('Error logging in', error);
-        this.error = error.error.message;
-      }
-    );
+    this.authService.userExists(phoneNumber).subscribe((res: any) => {
+      console.log(res);
+      loading.dismiss();
+      this.sendOTP(phoneNumber);
+    }, err => {
+      console.log(err);
+      this.error = err.error.message;
+      loading.dismiss();
+    });
+   
   }
+
+  async sendOTP(phoneNumber: string) {
+    const loading = await this.loadingCtrl.create({ message: "Sending OTP..." });
+    await loading.present();
+     this.authService.sendOtp(phoneNumber).subscribe((res: any) => {
+      loading.dismiss();
+      console.log("OTP SENT", res.otp);
+    
+      this.presentOTPModal(res);
+      
+    }, err => {
+        loading.dismiss();
+        console.log(err);
+        this.error = err.error.message
+      })
+  }
+ 
 
   async openCountryCodeModal() {
     const modal = await this.modalCtrl.create({
@@ -156,6 +150,18 @@ export class LoginComponent implements OnInit {
 
   goToCreateAccount() {
     this.router.navigateByUrl('create-account');
+  }
+ 
+  onPasscodeChange(evn: any){
+    console.log(evn);
+  }
+
+  async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header, message, buttons: ['Dismiss']
+    })
+
+    await alert.present();
   }
 
 }

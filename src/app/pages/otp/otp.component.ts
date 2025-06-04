@@ -4,10 +4,9 @@ import { Router } from '@angular/router';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
 import { AuthService } from 'src/app/commons/services/auth.service';
-import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
 import moment from 'moment';
-import { SettingsComponent } from '../settings/settings.component';
-
+import { OTP } from 'src/app/commons/model';
+ 
 @Component({
   selector: 'app-otp',
   templateUrl: './otp.component.html',
@@ -18,9 +17,12 @@ import { SettingsComponent } from '../settings/settings.component';
 export class OtpComponent  implements OnInit {
   enteredOtp: any;
   error: string = '';
-  @Input() phoneNumber: string = '';
-  @Input() otpExpiresAt!: Date;
-  @Input() otp: string = '';
+  otpExpired: boolean = false;
+  @Input() otpData: OTP = {
+    phoneNumber: '',
+    otp: '',
+    otpExpiresAt: ''
+  };
 
   isValid: boolean = false;
   remainingSeconds: number = 0;
@@ -36,6 +38,8 @@ export class OtpComponent  implements OnInit {
     private modalCtrl: ModalController) {}
   
   ngOnInit() {
+    console.log("Passed otp ", this.otpData);
+    
     this.otpFG = this.formBuilder.group({
         otpControl: new FormControl('', Validators.compose([
           Validators.required,
@@ -47,6 +51,9 @@ export class OtpComponent  implements OnInit {
     this.remainingSeconds = this.calculateRemainingSeconds();
     this.intervalId = setInterval(() => {
       this.remainingSeconds = this.calculateRemainingSeconds();
+      if(this.remainingSeconds <= 0) {
+        this.otpExpired = true;
+      }
     }, 1000);
   }
  
@@ -55,33 +62,25 @@ export class OtpComponent  implements OnInit {
     this.router.navigateByUrl('login')
   }
 
- 
-  
-   verifyOtp() { 
-
+  verifyOtp() { 
     const otp = this.otpFG.value.otpControl;
-
-    const expAt = moment(this.otpExpiresAt);
+    const expAt = moment(this.otpData.otpExpiresAt);
     const today = moment(new Date(Date.now() + 5 * 60 * 1000));
 
-    if (expAt.isBefore(today) && otp === this.otp) {
+    if (expAt.isBefore(today) && otp === this.otpData.otp) {
       this.modalCtrl.dismiss(null, 'verified');
-            
     } else {
       this.error = 'Invalid or expired OTP';
     }
-    
-
-   }
-
+  }
 
   calculateRemainingSeconds(): number {
-
+    console.log(this.otpData);
+    
     const now = new Date(Date.now()).toLocaleString('en-US', {
       timeZone: 'Europe/London'
     });
-
-    return moment(this.otpExpiresAt).diff(now, 'seconds');
+    return moment(this.otpData.otpExpiresAt).diff(now, 'seconds');
   }
 
    onOtpChange(event: any){
@@ -93,15 +92,12 @@ export class OtpComponent  implements OnInit {
       await loading.present();
       
       this.error = '';
-       this.authService.storageSave(STORAGE.PHONE_NUMBER, this.phoneNumber);
-      const req = {phoneNumber: this.phoneNumber, type:  ACCOUNT_TYPE.PhoneNumber}
+       this.authService.storageSave(STORAGE.PHONE_NUMBER, this.otpData.phoneNumber);
   
-      this.authService.sendOtp(req).subscribe((res: any) => {
+      this.authService.sendOtp(this.otpData.phoneNumber).subscribe((res: any) => {
         loading.dismiss();
         console.log("OTP SENT", res.otp);
-        this.otp = res.otp;
-        this.otpExpiresAt = res.otpExpiresAt;
-        this.phoneNumber = res.phoneNumber;
+        this.otpData = res; 
         this.error = "OTP sent, please enter the new OTP";
         this.otpFG.reset();
       },

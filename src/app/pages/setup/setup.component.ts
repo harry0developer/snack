@@ -9,16 +9,14 @@ import { AuthService } from 'src/app/commons/services/auth.service';
   styleUrls: ['./setup.component.scss'],
   standalone: false
 })
-export class SetupComponent  implements OnInit {
+export class SetupComponent implements OnInit {
   profileFormGroup!: FormGroup;
 
-  // username: { type: String, required: true, unique: true },
-  // password: { type: String, required: true },
- step: number = 1;
+  step: number = 1;
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private formBuilder: FormBuilder,
-    private router: Router) {}
+    private router: Router) { }
 
 
   ngOnInit() {
@@ -44,7 +42,7 @@ export class SetupComponent  implements OnInit {
   back() {
     this.step = this.step > 1 ? --this.step : this.step;
   }
-  goToSignIn(){
+  goToSignIn() {
     this.router.navigateByUrl('login')
   }
 

@@ -13,9 +13,7 @@ export class DataService {
   flags: any = [];
 
   getCountries() {
-    this.http.get('assets/country-codes.json').forEach((c: any) => {
-      this.countries = c;   
-    });
+    return this.http.get('assets/country-codes.json');
   }
 
   getFlags(){

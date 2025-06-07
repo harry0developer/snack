@@ -328,23 +328,6 @@ export class SignupPhoneModalPage implements OnInit {
     console.log("IMAGES...", result.photos.length);
 
   }
-  // for (let index = 0; index < photos.photos.length; index++) {
-  //   const photo = photos.photos[index];
-
-
-  //   try {
-  //     const blob = await this.fetchBlobFromWebPath(photo.webPath!);
-  //     const extension = this.getExtensionFromMime(blob.type);
-  //     const fileName = `photo_${Date.now()}_${index}.${extension}`;
-
-  //     this.formDataForImages.append('files', blob, fileName);
-  //     console.log("Appended blob:", this.authService.showBlob(blob));
-
-  //     this.blobImages.push(photo.webPath);
-  //   } catch (error) {
-  //     console.error("Failed to fetch blob from webPath", error);
-  //   }
-  // }
-  // }
+   
 
 }

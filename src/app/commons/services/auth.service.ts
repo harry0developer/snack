@@ -81,7 +81,7 @@ export class AuthService {
     });
   }
 
-  updateProfilePic(user: User) {
+  updateUser(user: User) {
     return this.http.put(`${this.apiUrl}/users/${user._id}`, user);
   }
 
@@ -130,5 +130,8 @@ export class AuthService {
     // localStorage.removeItem(STORAGE.ME);
   }
 
+  saveLocalUser(user: User) {
+    this.storageSave(STORAGE.ME, user);
+  }
 
 }

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoadingController } from '@ionic/angular';
 import {IonContent,IonButton, IonSearchbar, 
   IonButtons, IonItem, IonSpinner, IonList,
   IonHeader, IonToolbar,
@@ -31,7 +32,7 @@ import { DataService } from 'src/app/commons/services/data.service';
   providers: [ModalController]
 
 })
-export class CountryCodeComponent  implements OnInit {
+export class CountryCodeComponent   {
   countries: any = [];
 
   searchControl: FormControl;
@@ -43,15 +44,25 @@ export class CountryCodeComponent  implements OnInit {
   
   constructor( 
     private modalCtrl: ModalController,
+    private loadingCtrl: LoadingController,
     private dataService: DataService) {
     this.searchControl = new FormControl();
   } 
 
-  ngOnInit(): void {
-    this.dataService.getCountries();
-  } 
  
-  ionViewWillEnter() {
+ 
+  async ionViewWillEnter() {
+    const loadingCountryCode = await this.loadingCtrl.create({ message: "Uploading images..." });
+    await loadingCountryCode.present();
+    this.dataService.getCountries().forEach((c: any) => {
+      this.countries = c;  
+      loadingCountryCode.dismiss();
+    }).catch(err => {
+      console.log(err);
+      loadingCountryCode.dismiss();
+      
+    })
+
     this.setFilteredItems();      
     this.searchControl.valueChanges
     .pipe(debounceTime(400)

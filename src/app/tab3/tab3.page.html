@@ -20,6 +20,8 @@
       </div>
       <div class="user-info">
         <h1>{{currentUser?.name}}, {{currentUser?.age}}</h1>
+        <ion-badge *ngIf="!currentUser?.isVerified" class="badge unverified">{{currentUser?.gender}}</ion-badge>
+<br>
         <ion-badge *ngIf="!currentUser?.isVerified" class="badge unverified">Unverified</ion-badge>
         <ion-badge *ngIf="currentUser?.isVerified" class="badge verified">verified</ion-badge>
       </div>
@@ -44,11 +46,21 @@
         </ion-item> 
 
         <p class="bio">Bio</p>
-        <ion-item> 
-          <ion-textarea placeholder="Type something here" rows="3" [value]="currentUser?.bio" [maxlength]="100"></ion-textarea>
-        </ion-item>
-        
+
+        <form [formGroup]="bioFormGroup">
+        <ion-item class="textarea-container"> 
+            <ion-textarea class="custom-textarea" placeholder="Type something here" 
+            rows="3" [(ngModel)]="bio" [maxlength]="100"
+            formControlName="bio" ></ion-textarea>
+          
+            <ion-button class="solid primary bio-btn" [disabled]="!bioFormGroup.valid" (click)="updateBio()">
+            Update
+            </ion-button>
+            
+          </ion-item>
+        </form>
       </ion-list>
+ 
       
 
       <ion-item-divider class="divider">

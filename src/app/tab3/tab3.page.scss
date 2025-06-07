@@ -29,14 +29,14 @@
             padding-top: 20px;
             text-align: center;
             h1 {
-                font-size: 26px;
+                font-size: x-large;
                 font-weight: bold;
                 margin: 0;
                 padding: 0;
             }
             .badge{
                 padding: 4px 10px;
-                font-size: 14px;
+                font-size: medium;
             }
             .verified {
                 background-color: green;
@@ -64,7 +64,7 @@
             background-color: $white;
         }
         ion-button {
-            width: 60px;
+            // width: 60px;
             height: 30px; 
             font-size: 14px;
         }
@@ -178,6 +178,24 @@
       font-size: 20px;
     }
   }
+
+
+.textarea-container {
+  position: relative;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --padding-end: 0;
+}
+
+.custom-textarea {
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 48px; /* Add space for the button */
+}
+
+.bio-btn{
+    padding: 0 20px;
+}
 
 
 .ng-image-fullscreen-view .lightbox-wrapper .lightbox-div .next {

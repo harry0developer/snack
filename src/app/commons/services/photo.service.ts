@@ -9,8 +9,6 @@ export class PhotoService {
   images: any[] = [];
   async uploadPhotos(result: GalleryPhotos, uid: string) {
     try {
-    
-
       for (const photo of result.photos) {
         const response = await fetch(photo.webPath!);
         const blob = await response.blob();

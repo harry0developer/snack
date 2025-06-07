@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AlertController, LoadingController, ModalController, Platform, ToastController } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource, GalleryPhotos } from '@capacitor/camera';
 
 import { AuthService } from '../commons/services/auth.service';
 import { APP_ROUTES, STORAGE } from '../commons/conts';
@@ -11,6 +11,8 @@ import { UtilService } from '../commons/services/util.service';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Directory, Filesystem } from '@capacitor/filesystem';
+import { PhotoService } from '../commons/services/photo.service';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-tab3',
@@ -29,6 +31,13 @@ export class Tab3Page implements OnInit {
   profilePicture: string = 'assets/icons/user.png';
 
   img: string = '';
+
+  blobImages: any[] = [];
+  deviceId: string = '';
+
+  galleryPhotos!: GalleryPhotos
+  bioFormGroup!: FormGroup;
+  bio: string = '';
   constructor(
     private modalCtrl: ModalController,
     private actionSheetController: ActionSheetController,
@@ -39,12 +48,23 @@ export class Tab3Page implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private formBuilder: FormBuilder,
+    private photoService: PhotoService
   ) { }
 
   ngOnInit() {
+
+    this.bioFormGroup = this.formBuilder.group({
+      bio: new FormControl('', Validators.compose([
+        Validators.required
+      ]))
+    });
+  
     this.isLoading = false;
     this.currentUser = this.authService.storageGet(STORAGE.ME);
+    console.log("CURRENT USER ", this.currentUser);
+    this.bio = this.currentUser.bio;
     if (!this.currentUser || !this.currentUser.gender) {
       this.authService.logout();
       this.router.navigateByUrl(APP_ROUTES.RE_LOGIN)
@@ -125,16 +145,7 @@ export class Tab3Page implements OnInit {
     };
     // this.gallery.load(prop);
   }
- 
-  private dataURLtoBlob(dataurl: string): Blob {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
-    return new Blob([u8arr], { type: mime });
-  }
+  
 
   getUserImages(images: string[]) {
     this.images = [];
@@ -157,67 +168,67 @@ export class Tab3Page implements OnInit {
     }
   }
 
-
   async uploadImages() {
-
-    const image = await Camera.getPhoto({
-      resultType: CameraResultType.Base64,
-      source: CameraSource.Camera,
-      quality: 80,
-    });
-    await Filesystem.writeFile({
-      path: `image-${Date.now()}.jpeg`,
-      data: image.base64String!,
-      directory: Directory.Data,
+    const result = await Camera.pickImages({
+      quality: 50,
+      limit: 5 - this.images.length 
     });
 
-    console.log("IMG ", image);
+    if (!result.photos.length) {
+      console.log('No images selected');
+      return;
+    }
+
+    this.galleryPhotos = result;
+    const loadingUploadImages = await this.loadingCtrl.create({ message: "Uploading images..." });
+    await loadingUploadImages.present();
+
+
+    this.photoService.uploadPhotos(this.galleryPhotos, this.currentUser._id).then( async (user: any) => {
+      loadingUploadImages.dismiss();
+
+      const loadingUser = await this.loadingCtrl.create({ message: "Uploading images..." });
+      await loadingUser.present();
+      this.authService.getUserById(this.currentUser._id).subscribe(u => {
+        console.log("User", u);
+        this.authService.storageSave(STORAGE.ME, u);
+        this.currentUser = u;
+        this.getUserImages(this.currentUser.images);
+        this.cdr.detectChanges();
+        loadingUser.dismiss();
+      }, err => {
+        console.log(err);
+        loadingUser.dismiss();
+      })
+      
+    }).catch(err => {
+      console.log(err);
+      loadingUploadImages.dismiss();
+    })
+
+
   }
 
-  //multi
-  async XuploadImages() {
-    const photos = await Camera.pickImages({
-      quality: 90,
-      limit: 5
-    });
-  
-    const formData = new FormData();
-    formData.append('uid', this.currentUser._id);
-  
-    console.log("UPLOADING IMAGeS....");
-    
-    photos.photos.forEach((photo, index) => {
-      // pickImages returns webPath or path, not dataUrl, so we fetch the Blob
-      this.fetchBlobFromWebPath(photo.webPath!).then(blob => {
-        console.log("BLOB FETCHED ...", blob);
-        
-        const extension = this.getExtensionFromMime(blob.type);
-        const fileName = `photo_${Date.now()}_${index}.${extension}`;
-        formData.append('files', blob, fileName);
-  
-        // Upload only after all files are added
-        if (index === photos.photos.length - 1) {
-          console.log("formData", formData);
-          
-          this.authService.uploadImages(formData, this.currentUser._id).subscribe({
-            next: (res: any) => {
-              console.log("res.user", res.user);
-              this.authService.storageSave(STORAGE.ME, res.user);
-              this.currentUser = res.user;
-              this.getUserImages(res.user.images);
-            },
-            error: err => console.error('Upload failed:', err),
-          });
-        }
-      });
-    });
-  }
-  
-  // Fetch Blob from webPath
-  private async fetchBlobFromWebPath(webPath: string): Promise<Blob> {
-    const response = await fetch(webPath);
-    return await response.blob();
-  }
+
+  async updateBio(){
+    const loadingUpdateBio = await this.loadingCtrl.create({ message: "Uploading images..." });
+    await loadingUpdateBio.present();
+    const bio = this.bioFormGroup.get('bio')?.value;
+    console.log(bio);
+    this.currentUser.bio = bio;
+    this.authService.updateUser(this.currentUser).subscribe((user: any) => {
+      this.presentToast("Bio updated", 'bottom');
+      loadingUpdateBio.dismiss();
+      console.log(user);
+      this.authService.saveLocalUser(user);
+      this.currentUser = user;
+       
+    }, err => {
+      loadingUpdateBio.dismiss();
+      this.presentToast("An error occured while updating the profile picture", 'bottom');
+      console.log("Images upload error ", err);
+    })
+  } 
   
   // Helper to extract file extension
   private getExtensionFromMime(mime: string): string {
@@ -254,7 +265,7 @@ export class Tab3Page implements OnInit {
     await loading.present();    
     this.currentUser.profilePic = pic.filename;
     this.authService.storageSave(STORAGE.ME, this.currentUser);
-    this.authService.updateProfilePic(this.currentUser).subscribe(res => {
+    this.authService.updateUser(this.currentUser).subscribe(res => {
       this.presentToast("Profile picture updated", 'bottom');
       this.profilePicture = pic.img.changingThisBreaksApplicationSecurity;
 

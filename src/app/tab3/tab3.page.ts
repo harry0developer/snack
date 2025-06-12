@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { AlertController, LoadingController, ModalController, Platform, ToastController } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource, GalleryPhotos } from '@capacitor/camera';
@@ -10,10 +10,10 @@ import { SettingsComponent } from '../pages/settings/settings.component';
 import { UtilService } from '../commons/services/util.service';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Directory, Filesystem } from '@capacitor/filesystem';
 import { PhotoService } from '../commons/services/photo.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-
+import { ImageViewerComponent } from '../components/image-viewer/image-viewer.component';
+ 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -38,6 +38,13 @@ export class Tab3Page implements OnInit {
   galleryPhotos!: GalleryPhotos
   bioFormGroup!: FormGroup;
   bio: string = '';
+ 
+  @Input() imageUrl: string = '';
+  scale = 1;
+  lastScale = 1;
+  position = { x: 0, y: 0 };
+  lastPosition = { x: 0, y: 0 };
+
   constructor(
     private modalCtrl: ModalController,
     private actionSheetController: ActionSheetController,
@@ -50,10 +57,10 @@ export class Tab3Page implements OnInit {
     private toastController: ToastController,
     private sanitizer: DomSanitizer,
     private formBuilder: FormBuilder,
-    private photoService: PhotoService
+    private photoService: PhotoService,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     this.bioFormGroup = this.formBuilder.group({
       bio: new FormControl('', Validators.compose([
@@ -64,6 +71,8 @@ export class Tab3Page implements OnInit {
     this.isLoading = false;
     this.currentUser = this.authService.storageGet(STORAGE.ME);
     console.log("CURRENT USER ", this.currentUser);
+ 
+    
     this.bio = this.currentUser.bio;
     if (!this.currentUser || !this.currentUser.gender) {
       this.authService.logout();
@@ -71,10 +80,14 @@ export class Tab3Page implements OnInit {
     }
     console.log("User ", this.currentUser);
     
-    this.getUserImages(this.currentUser.images);
+    await this.getUserImages(this.currentUser.images);
+    if(!this.currentUser.profilePic) {
+      this.profilePicture = this.images[0]?.img
+    }else {
+      this.getProfilePic(this.currentUser.profilePic);
+    }
   }
- 
-
+  
   async presentToast(message: string, position: 'top' | 'middle' | 'bottom') {
     const toast = await this.toastController.create({
       message,
@@ -88,12 +101,25 @@ export class Tab3Page implements OnInit {
   private viewPhoto(index: number) {
     // this.showImage(index);
   }
+ 
 
+async openImageViewer(img: any) {
+  console.log("IMAGE VIEW", img);
+  
+  const modal = await this.modalCtrl.create({
+    component: ImageViewerComponent,
+    componentProps: {
+      imageUrl: img.img,
+    },
+    cssClass: 'fullscreen-modal',
+  });
 
+  await modal.present();
+}
+   
 
-  getAge(dob: string) {
-  }
-
+ 
+   
   async showAlert(header: string, message: string, btnText: string) {
     const alert = await this.alertCtrl.create({
       header, message, buttons: [btnText],
@@ -147,26 +173,37 @@ export class Tab3Page implements OnInit {
   }
   
 
-  getUserImages(images: string[]) {
-    this.images = [];
-    if (this.currentUser.images && this.currentUser.images.length > 0) {
-      console.log("images ", images);
-      
-      images.forEach((filename: any) => {
-        this.authService.getImageData(this.currentUser._id, filename).subscribe((blob: any) => {
-          const objectURL = URL.createObjectURL(blob);
-          const bob: ImageBlob = {
-            img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
-            filename
-          }
-          this.images.push(bob);
-        }, err => console.log(err))
-      });      
-      this.getProfilePic(this.currentUser.profilePic);
-      this.cdr.detectChanges();
+  async getUserImages(images: string[]) {
+  this.images = [];
 
-    }
+  if (this.currentUser.images && this.currentUser.images.length > 0) {
+    console.log("images ", images);
+
+    const imagePromises = images.map(async (filename: string) => {
+      try {
+        const blob = await this.authService.getImageData(this.currentUser._id, filename).toPromise();
+
+        const objectURL = URL.createObjectURL(blob as Blob);
+        const imageBlob: ImageBlob = {
+          img: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+          filename
+        };
+
+        return imageBlob;
+
+      } catch (error) {
+        console.error(`Error fetching image ${filename}:`, error);
+        return null;
+      }
+    });
+
+    const results = await Promise.all(imagePromises);
+    this.images = results.filter(img => img !== null) as ImageBlob[];
+
+    this.cdr.detectChanges();
   }
+}
+
 
   async uploadImages() {
     const result = await Camera.pickImages({
@@ -229,17 +266,7 @@ export class Tab3Page implements OnInit {
       console.log("Images upload error ", err);
     })
   } 
-  
-  // Helper to extract file extension
-  private getExtensionFromMime(mime: string): string {
-    const map: any = {
-      'image/jpeg': 'jpg',
-      'image/png': 'png',
-      'image/webp': 'webp',
-    };
-    return map[mime] || 'jpg';
-  }
-  
+   
   //end multi
 
   private getProfilePic(filename: string) {
@@ -297,15 +324,16 @@ export class Tab3Page implements OnInit {
     })
   }
 
+ 
 
-  async openImageActionSheet(img: any) {
+async openImageActionSheet(img: any) {
     const actionSheet = await this.actionSheetController.create({
       header: "Photo settings",
       buttons: [
         {
           text: 'View Photo',
           handler: () => {
-            this.viewPhoto(img)
+            this.openImageViewer(img);
           }
         },
         {

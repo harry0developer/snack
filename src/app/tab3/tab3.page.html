@@ -13,6 +13,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true"> 
+ 
+  
+ 
   <div class="container" *ngIf="!isLoading; else emptyTemplate">
     <div class="top">
       <div class="user-avatar">
@@ -20,8 +23,6 @@
       </div>
       <div class="user-info">
         <h1>{{currentUser?.name}}, {{currentUser?.age}}</h1>
-        <ion-badge *ngIf="!currentUser?.isVerified" class="badge unverified">{{currentUser?.gender}}</ion-badge>
-<br>
         <ion-badge *ngIf="!currentUser?.isVerified" class="badge unverified">Unverified</ion-badge>
         <ion-badge *ngIf="currentUser?.isVerified" class="badge verified">verified</ion-badge>
       </div>
@@ -96,6 +97,8 @@
       </ion-grid>
     </div>
   </div>
+
+
 
   <ng-template #emptyTemplate>
     <div class="is-loading">

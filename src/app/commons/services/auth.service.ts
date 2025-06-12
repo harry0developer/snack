@@ -86,14 +86,18 @@ export class AuthService {
   }
 
   getUsers(user: User): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/users-search`, user);
+    const req = {...user}
+ 
+    return this.http.post<any>(`${this.apiUrl}/users`, req);
   }
 
   getUserById(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/users/${id}`);
   }
 
-  getSwipes(id: string): Observable<any> {
+  getSwipes(id: string | undefined): Observable<any> {
+    console.log("SWIPED ", id);
+    
     return this.http.get<any>(`${this.apiUrl}/swipe/${id}`);
   }
 
@@ -127,7 +131,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(STORAGE.AUTH_TOKEN);
-    // localStorage.removeItem(STORAGE.ME);
+    localStorage.removeItem(STORAGE.ME);
   }
 
   saveLocalUser(user: User) {

@@ -54,7 +54,6 @@ export interface Location {
     username: string;
     ethnicity: string;
     bodyType: string;
-    height: string;
     interests: string[];
     bio: string;
     settings: {

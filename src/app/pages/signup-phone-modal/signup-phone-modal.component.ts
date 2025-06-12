@@ -134,10 +134,7 @@ export class SignupPhoneModalPage implements OnInit {
   }
   get bio() {
     return this.userFormGroup.get('bio')?.value;
-  }
-  get height() {
-    return this.userFormGroup.get('height')?.value;
-  }
+  } 
   get ethnicity() {
     return this.userFormGroup.get('ethnicity')?.value;
   }
@@ -172,10 +169,7 @@ export class SignupPhoneModalPage implements OnInit {
       ])),
       bio: new FormControl('', Validators.compose([
         Validators.required,
-      ])),
-      height: new FormControl('', Validators.compose([
-        Validators.required
-      ])),
+      ])), 
       preferenceFor: new FormControl('', Validators.compose([
         Validators.required
       ])),
@@ -243,7 +237,6 @@ export class SignupPhoneModalPage implements OnInit {
       username: this.phoneNumber,
       ethnicity: f.ethnicity,
       bodyType: f.bodyType,
-      height: f.height,
       bio: f.bio,
       interests: [],
       images: [],

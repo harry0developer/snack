@@ -1,7 +1,7 @@
 <ion-header> </ion-header>
 
 <ion-content class="modal-container">
-  <div class="counter" *ngIf="activeStep <= 8">Step {{activeStep + 1}}/9</div>
+  <div class="counter" *ngIf="activeStep <= 7">Step {{activeStep + 1}}/8</div>
 
   <!-- Step Name  -->
   <div class="container" *ngIf="activeStep == 0">
@@ -93,44 +93,9 @@
       </div>
     </form>
   </div>
-
-  <!-- Step height -->
-  <div class="container" *ngIf="activeStep == 3">
-    <div class="title mb">
-      <h1>What's your height</h1>
-      <p>This help us find the right match for you</p>
-    </div>
-
-    <form class="modal-form" [formGroup]="userFormGroup">
-      <ion-card>
-        <ion-item class="item-choose" lines="none">
-          <ion-select formControlName="height" interface="action-sheet" placeholder="Select body type">
-            <ion-select-option value="120 - 140">120cm - 140cm</ion-select-option>
-            <ion-select-option value="141 - 150">141cm - 150cm</ion-select-option>
-            <ion-select-option value="151 - 160">151cm - 160cm</ion-select-option>
-            <ion-select-option value="161 - 170">161cm - 170cm</ion-select-option>
-            <ion-select-option value="171 - 180">171cm - 180cm</ion-select-option>
-            <ion-select-option value="181 - 190">181cm - 190cm</ion-select-option>
-            <ion-select-option value="191 - 200">191cm - 200cm</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card>
-
-      <div class="buttons">
-        <ion-button class="clear primary" shape="round" (click)="back()">
-          Back
-        </ion-button>
-
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('height')?.valid" shape="round"
-          (click)="next()">
-          Next
-        </ion-button>
-      </div>
-    </form>
-  </div>
-
+ 
   <!-- Step bodyType -->
-  <div class="container" *ngIf="activeStep == 4">
+  <div class="container" *ngIf="activeStep == 3">
     <div class="title mb">
       <h1>What's your body type</h1>
       <p>This help us find the right match for you</p>
@@ -168,7 +133,7 @@
   </div>
 
   <!-- Step Ethnicity -->
-  <div class="container" *ngIf="activeStep == 5">
+  <div class="container" *ngIf="activeStep == 4">
     <div class="title mb">
       <h1>What's your ethnicity?</h1>
       <p>This help us find the right match for you</p>
@@ -200,7 +165,7 @@
   </div>
 
   <!-- Step preferences -->
-  <div class="container" *ngIf="activeStep == 6">
+  <div class="container" *ngIf="activeStep == 5">
     <div class="title mb">
       <h1>What are you looking for?</h1>
       <p>These preferences can be changed once logged in</p>
@@ -246,7 +211,7 @@
   </div>
 
   <!-- Step bio -->
-  <div class="container" *ngIf="activeStep == 7">
+  <div class="container" *ngIf="activeStep == 6">
     <div class="title mb">
       <h1>Tell us a bit about you</h1>
       <p>Some things are better said in words</p>
@@ -272,49 +237,9 @@
       </div>
     </form>
   </div>
-
-  <!-- Step 6  -->
-  <!-- <div class="container" *ngIf="activeStep == 8">
-    <div class="title mb">
-      <h1>Lastly, setup a 6 digit Passcode</h1>
-      <p>This is required to login</p>
-    </div>
-    <form class="modal-form" [formGroup]="userFormGroup">
-      <ion-card>
-        <ion-item mode="ios" lines="none">
-          <ion-input class="border" placeholder="Enter a passcode" type="text" formControlName="passcode"></ion-input>
-        </ion-item>
-      </ion-card>
-      <div class="validation-errors">
-        <ng-container *ngFor="let validation of validationMessages.passcode">
-          <div class="error-message"
-            *ngIf="userFormGroup.get('passcode')?.hasError(validation.type) && (userFormGroup.get('passcode')?.dirty || userFormGroup.get('passcode')?.touched)">
-            {{ validation.message }}
-          </div>
-        </ng-container>
-      </div>
-
-
-      <div class="validation-errors">
-        <label class="error-message">{{errorMessage}}</label>
-      </div>
-      <div class="buttons">
-        <ion-button class="clear primary" shape="round" (click)="back()">
-          Back
-        </ion-button>
-
-        <ion-button class="solid primary" [disabled]="!userFormGroup.get('passcode')?.valid" shape="round"
-          (click)="createAccount()">
-          All Set
-        </ion-button>
-      </div>
-
-    </form>
-  </div> -->
-
  
   <!-- Step photos -->
-  <div class="container" *ngIf="activeStep == 8">
+  <div class="container" *ngIf="activeStep == 7">
     <div class="title">
       <h1>Lastly, upload your photos</h1>
       <p>Show them what you got</p>

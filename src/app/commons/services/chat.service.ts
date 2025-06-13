@@ -16,5 +16,12 @@ export class ChatService {
     return this.http.get<any>(`${this.apiUrl}/${uid1}/${uid2}`);
   }
 
+  getLastMessage(uid1: string, uid2: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/last/${uid1}/${uid2}`);
+  }
+  
+  getMyChats(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
  
 }

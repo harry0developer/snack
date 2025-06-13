@@ -3,26 +3,34 @@
     <ion-title class="title" text-center>
       Chats
     </ion-title>
-
-    <ion-buttons slot="secondary">
-     
-    </ion-buttons>
+    <ion-buttons slot="secondary">  </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  
+ <div class="avatar-scroll-container">
+    <div class="avatar-wrapper" *ngFor="let user of users">
+      <ion-avatar (click)="openChats(user)">
+        <img [src]="user.profilePic" />
+      </ion-avatar>
+      <div class="avatar-name">{{ user.name }}</div>
+    </div>
+  </div>
+
   <ion-list lines="none" class="tab2">
     <ion-card  *ngFor="let user of users; let i = index">
-      <ion-item [button]="true" (click)="openChats(user)">
-        <ion-avatar slot="start" >
+      <ion-item class="chat-history" [button]="true" (click)="openChats(user)">
+        <ion-avatar  slot="start" >
           <img [alt]="user?.name" [src]="img" />
         </ion-avatar>  
         <ion-label>
-          {{user?.name}}
+          <ion-icon *ngIf="user.lastMessage?.sender === currentUser._id" slot="start" name="arrow-undo-outline"></ion-icon>
+          {{user?.lastMessage?.message}}
         </ion-label>
       </ion-item>
     </ion-card>
   </ion-list> 
 
-  <app-not-found [data]="notFound"></app-not-found>
+  <app-not-found *ngIf="users.length < 1" [data]="notFound"></app-not-found>
 </ion-content>

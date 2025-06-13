@@ -87,8 +87,12 @@ export class AuthService {
 
   getUsers(user: User): Observable<any> {
     const req = {...user}
- 
     return this.http.post<any>(`${this.apiUrl}/users`, req);
+  }
+
+  getUsersById(usersIds: any[]) {
+    const req = {ids: [...usersIds]};
+    return this.http.post(`${this.apiUrl}/users-by-id`, req);
   }
 
   getUserById(id: string): Observable<any> {

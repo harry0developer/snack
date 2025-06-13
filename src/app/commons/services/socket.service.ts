@@ -35,7 +35,9 @@ export class SocketService {
   receiveMessages() {
     return new Observable((observer) => {
       this.socket.on('receive-message', (data) => {
-        observer.next(data);  // Emit the received data
+        console.log("Recieved new message");
+        
+        observer.next(data);   
       });
     });
   }

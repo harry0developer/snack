@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../../commons/services/chat.service';
 import { Message, User } from 'src/app/commons/model';
@@ -25,6 +25,8 @@ export class ChatComponent implements OnInit {
     private chatService: ChatService,
     private socketService: SocketService,
     private authService: AuthService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -55,7 +57,12 @@ export class ChatComponent implements OnInit {
     }
 
     this.socketService.receiveMessages().subscribe((message: any) => {
-      this.messages.push(message);
+       this.ngZone.run(() => {
+          this.messages.push(message); // UI will now update
+          console.log("Recieved new message", this.messages);
+        });
+      // this.messages.push(message);
+      this.cdr.detectChanges();
     });
   }
 

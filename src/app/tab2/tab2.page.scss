@@ -1,4 +1,47 @@
-@import url('../../theme/colors.scss');
+@import '../../theme/colors.scss';
+
+.avatar-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  padding: 1rem;
+  gap: 1rem;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.avatar-wrapper {
+  flex: 0 0 auto;
+  text-align: center;
+  width: 80px;
+
+  ion-avatar {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto;
+    padding: 2px;
+    border: 4px solid $primary;  
+  }
+
+  .avatar-name {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+  }
+}
+
+.chat-history {
+   ion-avatar {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto;
+    padding: 2px;
+    margin-right: 20px;
+    border: 4px solid $primary;  
+  }
+}
 
 .title {
   font-weight: bold;
@@ -15,3 +58,4 @@
   }
   
 }
+

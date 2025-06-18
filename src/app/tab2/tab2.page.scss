@@ -22,12 +22,31 @@
     border: 4px solid $primary;  
   }
 
+  ion-thumbnail {
+    height: 100px;
+    width: 80px;
+    border: 4px solid $primary;
+    border-radius: 10px;
+    img {
+      border-radius: 4px;
+    }
+  }
   .avatar-name {
     margin-top: 0.5rem;
     font-size: 0.75rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: bold;
+  }
+
+  .super-likes {
+    background-color: #ffea78;
+    height: 100px;
+    width: 80px;
+    border: 4px solid #7d0270;
+    border-radius: 10px;
+    padding-top: 45%;
     font-weight: bold;
   }
 }

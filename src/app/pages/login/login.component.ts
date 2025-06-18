@@ -7,6 +7,7 @@ import { Country, OTP, User } from 'src/app/commons/model';
 import { AuthService } from 'src/app/commons/services/auth.service';
 import { CountryCodeComponent } from '../country-code/country-code.component';
 import { OtpComponent } from '../otp/otp.component';
+import { ErrorModalPage } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,6 @@ import { OtpComponent } from '../otp/otp.component';
 export class LoginComponent implements OnInit {
 
   password: string = '';
-  error: string = '';
   dob: string = '';
   name: string = '';
   code: string = '';
@@ -59,15 +59,8 @@ export class LoginComponent implements OnInit {
     this.loginFormGroup = this.formBuilder.group({
       phone: ['', [Validators.required]],
       code: ['', [Validators.required]],
-      // passcode: new FormControl('', Validators.compose([
-      //     Validators.required,
-      //     Validators.minLength(6),
-      //     Validators.maxLength(6),
-      //   ]))
     });
   }
- 
- 
 
   async presentOTPModal(otpData: OTP) {
     const modal = await this.modalCtrl.create({
@@ -99,36 +92,36 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
-    const loading = await this.loadingCtrl.create({ message: "Signing you in..." });
-    await loading.present();
+    const signinLoading = await this.loadingCtrl.create({ message: "Signing you in..." });
+    await signinLoading.present();
 
     const phoneNumber = this.loginFormGroup.controls['code'].value + this.loginFormGroup.controls['phone'].value;
 
     this.authService.userExists(phoneNumber).subscribe((res: any) => {
       console.log(res);
-      loading.dismiss();
+      signinLoading.dismiss();
       this.sendOTP(phoneNumber);
     }, err => {
       console.log(err);
-      this.error = err.error.message;
-      loading.dismiss();
+      const error = { title: "Login failed", content: err.error.message};
+      this.showErrorModal(error)
+      signinLoading.dismiss();
     });
    
   }
 
   async sendOTP(phoneNumber: string) {
-    const loading = await this.loadingCtrl.create({ message: "Sending OTP..." });
-    await loading.present();
+    const otpLoading = await this.loadingCtrl.create({ message: "Sending OTP..." });
+    await otpLoading.present();
      this.authService.sendOtp(phoneNumber).subscribe((res: any) => {
-      loading.dismiss();
+      otpLoading.dismiss();
       console.log("OTP SENT", res.otp);
     
       this.presentOTPModal(res);
       
     }, err => {
-        loading.dismiss();
+        otpLoading.dismiss();
         console.log(err);
-        this.error = err.error.message
       })
   }
  
@@ -138,6 +131,26 @@ export class LoginComponent implements OnInit {
       component: CountryCodeComponent,
       componentProps: {
         "code": this.code
+      }
+    });
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'save') {
+      console.log("applied", data);
+      this.selectedCountryCode = data.dial_code;
+    }
+  }
+
+
+  async showErrorModal(error: any) {
+    const modal = await this.modalCtrl.create({
+      component: ErrorModalPage,
+      backdropDismiss: false,
+      breakpoints: [0, 0.5],
+      initialBreakpoint: 0.5,
+      componentProps: {
+        title: error.title,
+        content: error.content
       }
     });
     modal.present();

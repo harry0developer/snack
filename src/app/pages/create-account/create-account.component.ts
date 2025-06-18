@@ -6,8 +6,9 @@ import { CountryCodeComponent } from '../country-code/country-code.component';
 import { Country, OTP } from 'src/app/commons/model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ACCOUNT_TYPE, STORAGE } from 'src/app/commons/conts';
-import { SignupPhoneModalPage } from 'src/app/pages/signup-phone-modal/signup-phone-modal.component';
+import { SignupPhoneModalPage } from 'src/app/pages/signup-modal/signup-modal.component';
 import { OtpComponent } from '../otp/otp.component';
+import { ErrorModalPage } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-create-account',
@@ -15,11 +16,10 @@ import { OtpComponent } from '../otp/otp.component';
   styleUrls: ['./create-account.component.scss'],
   standalone: false
 })
-export class CreateAccountComponent  implements OnInit {
+export class CreateAccountComponent implements OnInit {
   dob: string = '';
   name: string = '';
   password: string = '';
-  error: string = '';
   code: string = '';
   selectedCountryCode: string = '';
 
@@ -27,21 +27,21 @@ export class CreateAccountComponent  implements OnInit {
   validations_form!: FormGroup;
   createAccountFormGroup!: FormGroup;
 
- 
+
 
   phoneFormValidationMessages = {
     'phone': [
-     { type: 'required', message: 'Phone number is required.' },
-     { type: 'minlength', message: 'Phone number must be at least 9 characters long.' }
+      { type: 'required', message: 'Phone number is required.' },
+      { type: 'minlength', message: 'Phone number must be at least 9 characters long.' }
     ],
     'passcode': [
-     { type: 'required', message: 'Passcode is required.' },
-     { type: 'minlength', message: 'Passcode must be 6 characters long.' },
-     { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
+      { type: 'required', message: 'Passcode is required.' },
+      { type: 'minlength', message: 'Passcode must be 6 characters long.' },
+      { type: 'maxlength', message: 'Passcode must be 6 characters long.' }
 
     ]
   };
- 
+
   country: Country = {
     name: "South Africa",
     flag: "🇿🇦",
@@ -50,12 +50,12 @@ export class CreateAccountComponent  implements OnInit {
   };
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private formBuilder: FormBuilder,
     private loadingCtrl: LoadingController,
     private modalCtrl: ModalController,
-    private router: Router) {}
-  
+    private router: Router) { }
+
   ngOnInit() {
     this.createAccountFormGroup = this.formBuilder.group({
       phone: new FormControl('', Validators.compose([
@@ -67,8 +67,8 @@ export class CreateAccountComponent  implements OnInit {
       ]))
     });
   }
- 
-  
+
+
   async openCountryCodeModal() {
     const modal = await this.modalCtrl.create({
       component: CountryCodeComponent,
@@ -82,8 +82,21 @@ export class CreateAccountComponent  implements OnInit {
       console.log("applied", data);
       this.selectedCountryCode = data.dial_code;
     }
-  } 
- 
+  }
+
+  async showErrorModal(error: any) {
+    const modal = await this.modalCtrl.create({
+      component: ErrorModalPage,
+      backdropDismiss: false,
+      breakpoints: [0, 0.5],
+      initialBreakpoint: 0.5,
+      componentProps: {
+        title: error.title,
+        content: error.content
+      }
+    });
+    modal.present();
+  }
 
   async openCreateAccountModal(phoneNumber: string) {
     const modal = await this.modalCtrl.create({
@@ -102,19 +115,20 @@ export class CreateAccountComponent  implements OnInit {
   async sendOTP(phoneNumber: string) {
     const loading = await this.loadingCtrl.create({ message: "Sending OTP..." });
     await loading.present();
-     this.authService.sendOtp(phoneNumber).subscribe((res: any) => {
+    this.authService.sendOtp(phoneNumber).subscribe((res: any) => {
       loading.dismiss();
       console.log("OTP SENT", res.otp);
-    
+
       this.presentOTPModal(res);
-      
+
     }, err => {
-        loading.dismiss();
-        console.log(err);
-        this.error = err.error.message
-      })
+      loading.dismiss();
+      const error = { title: "Signup failed", content: err.error.message};
+      this.showErrorModal(error);
+      console.log(err);
+    })
   }
-  
+
   async presentOTPModal(otpData: OTP) {
     const modal = await this.modalCtrl.create({
       component: OtpComponent,
@@ -134,7 +148,7 @@ export class CreateAccountComponent  implements OnInit {
     }
   }
 
-  async createAccount() { 
+  async createAccount() {
     const loading = await this.loadingCtrl.create({ message: "Verifying your phone number..." });
     await loading.present();
 
@@ -143,17 +157,17 @@ export class CreateAccountComponent  implements OnInit {
     this.authService.userExists(phoneNumber).subscribe((res: any) => {
       console.log(res);
       loading.dismiss();
-      this.error = "Provided phone number has an active account";
+      const error = { title: "Signup failed", content: "Provided phone number has an active account"};
+      this.showErrorModal(error);
     }, err => {
       console.log(err);
       loading.dismiss();
       this.sendOTP(phoneNumber);
-
     });
- 
+
   }
 
-  goToSignIn(){
+  goToSignIn() {
     this.router.navigateByUrl('login')
   }
 

@@ -51,19 +51,22 @@ export class ChatComponent implements OnInit {
   joinChatRoom() {
     if(this.me._id &&  this.user._id)  {
       this.socketService.joinRoom(this.me._id, this.user._id);
-      this.chatService.getChatHistory(this.me._id, this.user._id).subscribe((chats) => {
-        this.messages = chats;
-      }); 
+      this.chatService.getMessages(this.me._id , this.user._id).subscribe((msgs: any) => {
+        this.messages = msgs;
+        console.log("Messages");
+        
+      })
+      // this.chatService.getChatHistory(this.me._id, this.user._id).subscribe((chats) => {
+      //   this.messages = chats;
+      // }); 
     }
 
     this.socketService.receiveMessages().subscribe((message: any) => {
-       this.ngZone.run(() => {
-          this.messages.push(message); // UI will now update
-          console.log("Recieved new message", this.messages);
-        });
-      // this.messages.push(message);
-      this.cdr.detectChanges();
+      this.messages.push(message); // UI will now update
+      console.log("Recieved new message", this.messages);
     });
+    // this.messages.push(message);
+    this.cdr.detectChanges();
   }
 
   sendMessage() {

@@ -11,7 +11,11 @@ export class ChatService {
   // private apiUrl = 'https://snuggle.onrender.com/api';
   constructor(private http: HttpClient) {}
  
+ 
 
+  getMessages(uid1: string, uid2: string): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/grouped/${uid1}/${uid2}`);
+  }
   getChatHistory(uid1: string, uid2: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${uid1}/${uid2}`);
   }

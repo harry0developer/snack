@@ -41,16 +41,20 @@
           </ng-container>
         </div> 
 
-        <div class="error-message">
-          <p>{{error}}</p>
-        </div>
-
         <div class="buttons">
           <ion-button expand="block" [disabled]="!loginFormGroup.valid" class="solid primary" (click)="login()">Login</ion-button>
          </div>
       </ion-grid>
     </form>
   </div>
+
+
+
+  <ion-modal trigger="open-modal" [initialBreakpoint]="1" [breakpoints]="[0, 1]">
+    <ng-template>
+      <div class="block">Block of Content</div>
+    </ng-template>
+  </ion-modal>
 </ion-content>
 
 <ion-footer>

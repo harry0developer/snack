@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ChatService } from '../commons/services/chat.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../commons/services/auth.service';
@@ -7,6 +7,8 @@ import { ImageBlob, NotFound, User } from '../commons/model';
 import { SocketService } from '../commons/services/socket.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LoadingController } from '@ionic/angular';
+import { UserService } from '../commons/services/user.service';
+import { firstValueFrom } from 'rxjs';
 
 export interface Chat {
   sender: string;
@@ -116,62 +118,74 @@ export class Tab2Page {
     body: 'Your matches will appear here where you can send them a message'
   }
 
+  usersWithChats: any[] = [];
+  usersWithoutChats: any[] = [];
+
   users: any[] = [];
+
   currentUser!: User;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private chatService: ChatService,
+    private userService: UserService,
     private socketService: SocketService,
     private sanitizer: DomSanitizer,
     private loadingCtrl: LoadingController,
-    private authService: AuthService
+    private authService: AuthService,
+
   ) { }
 
-  ngOnInit() { }
-
+ 
   async ionViewWillEnter() {
+    console.log("view will enter");
+    
     const token = this.authService.getToken();
-
     if (!token) {
       this.authService.logout();
       this.router.navigateByUrl('login');
     }
+
     this.currentUser = this.authService.storageGet(STORAGE.ME);
     const loading = await this.loadingCtrl.create({ message: "Loading matches..." });
     await loading.present();
 
     this.authService.getUserById(this.currentUser._id!).subscribe((user: any) => {
       console.log(user);
-      this.authService.getUsersById(user.matches).subscribe((users: any) => {
-        console.log(users);
-        this.users = users;
-        this.users.forEach((u: any) => {
-          this.authService.getImageData(u._id, u.profilePic).subscribe((blob: any) => {
-            const objectURL = URL.createObjectURL(blob);
-            u.profilePic = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-            loading.dismiss();
-          }, err => {
-            user.profilePic = 'assets/icons/profile-picture.png'
-            console.log(err);
-            loading.dismiss();
+      this.userService.getUsers(this.currentUser._id!, user.matches).subscribe((res) => {
+        console.log("ALL USERS",res);
+       
+        this.getBlobImagesForUsersWithChats(res.usersWithChats).then(u => {
+          this.usersWithChats = u;
+          this.usersWithChats.forEach(u => {
+            this.chatService.getLastMessage(this.currentUser?._id!, u._id).subscribe((last: any) => {
+              u.lastMessage = last;
+              loading.dismiss();
+            }, err => {
+              loading.dismiss();
+              console.log(err);
+            });
           });
-
-          // GET LAST MESSAGE 
-           this.chatService.getLastMessage(this.currentUser?._id!, u._id).subscribe((last: any) => {
-            console.log(last);
-            u.lastMessage = last;
-          }, err => {
-            console.log(err);
-          })
-          
+          loading.dismiss();
+        }).catch(err => {
+          this.usersWithChats = [];
+           loading.dismiss();
         });
 
+        this.getBlobImagesForUsersWithChats(res.usersWithoutChats).then(u => {
+          this.usersWithoutChats = u;
+           loading.dismiss();
+        }).catch(err => {
+          this.usersWithoutChats = [];
+           loading.dismiss();
+        });
+ 
       }, err => {
-        console.log(err);
         loading.dismiss();
-      })
+        console.log(err);
+      });
+ 
     }, err => {
       console.log(err);
       loading.dismiss();
@@ -181,20 +195,31 @@ export class Tab2Page {
     this.getMyChats();
   }
 
+  async getBlobImagesForUsersWithChats(users: any[]): Promise<any[]> {
+    const imagePromises = users.map(async (u) => {
+      try {
+        const blob: Blob = await firstValueFrom(this.authService.getImageData(u._id, u.profilePic));
+        const objectURL = URL.createObjectURL(blob);
+        u.profilePic = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+      } catch (err) {
+        u.profilePic = 'assets/icons/profile-picture.png';
+        console.log(err);
+      }
+    });
+
+    await Promise.all(imagePromises);
+
+    return users;
+  }
 
   async getMyChats() {
     console.log("Get chats ");
-    
-    const loading = await this.loadingCtrl.create({ message: "Loading chats..." });
-    await loading.present();
+     
 
     this.chatService.getMyChats(this.currentUser?._id!).subscribe((chats: any) => {
-      console.log(chats);
-      this.chats = chats;
-      loading.dismiss()
+      this.chats = chats; 
     }, err => {
       console.log(err);
-      loading.dismiss();
     })
   }
 

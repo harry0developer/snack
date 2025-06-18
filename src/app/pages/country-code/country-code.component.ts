@@ -52,7 +52,7 @@ export class CountryCodeComponent   {
  
  
   async ionViewWillEnter() {
-    const loadingCountryCode = await this.loadingCtrl.create({ message: "Uploading images..." });
+    const loadingCountryCode = await this.loadingCtrl.create({ message: "Loading, please wait..." });
     await loadingCountryCode.present();
     this.dataService.getCountries().forEach((c: any) => {
       this.countries = c;  

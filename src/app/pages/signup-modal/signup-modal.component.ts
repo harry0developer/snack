@@ -18,9 +18,9 @@ import { Camera, CameraResultType, CameraSource, GalleryPhotos } from '@capacito
 import { PhotoService } from 'src/app/commons/services/photo.service';
 
 @Component({
-  selector: 'app-signup-phone-modal',
-  templateUrl: './signup-phone-modal.component.html',
-  styleUrls: ['./signup-phone-modal.component.scss'],
+  selector: 'app-signup-modal',
+  templateUrl: './signup-modal.component.html',
+  styleUrls: ['./signup-modal.component.scss'],
   standalone: true,
   imports: [
     IonHeader,
